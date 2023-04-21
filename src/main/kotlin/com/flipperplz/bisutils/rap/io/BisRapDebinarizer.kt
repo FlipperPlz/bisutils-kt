@@ -5,26 +5,33 @@ package com.flipperplz.bisutils.rap.io
 import com.flipperplz.bisutils.rap.*
 import com.flipperplz.bisutils.utils.getAsciiZ
 import com.flipperplz.bisutils.utils.getCompactInt
+import com.flipperplz.bisutils.utils.getFloat
+import com.flipperplz.bisutils.utils.getInt
+import java.io.File
+import java.io.FileInputStream
 import java.io.InputStream
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 object BisRapDebinarizer {
     fun debinarizeFile(inputStream: InputStream): BisRapFile? = debinarizeFile(ByteBuffer.wrap(inputStream.readAllBytes()))
 
+    fun debinarizeFile(file: File) : BisRapFile? = debinarizeFile(FileInputStream(file))
+
     fun debinarizeFile(buffer: ByteBuffer): BisRapFile? {
-        if(
-           buffer.get() != 0.toByte() ||
-           buffer.get() != 114.toByte() ||
-           buffer.get() != 97.toByte() ||
-           buffer.get() != 80.toByte() ||
-           buffer.getInt() != 0 ||
-           buffer.getInt() != 8
-        ) return null
+        if(buffer.get() != 0.toByte()) return null
+        if(buffer.get() != 114.toByte()) return null
+        if(buffer.get() != 97.toByte()) return null
+        if(buffer.get() != 80.toByte()) return null
+        if(buffer.getInt(ByteOrder.LITTLE_ENDIAN) != 0) return null
+        if(buffer.getInt(ByteOrder.LITTLE_ENDIAN) != 8) return null
+
+
         return parseRap(buffer/*, RapFormatType.OP_FLASH_POINT*/)
     }
 
     private fun parseRap(buffer: ByteBuffer/*, format: RapFormatType*/): BisRapFile? {
-        val enumOffset = buffer.getInt()
+        val enumOffset = buffer.getInt(ByteOrder.LITTLE_ENDIAN)
         fun loadChildClasses(child: BisRapClassStatement): Boolean {
             for(clazz in child.statements.filterIsInstance<BisRapClassStatement>()) {
                 buffer.position(clazz.binaryOffset)
@@ -44,7 +51,7 @@ object BisRapDebinarizer {
         val statements = mutableListOf<BisRapStatement>()
         val file = BisRapFile()
 
-        buffer.getAsciiZ()
+        val v = buffer.getAsciiZ()
         val entryCount = buffer.getCompactInt()
         for (i in 0 until entryCount) statements.add(readStatement(buffer, file) ?: return null)
 
@@ -58,7 +65,7 @@ object BisRapDebinarizer {
     private fun readStatement(buffer: ByteBuffer, elementParent: BisRapElement?): BisRapStatement? = when(buffer.get()) {
         0.toByte() -> {
             val classname = buffer.getAsciiZ()
-            val offset = buffer.getInt()
+            val offset = buffer.getInt(ByteOrder.LITTLE_ENDIAN)
 
             BisRapClassStatement(elementParent, offset, classname)
         }
@@ -68,8 +75,8 @@ object BisRapDebinarizer {
             val ret = BisRapParameterStatement(elementParent, variableName)
             when(id) {
                 0.toByte() -> ret.tokenValue = BisRapStringLiteral(ret, buffer.getAsciiZ())
-                1.toByte() -> ret.tokenValue = BisRapFloatLiteral(ret, buffer.getFloat())
-                2.toByte() -> ret.tokenValue = BisRapIntegerLiteral(ret, buffer.getInt())
+                1.toByte() -> ret.tokenValue = BisRapFloatLiteral(ret, buffer.getFloat(ByteOrder.LITTLE_ENDIAN))
+                2.toByte() -> ret.tokenValue = BisRapIntegerLiteral(ret, buffer.getInt(ByteOrder.LITTLE_ENDIAN))
                 else -> throw Exception()
             }
             ret
@@ -90,14 +97,21 @@ object BisRapDebinarizer {
     }
 
     private fun readArray(buffer: ByteBuffer, elementParent: BisRapElement): BisRapElement.BisRapLiteral.BisRapArray {
+        val woah = buffer.position()
         val count = buffer.getCompactInt()
+        if(count == 2048) {
+            buffer.position(woah)
+            println("woahh settle down")
+
+        }
         val ret = BisRapArrayLiteral(elementParent)
         val entries =  mutableListOf<BisRapArrayElement>()
         for (i in 0 until count) {
-            when(buffer.get()) {
+            val v = buffer.get()
+            when(v) {
                 0.toByte() -> entries.add(BisRapStringLiteral(ret, buffer.getAsciiZ()))
-                1.toByte() -> entries.add(BisRapFloatLiteral(ret, buffer.getFloat()))
-                2.toByte() -> entries.add(BisRapIntegerLiteral(ret, buffer.getInt()))
+                1.toByte() -> entries.add(BisRapFloatLiteral(ret, buffer.getFloat(ByteOrder.LITTLE_ENDIAN)))
+                2.toByte() -> entries.add(BisRapIntegerLiteral(ret, buffer.getInt(ByteOrder.LITTLE_ENDIAN)))
                 3.toByte() -> entries.add(readArray(buffer, ret))
                 else -> throw Exception()
             }

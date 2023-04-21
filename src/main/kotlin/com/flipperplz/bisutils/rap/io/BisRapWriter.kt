@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.rap.io.formatting.BisRapBeautifier
 
 object BisRapWriter {
 
-    fun writeElement(element: BisRapElement, beautifier: BisRapBeautifier = BisRapBeautifier.NONE, previousBuilder: StringBuilder? = null): StringBuilder {
+    fun writeElement(element: BisRapElement, beautifier: BisRapBeautifier = BisRapBeautifier.DEFAULT, previousBuilder: StringBuilder? = null): StringBuilder {
         with(previousBuilder ?: StringBuilder()) {
             return when(element) {
                 is BisRapElement.BisRapFile -> this.also { for (statement in element.statements) it.append(writeElement(statement, beautifier)) }
