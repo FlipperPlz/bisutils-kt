@@ -16,7 +16,7 @@ import java.nio.ByteOrder
 object BisRapDebinarizer {
     fun debinarizeFile(inputStream: InputStream): BisRapFile? = debinarizeFile(ByteBuffer.wrap(inputStream.readAllBytes()))
 
-    fun debinarizeFile(file: File) : BisRapFile? = debinarizeFile(FileInputStream(file))
+    fun debinarizeFile(file: File) : BisRapFile? = with(FileInputStream(file)) { val rap = debinarizeFile(this); close(); rap  }
 
     fun debinarizeFile(buffer: ByteBuffer): BisRapFile? {
         if(buffer.get() != 0.toByte()) return null
@@ -125,6 +125,7 @@ object BisRapDebinarizer {
 
         return arrayEntry
     }
+
 
 }
 
