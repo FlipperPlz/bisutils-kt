@@ -28,10 +28,11 @@ fun ByteBuffer.getAsciiZ(charset: Charset = Charsets.UTF_8): String {
 fun ByteBuffer.getCompactInt(): Int {
     var value: Int = 0
     var i: Int = 0
-    while (true.also { ++i }) {
+    while (true) {
         val v: Int = get().toInt()
-        value = value or ((v and 0x7F) shl (7 * i))
+        value = value or v and 0x7F shl (7 * i)
         if ((v and 0x80) == 0) break
+        ++i;
     }
     return value
 }

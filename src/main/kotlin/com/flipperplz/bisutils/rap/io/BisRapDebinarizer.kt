@@ -32,92 +32,98 @@ object BisRapDebinarizer {
 
     private fun parseRap(buffer: ByteBuffer/*, format: RapFormatType*/): BisRapFile? {
         val enumOffset = buffer.getInt(ByteOrder.LITTLE_ENDIAN)
-        fun loadChildClasses(child: BisRapClassStatement): Boolean {
-            for(clazz in child.statements.filterIsInstance<BisRapClassStatement>()) {
-                buffer.position(clazz.binaryOffset)
-                clazz.superclass = buffer.getAsciiZ()
-
-                val childCount = buffer.getCompactInt()
-                val childStatements = mutableListOf<BisRapStatement>()
-                for(i in 0 until childCount) childStatements.add(readStatement(buffer, clazz) ?: return false)
-
-                clazz.statements = childStatements
-                child.statements.filterIsInstance<BisRapClassStatement>().forEach {
-                    if (!loadChildClasses(it)) return false
-                }
-            }
-            return true
-        }
-        val statements = mutableListOf<BisRapStatement>()
         val file = BisRapFile()
 
-        val v = buffer.getAsciiZ()
+        buffer.getAsciiZ()
         val entryCount = buffer.getCompactInt()
-        for (i in 0 until entryCount) statements.add(readStatement(buffer, file) ?: return null)
-
-        statements.filterIsInstance<BisRapClassStatement>().forEach {
-            if (!loadChildClasses(it)) return null
+        for (i in 0 until entryCount) {
+            file.statements.add(readStatement(buffer, file) ?: return null)
         }
-        //TODO: enums
+        println("kk")
+        file.statements.filterIsInstance<BisRapClassStatement>().forEach {
+            if (!loadChildClasses(it, buffer)) return null
+        }
+
+        buffer.position(enumOffset) //TODO: ENUMS
         return file
     }
 
-    private fun readStatement(buffer: ByteBuffer, elementParent: BisRapElement?): BisRapStatement? = when(buffer.get()) {
-        0.toByte() -> {
-            val classname = buffer.getAsciiZ()
-            val offset = buffer.getInt(ByteOrder.LITTLE_ENDIAN)
+    private fun loadChildClasses(child: BisRapClassStatement, buffer: ByteBuffer): Boolean {
+        buffer.position(child.binaryOffset)
+        child.superclass = buffer.getAsciiZ()
 
-            BisRapClassStatement(elementParent, offset, classname)
+        val childCount = buffer.getCompactInt()
+        for(i in 0 until childCount) child.statements.add(readStatement(buffer, child) ?: return false)
+
+        child.statements.filterIsInstance<BisRapClassStatement>().forEach {
+            if (!loadChildClasses(it, buffer)) return false
         }
-        1.toByte() -> {
-            val id = buffer.get()
-            val variableName = buffer.getAsciiZ()
-            val ret = BisRapParameterStatement(elementParent, variableName)
-            when(id) {
-                0.toByte() -> ret.tokenValue = BisRapStringLiteral(ret, buffer.getAsciiZ())
-                1.toByte() -> ret.tokenValue = BisRapFloatLiteral(ret, buffer.getFloat(ByteOrder.LITTLE_ENDIAN))
-                2.toByte() -> ret.tokenValue = BisRapIntegerLiteral(ret, buffer.getInt(ByteOrder.LITTLE_ENDIAN))
-                else -> throw Exception()
-            }
-            ret
-        }
-        2.toByte() -> {
-            val variableName = buffer.getAsciiZ()
-            val ret = BisRapArrayStatement(elementParent, variableName)
-            ret.tokenValue = readArray(buffer, ret)
-            ret
-        }
-        3.toByte() -> BisRapExternalClassStatement(elementParent, buffer.getAsciiZ())
-        4.toByte() -> BisRapDeleteStatement(elementParent, buffer.getAsciiZ())
-        5.toByte() -> {
-            if(buffer.getInt() == 1) BisRapArrayAddStatement(elementParent, buffer.getAsciiZ()).also { it.tokenValue = readArray(buffer, it) }
-            else BisRapArraySubtractStatement(elementParent, buffer.getAsciiZ()).also { it.tokenValue = readArray(buffer, it) }
-        }
-        else -> null
+        return true
     }
 
-    private fun readArray(buffer: ByteBuffer, elementParent: BisRapElement): BisRapElement.BisRapLiteral.BisRapArray {
-        val woah = buffer.position()
-        val count = buffer.getCompactInt()
-        if(count == 2048) {
-            buffer.position(woah)
-            println("woahh settle down")
-
+    private fun readStatement(buffer: ByteBuffer, elementParent: BisRapElement?): BisRapStatement? {
+        val v = buffer.get()
+        return when(v) {
+            0.toByte() -> readClassStatement(elementParent, buffer)
+            1.toByte() -> readParameterStatement(elementParent, buffer)
+            2.toByte() -> readArrayStatement(elementParent, buffer)
+            3.toByte() -> readExternalClass(elementParent, buffer.getAsciiZ())
+            4.toByte() -> readDelete(elementParent, buffer.getAsciiZ())
+            5.toByte() -> readArrayFlaggedStatement(elementParent, buffer)
+            else -> null
         }
-        val ret = BisRapArrayLiteral(elementParent)
-        val entries =  mutableListOf<BisRapArrayElement>()
+    }
+
+    private fun readClassStatement(elementParent: BisRapElement?, buffer: ByteBuffer): BisRapClassStatement {
+        val classname = buffer.getAsciiZ()
+        val offset = buffer.getInt(ByteOrder.LITTLE_ENDIAN)
+
+        return BisRapClassStatement(elementParent, offset, classname)
+    }
+
+
+    private fun readParameterStatement(elementParent: BisRapElement?, buffer: ByteBuffer): BisRapParameterStatement {
+        val id = buffer.get()
+        val variableName = buffer.getAsciiZ()
+        val param = BisRapParameterStatement(elementParent, variableName)
+        when(id) {
+            0.toByte() -> param.tokenValue = BisRapStringLiteral(param, buffer.getAsciiZ())
+            1.toByte() -> param.tokenValue = BisRapFloatLiteral(param, buffer.getFloat(ByteOrder.LITTLE_ENDIAN))
+            2.toByte() -> param.tokenValue = BisRapIntegerLiteral(param, buffer.getInt(ByteOrder.LITTLE_ENDIAN))
+            else -> throw Exception()
+        }
+        return param
+    }
+
+
+    private fun readArrayStatement(elementParent: BisRapElement?, buffer: ByteBuffer): BisRapBaseArrayStatement {
+        val variableName = buffer.getAsciiZ()
+        val ret = BisRapArrayStatement(elementParent, variableName)
+        ret.tokenValue = parseArray(buffer, ret)
+        return ret
+    }
+
+    private fun readArrayFlaggedStatement(elementParent: BisRapElement?, buffer: ByteBuffer): BisRapBaseArrayStatement = if(buffer.getInt() == 1)
+        BisRapArrayAddStatement(elementParent, buffer.getAsciiZ()).also { it.tokenValue = parseArray(buffer, it) }
+    else BisRapArraySubtractStatement(elementParent, buffer.getAsciiZ()).also { it.tokenValue = parseArray(buffer, it) }
+    private fun readDelete(elementParent: BisRapElement?, asciiZ: String): BisRapDeleteStatement = BisRapDeleteStatement(elementParent, asciiZ)
+
+    private fun readExternalClass(elementParent: BisRapElement?, asciiZ: String): BisRapExternalClassStatement = BisRapExternalClassStatement(elementParent, asciiZ)
+
+    private fun parseArray(buffer: ByteBuffer, elementParent: BisRapElement): BisRapElement.BisRapLiteral.BisRapArray {
+        val count = buffer.getCompactInt()
+        val arrayEntry = BisRapArrayLiteral(elementParent)
         for (i in 0 until count) {
-            val v = buffer.get()
-            when(v) {
-                0.toByte() -> entries.add(BisRapStringLiteral(ret, buffer.getAsciiZ()))
-                1.toByte() -> entries.add(BisRapFloatLiteral(ret, buffer.getFloat(ByteOrder.LITTLE_ENDIAN)))
-                2.toByte() -> entries.add(BisRapIntegerLiteral(ret, buffer.getInt(ByteOrder.LITTLE_ENDIAN)))
-                3.toByte() -> entries.add(readArray(buffer, ret))
+            when(buffer.get()) {
+                0.toByte() -> arrayEntry.value.add(BisRapStringLiteral(arrayEntry, buffer.getAsciiZ()))
+                1.toByte() -> arrayEntry.value.add(BisRapFloatLiteral(arrayEntry, buffer.getFloat(ByteOrder.LITTLE_ENDIAN)))
+                2.toByte() -> arrayEntry.value.add(BisRapIntegerLiteral(arrayEntry, buffer.getInt(ByteOrder.LITTLE_ENDIAN)))
+                3.toByte() -> arrayEntry.value.add(parseArray(buffer, arrayEntry))
                 else -> throw Exception()
             }
         }
 
-        return ret
+        return arrayEntry
     }
 
 }

@@ -2,16 +2,30 @@ package com.flipperplz.bisutils.rap.io
 
 import com.flipperplz.bisutils.rap.*
 import com.flipperplz.bisutils.rap.io.formatting.BisRapBeautifier
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.nio.file.Path
 
 
 object BisRapWriter {
 
-    fun writeElement(element: BisRapElement, beautifier: BisRapBeautifier = BisRapBeautifier.DEFAULT, previousBuilder: StringBuilder? = null): StringBuilder {
+    fun toString(file: BisRapFile, beautifier: BisRapBeautifier = BisRapBeautifier.NONE): String = writeElement(file, beautifier).toString()
+
+    fun writeTo(rapFile: BisRapFile, file: File, beautifier: BisRapBeautifier = BisRapBeautifier.NONE) {
+        val fileWriter = FileWriter(file)
+        fileWriter.flush()
+        fileWriter.write(toString(rapFile, beautifier))
+        fileWriter.close()
+    }
+
+    fun writeTo(rapFile: BisRapFile, path: Path, beautifier: BisRapBeautifier = BisRapBeautifier.NONE) = BisRapWriter.writeTo(rapFile, path.toFile(), beautifier)
+
+    private fun writeElement(element: BisRapElement, beautifier: BisRapBeautifier = BisRapBeautifier.NONE, previousBuilder: StringBuilder? = null): StringBuilder {
         with(previousBuilder ?: StringBuilder()) {
             return when(element) {
                 is BisRapElement.BisRapFile -> this.also { for (statement in element.statements) it.append(writeElement(statement, beautifier)) }
                 is BisRapArrayLiteral ->  this.also {
-                    beautifier.operator2ArrayStart(it)
                     it.append("{")
                     beautifier.arrayStart2ArrayElement(it)
                     for ((index, item) in element.value.withIndex()) {
@@ -19,16 +33,16 @@ object BisRapWriter {
                             beautifier.arrayElement2Comma(it)
                             it.append(",")
                             beautifier.comma2ArrayElement(it)
-                            it.append(item)
+                            writeElement(item, beautifier, it)
                         } else {
-                            it.append(item)
+                            writeElement(item, beautifier, it)
                             beautifier.arrayElement2ArrayEnd(it)
                         }
                     }
                     it.append("}")
                 }
                 is BisRapNumericLiteral -> this.append(element.value.toString())
-                is BisRapStringLiteral -> this.append("\"${element.value.toString()}\"")
+                is BisRapStringLiteral -> this.append("\"${element.value}\"")
                 is BisRapClassStatement -> this.also {
                     beautifier.beforeClassKw(it)
                     it.append("class")
@@ -58,8 +72,8 @@ object BisRapWriter {
                     beautifier.classKw2Classname(it)
                     it.append(element.classname)
                     beautifier.classname2Semi(it)
+                    it.append(";")
                     beautifier.afterExternalClassStatement(it)
-
                 }
                 is BisRapDeleteStatement -> this.also {
                     beautifier.beforeDeleteKw(it)
@@ -101,7 +115,5 @@ object BisRapWriter {
                 }
             }
         }
-        
     }
-
 }

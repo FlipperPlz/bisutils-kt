@@ -26,7 +26,7 @@ sealed interface BisRapElement {
         get() = null
 
     sealed interface BisRapStatementHolder : BisRapElement {
-        val statements: List<BisRapStatement>
+        val statements: MutableList<BisRapStatement>
     }
 
     sealed class BisRapLiteral<T>(override val parentElement: BisRapElement) : BisRapElement {
@@ -45,10 +45,11 @@ sealed interface BisRapElement {
             }
         }
 
-        class BisRapArray(parentElement: BisRapElement) :  BisRapLiteral<List<BisRapArrayElement>>(parentElement) {
-            override lateinit var value: List<BisRapArrayElement>
+        class BisRapArray(parentElement: BisRapElement) :  BisRapLiteral<MutableList<BisRapArrayElement>>(parentElement) {
+            override val value: MutableList<BisRapArrayElement> = mutableListOf()
 
-            override val children: List<BisRapElement> by lazy { value }
+            override val children: List<BisRapElement>
+                get() = value
         }
     }
 
@@ -62,8 +63,8 @@ sealed interface BisRapElement {
                 parentElement: BisRapElement?, val binaryOffset: Int, classname: String
             ) : BisRapBaseClassStatement(parentElement, classname), BisRapStatementHolder {
                 override val children: List<BisRapElement> by lazy { statements }
-                override lateinit var statements: List<BisRapStatement>
-                lateinit var superclass: String
+                override val statements: MutableList<BisRapStatement> = mutableListOf()
+                var superclass: String = ""
             }
         }
 
@@ -102,9 +103,10 @@ sealed interface BisRapElement {
 
     class BisRapFile : BisRapStatementHolder {
         override val parentElement: BisRapElement? = null
-        override val children: List<BisRapElement> by lazy { statements }
+        override val children: List<BisRapElement>
+            get() = statements
 
-        override lateinit var statements: List<BisRapStatement>
+        override val statements: MutableList<BisRapStatement> = mutableListOf()
         lateinit var enums: Map<String, Int>
     }
 }
