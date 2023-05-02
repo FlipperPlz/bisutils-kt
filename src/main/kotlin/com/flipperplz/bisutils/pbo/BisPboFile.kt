@@ -1,8 +1,6 @@
 package com.flipperplz.bisutils.pbo
 
 import com.flipperplz.bisutils.BisPboManager
-import com.flipperplz.bisutils.pbo.entry.BisPboDataEntry
-import com.flipperplz.bisutils.pbo.entry.BisPboEntry
 import com.flipperplz.bisutils.utils.BisRandomAccessFile
 import com.google.common.cache.CacheBuilder
 import java.io.File
@@ -24,7 +22,14 @@ class BisPboFile private constructor() : AutoCloseable {
 
 
     companion object {
+        fun lightRead(file: File) {
+            val result = BisPboFile()
+            val buffer = BisRandomAccessFile(file, "r")
 
+            BisPboManager.managePbo(result, buffer)
+
+
+        }
     }
 
     override fun close() {
