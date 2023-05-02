@@ -28,7 +28,7 @@ open class BisPboDummyEntry : BisPboEntry {
 
     override fun calculateMetadataLength(): Long = 21
 
-    class STAGED(
+    class INFILE(
         override val stageBuffer: RandomAccessFile,
         offset: Long
     ) : BisPboDummyEntry(), StagedPboEntry {
@@ -48,7 +48,7 @@ open class BisPboVersionEntry(
 
     override fun calculateMetadataLength(): Long = 21 + properties.sumOf { it.calculateLength() ?: 0 } + 1
 
-    class STAGED(
+    class INFILE(
         override val stageBuffer: RandomAccessFile,
         offset: Long,
         properties: List<BisPboProperty>
@@ -65,7 +65,7 @@ open class BisPboDataEntry(
     override var originalSize: Int,
     override var size: Int
 ) : BisPboEntry {
-    class STAGED(
+    class INFILE(
         override val stageBuffer: RandomAccessFile,
         override var metadataOffset: Long,
         fileName: String,
