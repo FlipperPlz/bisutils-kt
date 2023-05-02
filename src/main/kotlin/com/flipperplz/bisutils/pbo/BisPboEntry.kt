@@ -69,7 +69,7 @@ sealed class BisPboDataEntry(
         timeStamp: Int,
         mimeType: EntryMimeType,
         originalSize: Int,
-        dataBuffer: ByteBuffer
+        val dataBuffer: ByteBuffer
     ) : BisPboDataEntry(
         fileName,
         offset,
