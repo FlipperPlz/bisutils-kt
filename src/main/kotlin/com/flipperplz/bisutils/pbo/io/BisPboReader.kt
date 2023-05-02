@@ -54,7 +54,7 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
     }
 
     private fun initializeFile(file: BisPboFile): BisPboFile = file.apply {
-        entries = readMetaBlock()
+        entries.addAll(readMetaBlock())
         flagPtr = null
         initializeOffsets(entries)
     }

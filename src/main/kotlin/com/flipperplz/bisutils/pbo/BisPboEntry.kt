@@ -18,7 +18,7 @@ sealed interface BisPboEntry {
     fun calculateMetadataLength(): Long = 21L + fileName.length
 }
 
-open class BisPboDummyEntry : BisPboEntry {
+sealed class BisPboDummyEntry : BisPboEntry {
     override var fileName: String = ""
     override var mimeType: EntryMimeType = EntryMimeType.DUMMY
     override var size: Int = 0
@@ -28,6 +28,7 @@ open class BisPboDummyEntry : BisPboEntry {
 
     override fun calculateMetadataLength(): Long = 21
 
+    object CACHED : BisPboDummyEntry()
     class INFILE(
         override val stageBuffer: RandomAccessFile,
         offset: Long
@@ -36,8 +37,8 @@ open class BisPboDummyEntry : BisPboEntry {
     }
 }
 
-open class BisPboVersionEntry(
-    val properties: MutableList<BisPboProperty>
+sealed class BisPboVersionEntry(
+    val properties: List<BisPboProperty>
 ) : BisPboEntry {
     override var fileName: String = ""
     override var mimeType: EntryMimeType = EntryMimeType.DUMMY
@@ -48,16 +49,13 @@ open class BisPboVersionEntry(
 
     override fun calculateMetadataLength(): Long = 21 + properties.sumOf { it.calculateLength() ?: 0 } + 1
 
-    class INFILE(
-        override val stageBuffer: RandomAccessFile,
-        offset: Long,
-        properties: List<BisPboProperty>
-    ) : BisPboVersionEntry(properties.toMutableList()), StagedPboEntry {
+    class CACHED(properties: MutableList<BisPboProperty>): BisPboVersionEntry(properties)
+    class INFILE(override val stageBuffer: RandomAccessFile, offset: Long, properties: List<BisPboProperty>) : BisPboVersionEntry(properties.toMutableList()), StagedPboEntry {
         override var metadataOffset: Long = offset
     }
 }
 
-open class BisPboDataEntry(
+sealed class BisPboDataEntry(
     override var fileName: String,
     override var offset: Int,
     override var timeStamp: Int,
@@ -65,6 +63,22 @@ open class BisPboDataEntry(
     override var originalSize: Int,
     override var size: Int
 ) : BisPboEntry {
+    class CACHED(
+        fileName: String,
+        offset: Int,
+        timeStamp: Int,
+        mimeType: EntryMimeType,
+        originalSize: Int,
+        dataBuffer: ByteBuffer
+    ) : BisPboDataEntry(
+        fileName,
+        offset,
+        timeStamp,
+        mimeType,
+        originalSize,
+        dataBuffer.limit()
+    )
+
     class INFILE(
         override val stageBuffer: RandomAccessFile,
         override var metadataOffset: Long,
@@ -84,20 +98,4 @@ open class BisPboDataEntry(
     ), StagedPboDataEntry {
         override var dataOffset: Long? = null
     }
-
-    class CACHED(
-        fileName: String,
-        offset: Int,
-        timeStamp: Int,
-        mimeType: EntryMimeType,
-        originalSize: Int,
-        dataBuffer: ByteBuffer
-    ) : BisPboDataEntry(
-        fileName,
-        offset,
-        timeStamp,
-        mimeType,
-        originalSize,
-        dataBuffer.limit()
-    )
 }

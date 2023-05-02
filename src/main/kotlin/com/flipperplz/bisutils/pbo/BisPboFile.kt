@@ -6,7 +6,7 @@ import java.io.File
 import java.nio.ByteBuffer
 
 class BisPboFile internal constructor() : AutoCloseable {
-    internal lateinit var entries: MutableList<BisPboEntry>
+    internal val entries: MutableList<BisPboEntry> = mutableListOf()
     private val dataCache = CacheBuilder.newBuilder().build<BisPboDataEntry, ByteBuffer>()
     val pboEntries: List<BisPboEntry> = entries
 
