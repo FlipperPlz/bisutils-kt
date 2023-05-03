@@ -45,6 +45,7 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
                 entry.timeStamp,
                 entry.mimeType,
                 entry.originalSize,
+                entry.size,
                 ByteBuffer.wrap(reader.readBytes(entry.size))
             )
             reader.seek(startPtr)
@@ -65,7 +66,6 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
 
         for (entry in entries) {
             if(entry is BisPboDataEntry) {
-
                 if(entry is StagedPboDataEntry) entry.dataOffset = buffer.filePointer
                 if((buffer.length() - buffer.filePointer) > entry.size) continue
                 buffer.skipBytes(entry.size)
