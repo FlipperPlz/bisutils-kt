@@ -15,21 +15,32 @@ class BisPboFile internal constructor(prefix: String) : AutoCloseable {
     private val dataCache = CacheBuilder.newBuilder().build<BisPboDataEntry, ByteBuffer>()
     val pboEntries: List<BisPboEntry> = entries
     var pboPrefix: String = prefix
-        get() = customPrefix ?: field
-        internal set //TODO: if customPrefix is set we need to call set on that rather than pboPrefix itself
-
-    val customPrefix: String?
-        get() {
-            for (versionEntry in entries.filterIsInstance<BisPboVersionEntry>()) {
-                versionEntry.properties.lastOrNull { it.propertyName == "prefix" }?.propertyValue?.let {
-                    return normalizePath(it)
-                }
-            }
-            return null
+        get() = normalizePath(customPrefix?.propertyValue) ?: field
+        internal set(value) {
+            val custom = customPrefix
+            if(custom != null) custom.owner.properties.subtract(setOf(custom))
+            else field = value
         }
+
+    val customPrefix: BisPboProperty?
+        get() = entries.filterIsInstance<BisPboVersionEntry>().flatMap { it.properties }.lastOrNull { it.propertyName == "prefix" }
+
     override fun close() {
         dataCache.cleanUp()
         BisPboManager.releasePbo(this)
+    }
+
+    inline fun extractPBO(folder: File, pathChooser: (File, BisPboDataEntry, Int) -> File) {
+        val root = File(folder, pboPrefix)
+        if(root.exists() && !root.delete()) throw Exception("Failed to delete extraction root ${root.absolutePath}!")
+        if(!root.mkdirs()) throw Exception("Failed to create extraction root ${root.absolutePath}!")
+
+        for ((i, e) in pboEntries.filterIsInstance<BisPboDataEntry>().withIndex()) {
+            val file = pathChooser(root, e, i)
+            if(file.exists() && !file.delete()) throw Exception("Failed to delete entry ${file.absolutePath} to make room for entry with duplicate name!")
+            if(!file.createNewFile()) throw Exception("Failed to create ${file.path}!")
+            FileOutputStream(file).channel.use { it.write(retrieveEntryData(e, true)) }
+        }
     }
 
     fun retrieveEntryData(entry: BisPboDataEntry, raw: Boolean): ByteBuffer {
@@ -57,7 +68,8 @@ class BisPboFile internal constructor(prefix: String) : AutoCloseable {
             return pbo
         }
 
-        fun normalizePath(path: String): String {
+        fun normalizePath(path: String?): String? {
+            if(path == null) return null
             val result = StringBuilder(path.length)
             var separatorFlag = false
             var charsWritten = 0
