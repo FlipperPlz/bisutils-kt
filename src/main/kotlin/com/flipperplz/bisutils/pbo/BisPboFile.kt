@@ -10,11 +10,23 @@ import java.io.File
 import java.nio.ByteBuffer
 
 
-class BisPboFile internal constructor() : AutoCloseable {
+class BisPboFile internal constructor(prefix: String) : AutoCloseable {
     internal val entries: MutableList<BisPboEntry> = mutableListOf()
     private val dataCache = CacheBuilder.newBuilder().build<BisPboDataEntry, ByteBuffer>()
     val pboEntries: List<BisPboEntry> = entries
+    var pboPrefix: String = prefix
+        get() = customPrefix ?: field
+        internal set //TODO: if customPrefix is set we need to call set on that rather than pboPrefix itself
 
+    val customPrefix: String?
+        get() {
+            for (versionEntry in entries.filterIsInstance<BisPboVersionEntry>()) {
+                versionEntry.properties.lastOrNull { it.propertyName == "prefix" }?.propertyValue?.let {
+                    return normalizePath(it)
+                }
+            }
+            return null
+        }
     override fun close() {
         dataCache.cleanUp()
         BisPboManager.releasePbo(this)
@@ -31,20 +43,41 @@ class BisPboFile internal constructor() : AutoCloseable {
     }
 
     companion object {
-        operator fun invoke(file: File, lightRead: Boolean = true, mode: String = "r"): BisPboFile =
-            read(file, lightRead, mode)
 
-        fun read(file: File, lightRead: Boolean = true, mode: String = "r"): BisPboFile {
-            val reader = BisPboReader(BisRandomAccessFile(file, mode))
+        fun read(file: File, lightRead: Boolean = true, allowWrite: Boolean = false): BisPboFile {
+            val reader = BisPboReader(BisRandomAccessFile(file, if (allowWrite) "rw" else "r"))
 
             return if(lightRead) reader.lightRead() else reader.read()
         }
 
         fun create(prefix: String): BisPboFile {
-            val pbo = BisPboFile()
+            val pbo = BisPboFile(prefix)
             pbo.entries.add(BisPboVersionEntry.CACHED.withPrefix(prefix))
             pbo.entries.add(BisPboDummyEntry.CACHED)
             return pbo
+        }
+
+        fun normalizePath(path: String): String {
+            val result = StringBuilder(path.length)
+            var separatorFlag = false
+            var charsWritten = 0
+
+            for (c in path) {
+                if (c == '/' || c == '\\') {
+                    if (separatorFlag) continue
+                    result[charsWritten++] = '\\'
+                    separatorFlag = true
+                    continue
+                }
+
+                result.append(c.lowercase()).also {
+                    separatorFlag = false
+                    charsWritten++
+                }
+            }
+
+            if (charsWritten > 0 && result[charsWritten - 1] == '\\') charsWritten--
+            return result.toString()
         }
     }
 }
