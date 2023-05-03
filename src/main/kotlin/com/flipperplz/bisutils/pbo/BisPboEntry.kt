@@ -46,7 +46,7 @@ abstract class BisPboDummyEntry : BisPboEntry {
 
 abstract class BisPboVersionEntry(): BisPboEntry {
 
-    abstract val properties: List<BisPboProperty>
+    abstract var properties: List<BisPboProperty>
     override var fileName: String = ""
     override var mimeType: EntryMimeType = EntryMimeType.DUMMY
     override var size: Int = 0
@@ -58,7 +58,7 @@ abstract class BisPboVersionEntry(): BisPboEntry {
 
     class CACHED internal constructor(
         override val initialOwner: BisPboFile?,
-        override val properties: List<BisPboProperty>): BisPboVersionEntry() {
+        override var properties: List<BisPboProperty>): BisPboVersionEntry() {
         companion object {
             fun withPrefix(prefix: String, owner: BisPboFile? = null): CACHED =
                 CACHED(owner, mutableListOf(BisPboProperty("prefix", prefix.lowercase())))
@@ -74,7 +74,7 @@ abstract class BisPboVersionEntry(): BisPboEntry {
         override var synced: Boolean = true
         override var metadataOffset: Long = offset
 
-        override val properties: List<BisPboProperty> by Delegates.observable(properties) {
+        override var properties: List<BisPboProperty> by Delegates.observable(properties) {
                 _, _, _ -> onEditsMade()
         }
     }
@@ -91,7 +91,7 @@ abstract class BisPboDataEntry(
     internal abstract val entryData: ByteBuffer
 
 
-    var path: String = BisPboFile.normalizePath(fileName)
+    var path: String = BisPboFile.normalizePath(fileName) ?: "BUx0001: \"$fileName\""
         private set
     var segmentedPath: List<String> = path.split("\\")
         private set
@@ -101,7 +101,7 @@ abstract class BisPboDataEntry(
 
     protected open fun nameChanged(oldName: String, newName: String) {
         if(oldName == newName) return
-        path = BisPboFile.normalizePath(newName)
+        path = BisPboFile.normalizePath(newName) ?: "BUx0001: \"$newName\""
     }
 
     class CACHED internal constructor(

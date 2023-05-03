@@ -2,24 +2,26 @@ package com.flipperplz.bisutils.pbo
 
 import com.flipperplz.bisutils.BisPboManager
 import com.flipperplz.bisutils.pbo.io.BisPboReader
+import com.flipperplz.bisutils.pbo.misc.BisPboProperty
 import com.flipperplz.bisutils.pbo.misc.EntryMimeType
 import com.flipperplz.bisutils.utils.BisRandomAccessFile
 import com.flipperplz.bisutils.utils.decompress
 import com.google.common.cache.CacheBuilder
 import java.io.File
+import java.io.FileOutputStream
 import java.nio.ByteBuffer
-
 
 class BisPboFile internal constructor(prefix: String) : AutoCloseable {
     internal val entries: MutableList<BisPboEntry> = mutableListOf()
+
+    //TODO: UNUSED
     private val dataCache = CacheBuilder.newBuilder().build<BisPboDataEntry, ByteBuffer>()
     val pboEntries: List<BisPboEntry> = entries
     var pboPrefix: String = prefix
         get() = normalizePath(customPrefix?.propertyValue) ?: field
         internal set(value) {
-            val custom = customPrefix
-            if(custom != null) custom.owner.properties.subtract(setOf(custom))
-            else field = value
+            customPrefix?.let { it.owner.properties -= it; return }
+            field = value
         }
 
     val customPrefix: BisPboProperty?

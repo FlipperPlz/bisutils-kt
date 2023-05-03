@@ -60,17 +60,11 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
         initializeOffsets(entries)
     }
 
-    private fun initializeOffsets(entries: List<BisPboEntry>) {
-        val headerPtr = entries.sumOf { it.calculateMetadataLength() }
-        buffer.seek(headerPtr)
+    private fun initializeOffsets(entries: List<BisPboEntry>) = entries.filterIsInstance<BisPboDataEntry>().takeIf { it.isNotEmpty() }?.fold(buffer) { reader, entry ->
+        if (entry is StagedPboDataEntry) entry.dataOffset = reader.filePointer
+        reader.skipBytes(entry.size)
 
-        for (entry in entries) {
-            if(entry is BisPboDataEntry) {
-                if(entry is StagedPboDataEntry) entry.dataOffset = buffer.filePointer
-                if((buffer.length() - buffer.filePointer) > entry.size) continue
-                buffer.skipBytes(entry.size)
-            }
-        }
+        reader
     }
 
     private fun readMetaBlock(pbo: BisPboFile): MutableList<BisPboEntry> {
@@ -82,17 +76,7 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
             if(read == null) {
                 if(currentEntry == null || flagPtr == null) throw Exception("Failed to read entry")
                 if(currentEntry !is BisPboDummyEntry)  throw Exception("Failed to recover")
-                currentEntry = BisPboDataEntry.INFILE(
-                    pbo,
-                    buffer,
-                    flagPtr!!,
-                    "",
-                    0,
-                    0,
-                    EntryMimeType.DUMMY,
-                    0,
-                    0
-                )
+                currentEntry = BisPboDataEntry.INFILE(pbo, buffer, flagPtr!!, "", 0, 0, EntryMimeType.DUMMY, 0, 0)
                 entryList.add(currentEntry)
                 buffer.seek(flagPtr!!)
                 break
@@ -118,7 +102,9 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
         if(packedSize >= buffer.length()) packedSize = 0
 
         if(entryName == "" && originalSize == 0 && offset == 0 && timestamp == 0 && packedSize == 0) {
-            if(parsedMime == EntryMimeType.VERSION) return BisPboVersionEntry.INFILE(pbo, buffer, flagPtr!!, readPboProperties(pbo))
+            if(parsedMime == EntryMimeType.VERSION) return BisPboVersionEntry.INFILE(pbo, buffer, flagPtr!!, readPboProperties(pbo)).apply {
+                properties.forEach { it.owner = this }
+            }
             if(parsedMime == EntryMimeType.DUMMY) return BisPboDummyEntry.INFILE(pbo, buffer, flagPtr!!)
         }
 
@@ -131,7 +117,9 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
         var propertyName: String
         while (buffer.readAsciiZ().also { propertyName = it }.isNotEmpty()) {
             val propertyValue: String = buffer.readAsciiZ()
-            if(propertyName.lowercase() == "prefix") pbo.pboPrefix = BisPboFile.normalizePath(propertyValue)
+            if(propertyName.lowercase() == "prefix") BisPboFile.normalizePath(propertyValue)?.let {
+                pbo.pboPrefix = it
+            }
             properties.add(BisPboProperty(propertyName, propertyValue))
         }
 
