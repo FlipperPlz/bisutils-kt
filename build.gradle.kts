@@ -16,8 +16,14 @@ dependencies {
 
 }
 
-tasks.test {
-    useJUnitPlatform()
+tasks {
+    jar {
+
+    }
+
+    test {
+        useJUnitPlatform()
+    }
 }
 
 kotlin {
