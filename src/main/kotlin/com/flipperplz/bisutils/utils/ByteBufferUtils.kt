@@ -39,79 +39,73 @@ fun ByteBuffer.getCompactInt(): Int {
 
 
 fun ByteBuffer.decompress(expectedSize: Int, useSignedChecksum: Boolean): ByteBuffer {
-    val N = 4096
-    val F = 18
-    val THRESHOLD = 2
-    val text_buf = CharArray(N + F - 1)
-    val dst = ByteBuffer.allocate(expectedSize)
+    val result = ByteBuffer.allocate(expectedSize)
+    if (expectedSize <= 0) return result
 
-    if (expectedSize <= 0) return dst
-
+    val windowSize = 4096
+    val lookaheadBufferSize = 18
+    val threshold = 2
+    val textBuffer = IntArray(windowSize + lookaheadBufferSize - 1).apply { fill(0x20, 0, windowSize - lookaheadBufferSize) }
     val startPos = position()
     var bytesLeft = expectedSize
-    var iDst = 0
-
+    var resultIndex = 0
     var i: Int
     var j: Int
-    var r: Int
-    var c: Int
-    var csum = 0
-    var flags: Int
-    for (i in 0 until N - F) text_buf[i] = ' '
-    r = N - F
-    flags = 0
+    var bufferIndex: Int = windowSize - lookaheadBufferSize
+    var currentByte: Int
+    var checksum = 0
+    var flags: Int = 0
+    fun incrementChecksum(character: Int) = if (useSignedChecksum) checksum += character.toByte() else checksum += character
     while (bytesLeft > 0) {
-        if ((flags ushr  1) and 256 == 0) {
-            val c = get().toInt() and 0xff
-            flags = c or 0xff00
+        flags = flags shr 1
+        if (flags and 0x100 == 0) {
+            currentByte = get().toInt() and 0xff
+            flags = currentByte or 0xff00
         }
         if (flags and 1 != 0) {
-            val c = get().toInt() and 0xff
-            if (useSignedChecksum)
-                csum += c.toByte()
-            else
-                csum += c
+            currentByte = get().toInt() and 0xff
+            incrementChecksum(currentByte)
 
             // save byte
-            dst.put(iDst, c.toByte())
-            iDst++
+            result.put(resultIndex, currentByte.toByte())
+            resultIndex++
             bytesLeft--
             // continue decompression
-            text_buf[r] = c.toChar()
-            r++
-            r = r and (N - 1)
+            textBuffer[bufferIndex] = currentByte
+            bufferIndex++
+            bufferIndex = bufferIndex and (windowSize - 1)
         } else {
-            val i = get().toInt() and 0xff
-            val j = get().toInt() and 0xff
-            var ii = r - i
+            i = get().toInt() and 0xff
+            j = (get().toInt() and 0xff) and 0xf0
+
+            i = i or (j shl 4)
+            j += threshold
+
+            val ii = bufferIndex - i
             val jj = j + ii
-            if (j + 1 > bytesLeft) {
-                throw IllegalArgumentException("LZSS overflow")
-            }
+            if (j + 1 > bytesLeft) throw IllegalArgumentException("LZSS overflow")
 
             for (index in ii..jj) {
-                c = text_buf[index and (N - 1)].toInt()
-                if (useSignedChecksum)
-                    csum += c.toByte()
-                else
-                    csum += c
+                currentByte = textBuffer[index and (windowSize - 1)].toInt()
+                incrementChecksum(currentByte)
 
                 // save byte
-                dst.put(iDst, c.toByte())
-                iDst++
+                result.put(resultIndex, currentByte.toByte())
+                resultIndex++
                 bytesLeft--
                 // continue decompression
-                text_buf[r] = c.toChar()
-                r++
-                r = r and (N - 1)
+                textBuffer[bufferIndex] = currentByte
+                bufferIndex++
+                bufferIndex = bufferIndex and (windowSize - 1)
             }
         }
     }
+    if(
+        get() == (checksum shr 0x18).toByte() &&
+        get() == ((checksum shr 0x10) and 0xff).toByte() &&
+        get() == ((checksum shr 0x8) and 0xff).toByte() &&
+        get() == (checksum and  0xff).toByte()
+    ) return result
 
-    val csData = ByteArray(4)
-    get(csData, 0, 4)
-    val csr = ByteBuffer.wrap(csData).getInt()
-    if (csr != csum) throw IllegalArgumentException("Checksum mismatch")
-
-    return dst
+    throw IllegalArgumentException("Checksum mismatch")
 }
