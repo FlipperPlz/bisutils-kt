@@ -64,8 +64,12 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
         buffer.seek(headerPtr)
 
         for (entry in entries) {
-            if(entry is StagedPboDataEntry) entry.dataOffset = buffer.filePointer
-            if(entry is BisPboDataEntry) buffer.skipBytes(entry.size)
+            if(entry is BisPboDataEntry) {
+
+                if(entry is StagedPboDataEntry) entry.dataOffset = buffer.filePointer
+                if((buffer.length() - buffer.filePointer) > entry.size) continue
+                buffer.skipBytes(entry.size)
+            }
         }
     }
 
@@ -108,7 +112,9 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
         val originalSize = abs(buffer.readInt32())
         val offset = abs(buffer.readInt32())
         val timestamp = buffer.readInt32()
-        val packedSize = abs(buffer.readInt32())
+        var packedSize = abs(buffer.readInt32())
+
+        if(packedSize >= buffer.length()) packedSize = 0
 
         if(entryName == "" && originalSize == 0 && offset == 0 && timestamp == 0 && packedSize == 0) {
             if(parsedMime == EntryMimeType.VERSION) return BisPboVersionEntry.INFILE(buffer, flagPtr!!, readPboProperties())
