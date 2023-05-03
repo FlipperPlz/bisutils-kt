@@ -2,7 +2,9 @@ package com.flipperplz.bisutils.pbo
 
 import com.flipperplz.bisutils.BisPboManager
 import com.flipperplz.bisutils.pbo.io.BisPboReader
+import com.flipperplz.bisutils.pbo.misc.EntryMimeType
 import com.flipperplz.bisutils.utils.BisRandomAccessFile
+import com.flipperplz.bisutils.utils.decompress
 import com.google.common.cache.CacheBuilder
 import java.io.File
 import java.nio.ByteBuffer
@@ -19,9 +21,13 @@ class BisPboFile internal constructor() : AutoCloseable {
     }
 
     fun retrieveEntryData(entry: BisPboDataEntry, raw: Boolean): ByteBuffer {
-        if(raw) return entry.entryData
+        if(raw || entry.mimeType == EntryMimeType.DUMMY) return entry.entryData
+        if(entry.mimeType == EntryMimeType.ENCRYPTED_DATA) throw Exception("EBO not supported.")
+        if(entry.size != entry.originalSize && entry.mimeType == EntryMimeType.NORMAL_DATA) {
+            return entry.entryData.decompress(entry.originalSize, true)
+        }
 
-        TODO()
+        return entry.entryData
     }
 
     companion object {
