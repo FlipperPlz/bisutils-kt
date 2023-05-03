@@ -10,6 +10,9 @@ import com.google.common.cache.CacheBuilder
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.regex.Pattern
 
 class BisPboFile internal constructor(prefix: String) : AutoCloseable {
     internal val entries: MutableList<BisPboEntry> = mutableListOf()
@@ -34,7 +37,8 @@ class BisPboFile internal constructor(prefix: String) : AutoCloseable {
 
     inline fun extractPBO(folder: File, pathChooser: (File, BisPboDataEntry, Int) -> File) {
         val root = File(folder, pboPrefix)
-        if(root.exists() && !root.delete()) throw Exception("Failed to delete extraction root ${root.absolutePath}!")
+
+        if(root.exists() && !root.deleteRecursively()) throw Exception("Failed to delete extraction root ${root.absolutePath}!")
         if(!root.mkdirs()) throw Exception("Failed to create extraction root ${root.absolutePath}!")
 
         for ((i, e) in pboEntries.filterIsInstance<BisPboDataEntry>().withIndex()) {
@@ -70,28 +74,7 @@ class BisPboFile internal constructor(prefix: String) : AutoCloseable {
             return pbo
         }
 
-        fun normalizePath(path: String?): String? {
-            if(path == null) return null
-            val result = StringBuilder(path.length)
-            var separatorFlag = false
-            var charsWritten = 0
-
-            for (c in path) {
-                if (c == '/' || c == '\\') {
-                    if (separatorFlag) continue
-                    result[charsWritten++] = '\\'
-                    separatorFlag = true
-                    continue
-                }
-
-                result.append(c.lowercase()).also {
-                    separatorFlag = false
-                    charsWritten++
-                }
-            }
-
-            if (charsWritten > 0 && result[charsWritten - 1] == '\\') charsWritten--
-            return result.toString()
-        }
+        fun normalizePath(path: String?): String? =
+            path?.lowercase()?.replace(Regex("[\\\\/]+"), "\\\\")?.trimEnd('\\')
     }
 }
