@@ -38,8 +38,8 @@ fun ByteBuffer.getCompactInt(): Int {
 }
 
 
-fun ByteBuffer.decompress(expectedSize: Int, useSignedChecksum: Boolean): ByteBuffer {
-    val result = ByteBuffer.allocate(expectedSize)
+fun ByteBuffer.decompress(expectedSize: Long, useSignedChecksum: Boolean): ByteBuffer {
+    val result = ByteBuffer.allocate(expectedSize.toInt())
     if (expectedSize <= 0) return result
 
     val windowSize = 4096
