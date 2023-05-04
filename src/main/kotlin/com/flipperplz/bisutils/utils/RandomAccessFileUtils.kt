@@ -41,6 +41,7 @@ fun RandomAccessFile.peekBytes(count: Int, offset: Int): ByteArray {
 }
 
 fun RandomAccessFile.readInt32(endianness: ByteOrder = ByteOrder.LITTLE_ENDIAN): Int = ByteBuffer.wrap(readBytes(4)).order(endianness).int
+fun RandomAccessFile.readLong32(endianness: ByteOrder = ByteOrder.LITTLE_ENDIAN): Long = ByteBuffer.wrap(readBytes(4)).order(endianness).long
 
 fun RandomAccessFile.peekInt(): Int = readInt32().also { popInt() }
 fun RandomAccessFile.peekAsciiZ(): String = readAsciiZ().also { seek(filePointer - (it.length + 1)) }

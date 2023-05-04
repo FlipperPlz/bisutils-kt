@@ -15,10 +15,10 @@ sealed interface BisPboEntry {
 
     var mimeType: EntryMimeType
     var fileName: String
-    var timeStamp: Int
-    var offset: Int
-    var originalSize: Int
-    var size: Int
+    var timeStamp: Long
+    var offset: Long
+    var originalSize: Long
+    var size: Long
 
     fun calculateMetadataLength(): Long = 21L + fileName.length
 }
@@ -26,10 +26,10 @@ sealed interface BisPboEntry {
 abstract class BisPboDummyEntry : BisPboEntry {
     override var fileName: String = ""
     override var mimeType: EntryMimeType = EntryMimeType.DUMMY
-    override var size: Int = 0
-    override var offset: Int = 0
-    override var originalSize: Int = 0
-    override var timeStamp: Int = 0
+    override var size: Long = 0
+    override var offset: Long = 0
+    override var originalSize: Long = 0
+    override var timeStamp: Long = 0
     override val initialOwner: BisPboFile? = null
     override fun calculateMetadataLength(): Long = 21
 
@@ -49,10 +49,10 @@ abstract class BisPboVersionEntry(): BisPboEntry {
     abstract var properties: List<BisPboProperty>
     override var fileName: String = ""
     override var mimeType: EntryMimeType = EntryMimeType.DUMMY
-    override var size: Int = 0
-    override var offset: Int = 0
-    override var originalSize: Int = 0
-    override var timeStamp: Int = 0
+    override var size: Long = 0
+    override var offset: Long = 0
+    override var originalSize: Long = 0
+    override var timeStamp: Long = 0
 
     override fun calculateMetadataLength(): Long = 21 + properties.sumOf { it.calculateLength() } + 1
 
@@ -82,11 +82,11 @@ abstract class BisPboVersionEntry(): BisPboEntry {
 
 abstract class BisPboDataEntry(
     fileName: String,
-    override var offset: Int,
-    override var timeStamp: Int,
+    override var offset: Long,
+    override var timeStamp: Long,
     override var mimeType: EntryMimeType,
-    override var originalSize: Int,
-    override var size: Int,
+    override var originalSize: Long,
+    override var size: Long,
 ) : BisPboEntry {
     internal abstract val entryData: ByteBuffer
 
@@ -107,11 +107,11 @@ abstract class BisPboDataEntry(
     class CACHED internal constructor(
         override val initialOwner: BisPboFile?,
         fileName: String,
-        offset: Int,
-        timeStamp: Int,
+        offset: Long,
+        timeStamp: Long,
         mimeType: EntryMimeType,
-        originalSize: Int,
-        size: Int,
+        originalSize: Long,
+        size: Long,
         override val entryData: ByteBuffer
     ) : BisPboDataEntry(
         fileName,
@@ -127,11 +127,11 @@ abstract class BisPboDataEntry(
         override val stageBuffer: RandomAccessFile,
         override var metadataOffset: Long,
         fileName: String,
-        offset: Int,
-        timeStamp: Int,
+        offset: Long,
+        timeStamp: Long,
         mimeType: EntryMimeType,
-        originalSize: Int,
-        size: Int,
+        originalSize: Long,
+        size: Long,
     ) : BisPboDataEntry(
         fileName,
         offset,
@@ -149,7 +149,7 @@ abstract class BisPboDataEntry(
 
                 return (if((stageBuffer.length() - stageBuffer.filePointer) > size)
                     ByteBuffer.allocate(0) else
-                    ByteBuffer.wrap(stageBuffer.readBytes(size))).also {
+                    ByteBuffer.wrap(stageBuffer.readBytes(size.toInt()))).also {
                     stageBuffer.seek(start)
                 }
             }

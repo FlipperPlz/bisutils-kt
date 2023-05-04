@@ -5,10 +5,7 @@ import com.flipperplz.bisutils.pbo.*
 import com.flipperplz.bisutils.pbo.misc.BisPboProperty
 import com.flipperplz.bisutils.pbo.misc.EntryMimeType
 import com.flipperplz.bisutils.pbo.misc.StagedPboDataEntry
-import com.flipperplz.bisutils.utils.BisRandomAccessFile
-import com.flipperplz.bisutils.utils.readAsciiZ
-import com.flipperplz.bisutils.utils.readBytes
-import com.flipperplz.bisutils.utils.readInt32
+import com.flipperplz.bisutils.utils.*
 import java.io.File
 import java.nio.ByteBuffer
 import kotlin.math.abs
@@ -46,7 +43,7 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
                 entry.mimeType,
                 entry.originalSize,
                 entry.size,
-                ByteBuffer.wrap(reader.readBytes(entry.size))
+                ByteBuffer.wrap(reader.readBytes(entry.size.toInt()))
             )
             reader.seek(startPtr)
         }
@@ -62,7 +59,7 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
 
     private fun initializeOffsets(entries: List<BisPboEntry>) = entries.filterIsInstance<BisPboDataEntry>().takeIf { it.isNotEmpty() }?.fold(buffer) { reader, entry ->
         if (entry is StagedPboDataEntry) entry.dataOffset = reader.filePointer
-        reader.skipBytes(entry.size)
+        reader.skipBytes(entry.size.toInt())
 
         reader
     }
@@ -94,14 +91,14 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
 
         val entryName = buffer.readAsciiZ()
         val parsedMime = EntryMimeType.fromMime(buffer.readInt32()) ?: return null
-        val originalSize = abs(buffer.readInt32())
-        val offset = abs(buffer.readInt32())
-        val timestamp = buffer.readInt32()
-        var packedSize = abs(buffer.readInt32())
+        val originalSize = abs(buffer.readLong32())
+        val offset = abs(buffer.readLong32())
+        val timestamp = buffer.readLong32()
+        var packedSize = abs(buffer.readLong32())
 
         if(packedSize >= buffer.length()) packedSize = 0
 
-        if(entryName == "" && originalSize == 0 && offset == 0 && timestamp == 0 && packedSize == 0) {
+        if(entryName == "" && originalSize == 0L && offset == 0L && timestamp == 0L && packedSize == 0L) {
             if(parsedMime == EntryMimeType.VERSION) return BisPboVersionEntry.INFILE(pbo, buffer, flagPtr!!, readPboProperties(pbo)).apply {
                 properties.forEach { it.owner = this }
             }
