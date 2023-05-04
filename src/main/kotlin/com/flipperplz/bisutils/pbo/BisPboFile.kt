@@ -9,6 +9,7 @@ import com.flipperplz.bisutils.utils.decompress
 import com.google.common.cache.CacheBuilder
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.StringBuilder
 import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.Path
@@ -64,6 +65,8 @@ class BisPboFile internal constructor(prefix: String) : AutoCloseable {
             return created.getOrCreateDirectory(rest)
         }
     }
+
+    fun getAbsoluteEntryPath(entry: BisPboDataEntry): String = StringBuilder(pboPrefix).append('\\').append(entry.path).toString()
 
     fun createEntryTree(): PboPseudoDirectory {
         val root = PboPseudoDirectory(pboPrefix,null)
