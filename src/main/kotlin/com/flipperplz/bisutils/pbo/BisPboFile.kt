@@ -45,17 +45,47 @@ class BisPboFile internal constructor(prefix: String) : AutoCloseable {
             val file = pathChooser(root, e, i)
             if(file.exists() && !file.delete()) throw Exception("Failed to delete entry ${file.absolutePath} to make room for entry with duplicate name!")
             if(!file.createNewFile()) throw Exception("Failed to create ${file.path}!")
-            FileOutputStream(file).channel.use { it.write(retrieveEntryData(e, true)) }
+            FileOutputStream(file).channel.use { it.write(retrieveEntryData(e, false)) }
         }
+    }
+
+    data class PboPseudoDirectory(
+        val name: String,
+        val parent: PboPseudoDirectory?,
+        val childrenFolders: MutableList<PboPseudoDirectory> = mutableListOf(),
+        val childrenFiles: MutableList<BisPboDataEntry> = mutableListOf()
+    ) {
+        fun getOrCreateDirectory(entryPath: List<String>): PboPseudoDirectory {
+            val directory = entryPath.firstOrNull() ?: return this
+            val rest = entryPath.drop(1)
+            childrenFolders.firstOrNull { it.name == directory }?.getOrCreateDirectory(rest)?.let { return it }
+            return with(PboPseudoDirectory(directory, this)) {
+                childrenFolders.add(this)
+                this.getOrCreateDirectory(rest)
+            }
+        }
+    }
+
+    fun createEntryTree(): PboPseudoDirectory {
+        val root = PboPseudoDirectory(pboPrefix,null)
+
+        for (entry in entries.filterIsInstance<BisPboDataEntry>()) {
+            val splitPath = entry.segmentedPath
+            if(splitPath.size == 1) root.childrenFiles.add(entry)
+            else root.getOrCreateDirectory(splitPath.dropLast(1)).also {
+                it.childrenFiles.add(entry)
+            }
+        }
+
+        return root
     }
 
     fun retrieveEntryData(entry: BisPboDataEntry, raw: Boolean): ByteBuffer {
         if(raw || entry.mimeType == EntryMimeType.DUMMY) return entry.entryData
         if(entry.mimeType == EntryMimeType.ENCRYPTED_DATA) throw Exception("EBO not supported.")
-        if(entry.size != entry.originalSize && entry.mimeType == EntryMimeType.NORMAL_DATA) {
-            return entry.entryData.decompress(entry.originalSize, true)
-        }
-
+            if(entry.size != entry.originalSize && entry.mimeType == EntryMimeType.NORMAL_DATA) {
+                return entry.entryData.decompress(entry.originalSize, true)
+            }
         return entry.entryData
     }
 
