@@ -49,7 +49,7 @@ class BisPboFile internal constructor(prefix: String) : AutoCloseable {
         }
     }
 
-    data class PboPseudoDirectory(
+    class PboPseudoDirectory(
         val name: String,
         val parent: PboPseudoDirectory?,
         val childrenFolders: MutableList<PboPseudoDirectory> = mutableListOf(),
@@ -59,10 +59,9 @@ class BisPboFile internal constructor(prefix: String) : AutoCloseable {
             val directory = entryPath.firstOrNull() ?: return this
             val rest = entryPath.drop(1)
             childrenFolders.firstOrNull { it.name == directory }?.getOrCreateDirectory(rest)?.let { return it }
-            return with(PboPseudoDirectory(directory, this)) {
-                childrenFolders.add(this)
-                this.getOrCreateDirectory(rest)
-            }
+            val created = PboPseudoDirectory(directory, this)
+            childrenFolders.add(created)
+            return created.getOrCreateDirectory(rest)
         }
     }
 
