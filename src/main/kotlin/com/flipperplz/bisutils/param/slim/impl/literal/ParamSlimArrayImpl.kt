@@ -6,6 +6,6 @@ import com.flipperplz.bisutils.param.slim.ParamSlimLiteral
 
 
 data class ParamSlimArrayImpl(
-    override var parentElement: ParamSlim?,
+    var parentElement: ParamSlim?,
     override var value: MutableList<ParamSlimLiteral<*>> = mutableListOf()
 ) : ParamSlimArray

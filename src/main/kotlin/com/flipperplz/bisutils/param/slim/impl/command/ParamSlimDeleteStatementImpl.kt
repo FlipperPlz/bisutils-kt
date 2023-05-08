@@ -5,6 +5,6 @@ import com.flipperplz.bisutils.param.slim.ParamSlimDeleteStatement
 
 
 data class ParamSlimDeleteStatementImpl(
-    override var parentElement: ParamSlim?,
+    var parentElement: ParamSlim?,
     override var target: String
 ) : ParamSlimDeleteStatement

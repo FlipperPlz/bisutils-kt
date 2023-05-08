@@ -1,7 +1,6 @@
 package com.flipperplz.bisutils.param.slim
 
 sealed interface ParamSlim {
-    var parentElement: ParamSlim?
     fun toEnforce(): String
 }
 sealed interface ParamSlimCommand : ParamSlim
@@ -47,11 +46,13 @@ interface ParamSlimClass : ParamSlimExternalClass {
         return builder.append("};").toString()
     }
 }
+
 interface ParamSlimDeleteStatement : ParamSlimCommand {
     var target: String
 
     override fun toEnforce(): String = "delete $target;"
 }
+
 interface ParamSlimVariableStatement : ParamSlimCommand {
     var name: String;
     var value: ParamSlimLiteral<*>

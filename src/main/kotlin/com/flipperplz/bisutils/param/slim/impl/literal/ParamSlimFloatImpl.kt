@@ -5,6 +5,6 @@ import com.flipperplz.bisutils.param.slim.ParamSlimFloat
 
 
 data class ParamSlimFloatImpl(
-    override var parentElement: ParamSlim?,
+    var parentElement: ParamSlim?,
     override var value: Float
 ) : ParamSlimFloat

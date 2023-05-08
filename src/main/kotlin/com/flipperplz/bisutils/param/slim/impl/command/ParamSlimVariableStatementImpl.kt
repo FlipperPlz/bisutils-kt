@@ -7,7 +7,7 @@ import com.flipperplz.bisutils.param.slim.ParamSlimVariableStatement
 
 
 data class ParamSlimVariableStatementImpl(
-    override var parentElement: ParamSlim?,
+    var parentElement: ParamSlim?,
     override var operator: ParamOperator,
     override var name: String,
     override var value: ParamSlimLiteral<*>
