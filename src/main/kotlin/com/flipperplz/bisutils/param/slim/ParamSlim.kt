@@ -3,9 +3,9 @@ package com.flipperplz.bisutils.param.slim
 sealed interface ParamSlim {
     fun toEnforce(): String
 }
-sealed interface ParamSlimCommand : ParamSlim
-sealed interface ParamSlimLiteral<T> : ParamSlim { var value: T }
-sealed interface ParamSlimNumericLiteral<T: Number> : ParamSlimLiteral<T>
+interface ParamSlimCommand : ParamSlim
+interface ParamSlimLiteral<T> : ParamSlim { var value: T }
+interface ParamSlimNumericLiteral<T: Number> : ParamSlimLiteral<T>
 
 enum class ParamOperator(val text: String) {
     ASSIGN("="),
