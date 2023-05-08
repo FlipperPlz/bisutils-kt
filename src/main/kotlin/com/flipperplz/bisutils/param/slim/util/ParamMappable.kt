@@ -24,9 +24,10 @@ abstract class ParamMappableClass(
     @Target(AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.FIELD, AnnotationTarget.FUNCTION)
     annotation class PMappedVariableValue(val name: String, val operation: ParamOperator = ParamOperator.ASSIGN)
 
-    override val commands: MutableList<ParamSlimCommand> = mutableListOf()
+    override lateinit var slimCommands: List<ParamSlimCommand>
 
     fun remap() {
+        val commands = mutableListOf<ParamSlimCommand>()
         for (property in annotatedProperties) {
             val returnType = property.returnType
             when {
@@ -41,6 +42,7 @@ abstract class ParamMappableClass(
                 }
             }
         }
+        slimCommands = commands;
     }
 
     override fun toString(): String {

@@ -25,7 +25,7 @@ interface ParamSlimInt : ParamSlimNumericLiteral<Int> {
     override fun toEnforce(): String = value.toString()
 }
 
-interface ParamSlimArray : ParamSlimLiteral<MutableList<ParamSlimLiteral<*>>> {
+interface ParamSlimArray : ParamSlimLiteral<List<ParamSlimLiteral<*>>> {
     override fun toEnforce(): String = value.joinToString(", ", prefix = "{", postfix = "}") { it.toEnforce() }
 }
 
@@ -36,7 +36,7 @@ interface ParamSlimExternalClass : ParamSlimCommand {
 
 interface ParamSlimClass : ParamSlimExternalClass {
     var superClass: String?
-    val slimCommands: MutableList<ParamSlimCommand>
+    var slimCommands: List<ParamSlimCommand>
 
     override fun toEnforce(): String {
         val builder = StringBuilder("class ").append(className)
