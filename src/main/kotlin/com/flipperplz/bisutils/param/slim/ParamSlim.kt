@@ -36,13 +36,13 @@ interface ParamSlimExternalClass : ParamSlimCommand {
 
 interface ParamSlimClass : ParamSlimExternalClass {
     var superClass: String?
-    val commands: MutableList<ParamSlimCommand>
+    val slimCommands: MutableList<ParamSlimCommand>
 
     override fun toEnforce(): String {
         val builder = StringBuilder("class ").append(className)
         if(superClass != null) builder.append(" : ").append(superClass)
         builder.append(" { \n")
-        builder.append(commands.joinToString(separator = "\n", postfix = "\n"){ it.toEnforce() })
+        builder.append(slimCommands.joinToString(separator = "\n", postfix = "\n"){ it.toEnforce() })
         return builder.append("};").toString()
     }
 }
