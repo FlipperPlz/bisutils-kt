@@ -1,31 +1,39 @@
 package com.flipperplz.bisutils.param.slim
 
+import com.flipperplz.bisutils.param.slim.util.ParamLiteralTypes
+import com.flipperplz.bisutils.param.slim.util.ParamOperatorTypes
+
 sealed interface ParamSlim {
-    fun toEnforce(): String
+    open fun toEnforce(): String = "//Unknown"
 }
 interface ParamSlimCommand : ParamSlim
-interface ParamSlimLiteral<T> : ParamSlim { var value: T }
+interface ParamSlimLiteral<T> : ParamSlim {
+    val type: ParamLiteralTypes
+    var value: T
+}
 interface ParamSlimNumericLiteral<T: Number> : ParamSlimLiteral<T>
 
-enum class ParamOperator(val text: String) {
-    ASSIGN("="),
-    ADD_ASSIGN("+="),
-    SUB_ASSIGN("-=")
-}
-
 interface ParamSlimString : ParamSlimLiteral<String> {
+    override val type: ParamLiteralTypes
+        get() = ParamLiteralTypes.STRING
     override fun toEnforce(): String = "\"${value.replace("\"", "\"\"")}\""
 }
 
 interface ParamSlimFloat : ParamSlimNumericLiteral<Float> {
+    override val type: ParamLiteralTypes
+        get() = ParamLiteralTypes.FLOAT
     override fun toEnforce(): String = value.toString()
 }
 
 interface ParamSlimInt : ParamSlimNumericLiteral<Int> {
+    override val type: ParamLiteralTypes
+        get() = ParamLiteralTypes.INTEGER
     override fun toEnforce(): String = value.toString()
 }
 
 interface ParamSlimArray : ParamSlimLiteral<List<ParamSlimLiteral<*>>> {
+    override val type: ParamLiteralTypes
+        get() = ParamLiteralTypes.ARRAY
     override fun toEnforce(): String = value.joinToString(", ", prefix = "{", postfix = "}") { it.toEnforce() }
 }
 
@@ -56,7 +64,7 @@ interface ParamSlimDeleteStatement : ParamSlimCommand {
 interface ParamSlimVariableStatement : ParamSlimCommand {
     var name: String;
     var value: ParamSlimLiteral<*>
-    var operator: ParamOperator
+    var operator: ParamOperatorTypes
     override fun toEnforce(): String {
         val builder = StringBuilder(name)
         if (value is ParamSlimArray) builder.append("[]")
