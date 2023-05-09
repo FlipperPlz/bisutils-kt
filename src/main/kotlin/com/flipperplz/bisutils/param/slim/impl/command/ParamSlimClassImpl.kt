@@ -2,7 +2,7 @@ package com.flipperplz.bisutils.param.slim.impl.command
 
 import com.flipperplz.bisutils.param.slim.ParamSlim
 import com.flipperplz.bisutils.param.slim.ParamSlimClass
-import com.flipperplz.bisutils.param.slim.ParamSlimCommand
+import com.flipperplz.bisutils.param.slim.structure.ParamSlimCommand
 
 
 data class ParamSlimClassImpl(

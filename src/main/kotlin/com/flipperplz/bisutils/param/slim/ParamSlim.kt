@@ -1,41 +1,16 @@
 package com.flipperplz.bisutils.param.slim
 
+import com.flipperplz.bisutils.param.slim.structure.ParamSlimCommand
+import com.flipperplz.bisutils.param.slim.structure.ParamSlimLiteral
+import com.flipperplz.bisutils.param.slim.structure.literals.ParamSlimArray
 import com.flipperplz.bisutils.param.slim.util.ParamLiteralTypes
 import com.flipperplz.bisutils.param.slim.util.ParamOperatorTypes
 
-sealed interface ParamSlim {
-    open fun toEnforce(): String = "//Unknown"
-}
-interface ParamSlimCommand : ParamSlim
-interface ParamSlimLiteral<T> : ParamSlim {
-    val type: ParamLiteralTypes
-    var value: T
-}
-interface ParamSlimNumericLiteral<T: Number> : ParamSlimLiteral<T>
-
-interface ParamSlimString : ParamSlimLiteral<String> {
-    override val type: ParamLiteralTypes
-        get() = ParamLiteralTypes.STRING
-    override fun toEnforce(): String = "\"${value.replace("\"", "\"\"")}\""
+interface ParamSlim {
+    fun toEnforce(): String = "//Unknown"
+    fun currentlyValid(): Boolean = true
 }
 
-interface ParamSlimFloat : ParamSlimNumericLiteral<Float> {
-    override val type: ParamLiteralTypes
-        get() = ParamLiteralTypes.FLOAT
-    override fun toEnforce(): String = value.toString()
-}
-
-interface ParamSlimInt : ParamSlimNumericLiteral<Int> {
-    override val type: ParamLiteralTypes
-        get() = ParamLiteralTypes.INTEGER
-    override fun toEnforce(): String = value.toString()
-}
-
-interface ParamSlimArray : ParamSlimLiteral<List<ParamSlimLiteral<*>>> {
-    override val type: ParamLiteralTypes
-        get() = ParamLiteralTypes.ARRAY
-    override fun toEnforce(): String = value.joinToString(", ", prefix = "{", postfix = "}") { it.toEnforce() }
-}
 
 interface ParamSlimExternalClass : ParamSlimCommand {
     var className: String

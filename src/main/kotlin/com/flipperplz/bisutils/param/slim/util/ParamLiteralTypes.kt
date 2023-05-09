@@ -1,6 +1,11 @@
 package com.flipperplz.bisutils.param.slim.util
 
 import com.flipperplz.bisutils.param.slim.*
+import com.flipperplz.bisutils.param.slim.structure.ParamSlimLiteral
+import com.flipperplz.bisutils.param.slim.structure.literals.ParamSlimArray
+import com.flipperplz.bisutils.param.slim.structure.literals.ParamSlimFloat
+import com.flipperplz.bisutils.param.slim.structure.literals.ParamSlimInt
+import com.flipperplz.bisutils.param.slim.structure.literals.ParamSlimString
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
