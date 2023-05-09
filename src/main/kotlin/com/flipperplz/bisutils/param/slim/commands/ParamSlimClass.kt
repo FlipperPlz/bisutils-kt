@@ -1,13 +1,17 @@
-package com.flipperplz.bisutils.param.slim.structure.commands
+package com.flipperplz.bisutils.param.slim.commands
 
-import com.flipperplz.bisutils.param.slim.structure.ParamSlimCommand
+import com.flipperplz.bisutils.param.slim.ParamSlimCommand
+import com.flipperplz.bisutils.param.slim.util.ParamCommandTypes
 
 interface ParamSlimClass : ParamSlimExternalClass {
     val slimSuperClass: String?
     val slimCommands: List<ParamSlimCommand>
+    override val slimCommandType: ParamCommandTypes
+        get() = ParamCommandTypes.CLASS
 
-    override fun currentlyValid(): Boolean = super.currentlyValid() &&
-            slimCommands.all { it.currentlyValid() }
+    override val slimCurrentlyValid: Boolean
+        get() = super.slimCurrentlyValid && slimCommands.all { it.slimCurrentlyValid }
+
 
     override fun toEnforce(): String {
         val builder = StringBuilder(super.toEnforce())

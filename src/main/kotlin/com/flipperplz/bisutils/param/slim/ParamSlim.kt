@@ -1,21 +1,13 @@
 package com.flipperplz.bisutils.param.slim
 
-import com.flipperplz.bisutils.param.slim.structure.ParamSlimCommand
-import com.flipperplz.bisutils.param.slim.structure.ParamSlimLiteral
-import com.flipperplz.bisutils.param.slim.structure.literals.ParamSlimArray
-import com.flipperplz.bisutils.param.slim.util.ParamLiteralTypes
-import com.flipperplz.bisutils.param.slim.util.ParamOperatorTypes
+import com.flipperplz.bisutils.param.slim.util.ParamElementTypes
 
 interface ParamSlim {
+    val slimCurrentlyValid: Boolean
+        get() = true
+    val slimType: ParamElementTypes
     fun toEnforce(): String = "//Unknown"
-    fun currentlyValid(): Boolean = true
 }
-
-
-
-
-
-
 
 
 
