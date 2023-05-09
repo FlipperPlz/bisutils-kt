@@ -9,5 +9,5 @@ data class ParamSlimClassImpl(
     var parentElement: ParamSlim?,
     override var slimSuperClass: String?,
     override var slimCommands: List<ParamSlimCommand>,
-    override var slimClassName: String?,
+    override var slimClassName: String,
 ): ParamSlimClass

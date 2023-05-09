@@ -6,5 +6,5 @@ import com.flipperplz.bisutils.param.slim.commands.ParamSlimDeleteStatement
 
 data class ParamSlimDeleteStatementImpl(
     var parentElement: ParamSlim?,
-    override var slimDeleteTarget: String?
+    override var slimDeleteTarget: String
 ) : ParamSlimDeleteStatement

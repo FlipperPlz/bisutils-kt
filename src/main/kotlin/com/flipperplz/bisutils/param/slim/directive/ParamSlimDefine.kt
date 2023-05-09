@@ -32,6 +32,6 @@ interface ParamSlimDefine : ParamSlimDirective {
             separator = ", ",
             postfix = ")"
         ) { it })
-        return builder.append(" ").append(slimMacroValue?.replace("\n", "\\\n")).toString()
+        return builder.append(" ").append(slimMacroValue?.replace("\n", "\\\n")).append('\n').toString()
     }
 }

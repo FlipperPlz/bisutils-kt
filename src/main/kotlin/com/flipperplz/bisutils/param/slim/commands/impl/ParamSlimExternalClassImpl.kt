@@ -6,5 +6,5 @@ import com.flipperplz.bisutils.param.slim.commands.ParamSlimExternalClass
 
 data class ParamSlimExternalClassImpl(
     var parentElement: ParamSlim?,
-    override var slimClassName: String?
+    override var slimClassName: String
 ) : ParamSlimExternalClass

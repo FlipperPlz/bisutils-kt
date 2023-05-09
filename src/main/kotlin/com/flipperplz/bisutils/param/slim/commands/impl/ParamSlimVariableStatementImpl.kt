@@ -8,7 +8,7 @@ import com.flipperplz.bisutils.param.slim.util.ParamOperatorTypes
 
 data class ParamSlimVariableStatementImpl(
     var parentElement: ParamSlim?,
-    override var slimName: String?,
-    override var slimOperator: ParamOperatorTypes?,
-    override var slimValue: ParamSlimLiteral<*>?
+    override var slimName: String,
+    override var slimOperator: ParamOperatorTypes = ParamOperatorTypes.ASSIGN,
+    override var slimValue: ParamSlimLiteral<*>
 ) : ParamSlimVariableStatement
