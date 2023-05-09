@@ -1,7 +1,7 @@
 package com.flipperplz.bisutils.param.slim.commands
 
-import com.flipperplz.bisutils.param.slim.ParamSlimCommand
-import com.flipperplz.bisutils.param.slim.ParamSlimLiteral
+import com.flipperplz.bisutils.param.slim.node.ParamSlimCommand
+import com.flipperplz.bisutils.param.slim.node.ParamSlimLiteral
 import com.flipperplz.bisutils.param.slim.literals.ParamSlimArray
 import com.flipperplz.bisutils.param.slim.util.ParamCommandTypes
 import com.flipperplz.bisutils.param.slim.util.ParamOperatorTypes

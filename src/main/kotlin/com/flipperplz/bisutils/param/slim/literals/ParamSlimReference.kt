@@ -3,8 +3,9 @@ package com.flipperplz.bisutils.param.slim.literals
 import com.flipperplz.bisutils.param.slim.node.ParamSlimLiteral
 import com.flipperplz.bisutils.param.slim.util.ParamLiteralTypes
 
-interface ParamSlimFloat : ParamSlimLiteral<Float> {
+interface ParamSlimReference : ParamSlimLiteral<String> {
     override val slimLiteralType: ParamLiteralTypes
-        get() = ParamLiteralTypes.FLOAT
-    override fun toEnforce(): String = slimValue.toString()
+        get() = ParamLiteralTypes.REFERENCE
+
+    override fun toEnforce(): String = "@$slimValue"
 }

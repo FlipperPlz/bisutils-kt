@@ -6,8 +6,11 @@ enum class ParamElementTypes {
     C_DELETE,
     C_VARIABLE,
     C_VARIABLE_ARRAY,
+    CP_UNDEF,
+    CP_INCLUDE,
     L_STRING,
     L_INT,
     L_FLOAT,
-    L_ARRAY
+    L_ARRAY,
+    L_REFERENCE,
 }

@@ -1,23 +1,24 @@
 package com.flipperplz.bisutils.param.slim.commands
 
-import com.flipperplz.bisutils.param.slim.ParamSlimCommand
+import com.flipperplz.bisutils.param.slim.node.ParamSlimCommandHolder
 import com.flipperplz.bisutils.param.slim.util.ParamCommandTypes
 
-interface ParamSlimClass : ParamSlimExternalClass {
+interface ParamSlimClass : ParamSlimExternalClass, ParamSlimCommandHolder {
     val slimSuperClass: String?
-    val slimCommands: List<ParamSlimCommand>
     override val slimCommandType: ParamCommandTypes
         get() = ParamCommandTypes.CLASS
 
     override val slimCurrentlyValid: Boolean
-        get() = super.slimCurrentlyValid && slimCommands.all { it.slimCurrentlyValid }
+        get() = super<ParamSlimExternalClass>.slimCurrentlyValid &&
+                super<ParamSlimCommandHolder>.slimCurrentlyValid &&
+                (slimSuperClass?.isNotEmpty() ?: true)
 
 
     override fun toEnforce(): String {
-        val builder = StringBuilder(super.toEnforce())
+        val builder = StringBuilder(super<ParamSlimExternalClass>.toEnforce())
         if(slimSuperClass != null) builder.append(" : ").append(slimSuperClass)
         builder.append(" { \n")
-        builder.append(slimCommands.joinToString(separator = "\n", postfix = "\n"){ it.toEnforce() })
+        builder.append(super<ParamSlimCommandHolder>.toEnforce())
         return builder.append("};").toString()
     }
 }

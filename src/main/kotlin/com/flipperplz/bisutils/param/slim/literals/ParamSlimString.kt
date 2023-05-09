@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.param.slim.literals
 
-import com.flipperplz.bisutils.param.slim.ParamSlimLiteral
+import com.flipperplz.bisutils.param.slim.node.ParamSlimLiteral
 import com.flipperplz.bisutils.param.slim.util.ParamLiteralTypes
 
 interface ParamSlimString : ParamSlimLiteral<String> {
