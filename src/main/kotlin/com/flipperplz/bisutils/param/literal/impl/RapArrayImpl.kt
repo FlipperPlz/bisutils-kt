@@ -14,7 +14,7 @@ data class RapArrayImpl(
     companion object {
         operator fun invoke(buffer: ByteBuffer, parent: RapElement?): RapArrayImpl = RapArrayImpl(parent).apply {
             for (i in 0 until buffer.getCompactInt()) {
-                when(buffer.get()) {
+                when (buffer.get()) {
                     0.toByte() -> this.slimValue.add(RapStringImpl(buffer, this))
                     1.toByte() -> this.slimValue.add(RapFloatImpl(buffer, this))
                     2.toByte() -> this.slimValue.add(RapIntImpl(buffer, this))

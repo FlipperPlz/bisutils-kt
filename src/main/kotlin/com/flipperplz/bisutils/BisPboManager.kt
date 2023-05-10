@@ -18,7 +18,7 @@ object BisPboManager {
     }
 
     fun getBuffer(file: BisPboFile): BisRandomAccessFile? {
-        if(!isManaged(file)) return null
+        if (!isManaged(file)) return null
         return managedPbos[file]?.buffer
     }
 

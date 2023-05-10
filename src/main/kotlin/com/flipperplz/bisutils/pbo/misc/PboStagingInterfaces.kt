@@ -7,7 +7,9 @@ interface StagedPboEntry {
     var metadataOffset: Long
     var synced: Boolean
 
-    fun onEditsMade() { synced = false }
+    fun onEditsMade() {
+        synced = false
+    }
 }
 
 interface StagedPboDataEntry : StagedPboEntry {

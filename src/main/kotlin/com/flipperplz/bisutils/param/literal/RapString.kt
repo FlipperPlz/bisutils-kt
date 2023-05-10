@@ -19,5 +19,6 @@ interface RapString : RapLiteral<String>, CharSequence {
     override fun subSequence(startIndex: Int, endIndex: Int): CharSequence =
         slimValue?.subSequence(startIndex, endIndex) ?: ""
 
-    override fun toEnforce(): String = if(slimValue != null) "\"${slimValue!!.replace("\"", "\"\"")}\"" else "//Unknown String"
+    override fun toEnforce(): String =
+        if (slimValue != null) "\"${slimValue!!.replace("\"", "\"\"")}\"" else "//Unknown String"
 }

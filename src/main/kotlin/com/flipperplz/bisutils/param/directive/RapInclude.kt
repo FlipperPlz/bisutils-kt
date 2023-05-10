@@ -19,7 +19,7 @@ interface RapInclude : RapDirective, RapLiteral<String> {
 
     //TODO(Ryann): abstract ParamUniversalElement (Literal && Statement)
     override val slimType: ParamElementTypes
-        get() = if(slimIsCommand) slimCommandType.type else slimLiteralType.type
+        get() = if (slimIsCommand) slimCommandType.type else slimLiteralType.type
 
     override val slimCurrentlyValid: Boolean
         get() = super<RapDirective>.slimCurrentlyValid && !slimValue.isNullOrBlank()

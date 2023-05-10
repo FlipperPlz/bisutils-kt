@@ -9,7 +9,7 @@ import java.nio.ByteOrder
 data class RapIntImpl(
     override val parent: RapElement?,
     override val slimValue: Int?
-): RapInt {
+) : RapInt {
     companion object {
         operator fun invoke(buffer: ByteBuffer, parent: RapElement?): RapIntImpl =
             RapIntImpl(parent, buffer.getInt(ByteOrder.LITTLE_ENDIAN))

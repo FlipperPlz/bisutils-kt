@@ -9,10 +9,10 @@ import java.nio.ByteOrder
 data class RapFloatImpl(
     override val parent: RapElement?,
     override val slimValue: Float?
-): RapFloat {
+) : RapFloat {
     companion object {
         operator fun invoke(buffer: ByteBuffer, parent: RapElement?): RapFloatImpl =
-            RapFloatImpl(parent, buffer.getFloat(ByteOrder.LITTLE_ENDIAN),)
+            RapFloatImpl(parent, buffer.getFloat(ByteOrder.LITTLE_ENDIAN))
 
     }
 }

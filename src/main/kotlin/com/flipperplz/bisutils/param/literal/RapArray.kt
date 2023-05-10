@@ -13,5 +13,7 @@ interface RapArray : RapLiteral<List<RapLiteralBase>> {
 
     override val slimCurrentlyValid: Boolean
         get() = super.slimCurrentlyValid && slimValue?.all { it.slimCurrentlyValid } ?: false
-    override fun toEnforce(): String = (slimValue ?: emptyList()).joinToString(", ", prefix = "{", postfix = "}") { it.toEnforce() }
+
+    override fun toEnforce(): String =
+        (slimValue ?: emptyList()).joinToString(", ", prefix = "{", postfix = "}") { it.toEnforce() }
 }

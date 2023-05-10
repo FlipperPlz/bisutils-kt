@@ -8,7 +8,6 @@ import com.flipperplz.bisutils.utils.readBytes
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import kotlin.properties.Delegates
-import kotlin.reflect.KProperty
 
 sealed interface BisPboEntry {
     val initialOwner: BisPboFile?
@@ -58,7 +57,8 @@ abstract class BisPboVersionEntry : BisPboEntry {
 
     class CACHED internal constructor(
         override val initialOwner: BisPboFile?,
-        override var properties: List<BisPboProperty>): BisPboVersionEntry() {
+        override var properties: List<BisPboProperty>
+    ) : BisPboVersionEntry() {
         companion object {
             fun withPrefix(prefix: String, owner: BisPboFile? = null): CACHED =
                 CACHED(owner, mutableListOf(BisPboProperty("prefix", prefix.lowercase())))
@@ -74,8 +74,8 @@ abstract class BisPboVersionEntry : BisPboEntry {
         override var synced: Boolean = true
         override var metadataOffset: Long = offset
 
-        override var properties: List<BisPboProperty> by Delegates.observable(properties) {
-                _, _, _ -> onEditsMade()
+        override var properties: List<BisPboProperty> by Delegates.observable(properties) { _, _, _ ->
+            onEditsMade()
         }
     }
 }
@@ -100,7 +100,7 @@ abstract class BisPboDataEntry(
     }
 
     protected open fun nameChanged(oldName: String, newName: String) {
-        if(oldName == newName) return
+        if (oldName == newName) return
         path = BisPboFile.normalizePath(newName) ?: "BUx0001: \"$newName\""
     }
 
@@ -147,14 +147,14 @@ abstract class BisPboDataEntry(
                 val start = stageBuffer.filePointer
                 stageBuffer.seek(dataOffset ?: throw Exception())
 
-                return (if((stageBuffer.length() - stageBuffer.filePointer) > size)
+                return (if ((stageBuffer.length() - stageBuffer.filePointer) > size)
                     ByteBuffer.allocate(0) else
                     ByteBuffer.wrap(stageBuffer.readBytes(size.toInt()))).also {
                     stageBuffer.seek(start)
                 }
             }
 
-        override fun nameChanged(oldName: String, newName: String) =  super.nameChanged(oldName, newName).also {
+        override fun nameChanged(oldName: String, newName: String) = super.nameChanged(oldName, newName).also {
             onEditsMade()
         }
     }

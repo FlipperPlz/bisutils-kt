@@ -37,6 +37,7 @@ enum class ParamCommandTypes(
      * @return true if the element type is a kind of T, false otherwise.
      */
     inline fun <reified T> isKindOf(): Boolean = T::class.isInstance(elementType)
+
     companion object {
         inline fun <reified T> fromType(): ParamCommandTypes? = ParamCommandTypes.values()
             .firstOrNull { it.isKindOf<T>() }

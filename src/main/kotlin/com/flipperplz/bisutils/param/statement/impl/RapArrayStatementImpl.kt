@@ -19,12 +19,13 @@ data class RapArrayStatementImpl(
         get() = 2
 
     companion object {
-        operator fun invoke(parent: RapElement?, buffer: ByteBuffer): RapArrayStatementImpl = RapArrayStatementImpl(parent, buffer.getAsciiZ()).apply {
-            slimValue = RapArrayImpl(buffer, parent)
-        }
+        operator fun invoke(parent: RapElement?, buffer: ByteBuffer): RapArrayStatementImpl =
+            RapArrayStatementImpl(parent, buffer.getAsciiZ()).apply {
+                slimValue = RapArrayImpl(buffer, parent)
+            }
     }
 
     override val slimCurrentlyValid: Boolean
-        get() = super<RapVariableStatement>.slimCurrentlyValid
+        get() = super.slimCurrentlyValid
 
 }

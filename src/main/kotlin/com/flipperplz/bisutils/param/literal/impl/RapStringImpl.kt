@@ -8,7 +8,7 @@ import java.nio.ByteBuffer
 data class RapStringImpl(
     override val parent: RapElement?,
     override val slimValue: String?
-): RapString {
+) : RapString {
     companion object {
         operator fun invoke(buffer: ByteBuffer, parent: RapElement?): RapStringImpl =
             RapStringImpl(parent, buffer.getAsciiZ())

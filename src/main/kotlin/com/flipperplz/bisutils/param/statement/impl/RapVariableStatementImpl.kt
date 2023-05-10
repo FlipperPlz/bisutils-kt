@@ -19,13 +19,13 @@ data class RapVariableStatementImpl(
     override val slimOperator: ParamOperatorTypes = ParamOperatorTypes.ASSIGN
 
     override val slimCurrentlyValid: Boolean
-        get() = super<RapVariableStatement>.slimCurrentlyValid && slimValue !is RapArray
+        get() = super.slimCurrentlyValid && slimValue !is RapArray
 
     companion object {
         operator fun invoke(parent: RapElement?, buffer: ByteBuffer): RapVariableStatementImpl {
             val id = buffer.get()
             return RapVariableStatementImpl(parent, buffer.getAsciiZ()).apply {
-                slimValue = when(id) {
+                slimValue = when (id) {
                     0.toByte() -> RapStringImpl(buffer, this)
                     1.toByte() -> RapFloatImpl(buffer, this)
                     2.toByte() -> RapIntImpl(buffer, this)

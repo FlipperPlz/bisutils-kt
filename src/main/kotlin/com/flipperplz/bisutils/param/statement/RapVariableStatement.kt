@@ -12,7 +12,7 @@ interface RapVariableStatement : RapStatement, RapNamedElement {
     val slimOperator: ParamOperatorTypes?
 
     override val slimCommandType: ParamCommandTypes
-        get() = if(slimValue is RapArray || (slimOperator != ParamOperatorTypes.ASSIGN || slimOperator != null))
+        get() = if (slimValue is RapArray || (slimOperator != ParamOperatorTypes.ASSIGN || slimOperator != null))
             ParamCommandTypes.ARRAY else
             ParamCommandTypes.VARIABLE
 

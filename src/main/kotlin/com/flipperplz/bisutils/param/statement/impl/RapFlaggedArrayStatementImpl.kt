@@ -19,8 +19,13 @@ data class RapFlaggedArrayStatementImpl(
         get() = 5
 
     companion object {
-        operator fun invoke(parent: RapElement?, buffer: ByteBuffer): RapFlaggedArrayStatementImpl = RapFlaggedArrayStatementImpl(parent, ParamOperatorTypes.forFlag(buffer.getInt()) ?: throw Exception(), buffer.getAsciiZ()).apply {
-            slimValue =  RapArrayImpl(buffer, this)
-        }
+        operator fun invoke(parent: RapElement?, buffer: ByteBuffer): RapFlaggedArrayStatementImpl =
+            RapFlaggedArrayStatementImpl(
+                parent,
+                ParamOperatorTypes.forFlag(buffer.getInt()) ?: throw Exception(),
+                buffer.getAsciiZ()
+            ).apply {
+                slimValue = RapArrayImpl(buffer, this)
+            }
     }
 }

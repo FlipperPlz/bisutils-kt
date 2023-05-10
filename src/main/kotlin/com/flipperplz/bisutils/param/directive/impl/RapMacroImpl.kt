@@ -8,4 +8,4 @@ data class RapMacroImpl(
     override var slimIsCommand: Boolean,
     override var slimMacroName: String,
     override var slimMacroArguments: List<String>,
-): RapMacro
+) : RapMacro

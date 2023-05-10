@@ -11,8 +11,9 @@ interface RapStatement : RapElement {
 
     override val slimType: ParamElementTypes
         get() = slimCommandType.type
+
     companion object {
-        operator fun invoke(buffer: ByteBuffer, parent: RapElement?): RapStatement? = when(buffer.get()) {
+        operator fun invoke(buffer: ByteBuffer, parent: RapElement?): RapStatement? = when (buffer.get()) {
             0.toByte() -> RapClassImpl(parent, buffer)
             1.toByte() -> RapVariableStatementImpl(parent, buffer)
             2.toByte() -> RapArrayStatementImpl(parent, buffer)

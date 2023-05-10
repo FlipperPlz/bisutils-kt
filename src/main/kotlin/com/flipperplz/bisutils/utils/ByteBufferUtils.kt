@@ -12,14 +12,17 @@ fun ByteBuffer.getBytes(count: Int): ByteArray {
     return bytes
 }
 
-fun ByteBuffer.getInt(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Int = ByteBuffer.wrap(getBytes(4)).order(order).getInt(0)
-fun ByteBuffer.getFloat(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Float = ByteBuffer.wrap(getBytes(4)).order(order).getFloat(0)
+fun ByteBuffer.getInt(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Int =
+    ByteBuffer.wrap(getBytes(4)).order(order).getInt(0)
+
+fun ByteBuffer.getFloat(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Float =
+    ByteBuffer.wrap(getBytes(4)).order(order).getFloat(0)
 
 fun ByteBuffer.getAsciiZ(charset: Charset = Charsets.UTF_8): String {
     val builder = mutableListOf<Byte>()
     while (this.hasRemaining()) {
         val c = this.get()
-        if(c == 0.toByte()) break
+        if (c == 0.toByte()) break
         builder.add(c)
     }
     return charset.decode(ByteBuffer.wrap(builder.toByteArray())).toString()
@@ -45,7 +48,8 @@ fun ByteBuffer.decompress(expectedSize: Long, useSignedChecksum: Boolean): ByteB
     val windowSize = 4096
     val lookaheadBufferSize = 18
     val threshold = 2
-    val textBuffer = IntArray(windowSize + lookaheadBufferSize - 1).apply { fill(0x20, 0, windowSize - lookaheadBufferSize) }
+    val textBuffer =
+        IntArray(windowSize + lookaheadBufferSize - 1).apply { fill(0x20, 0, windowSize - lookaheadBufferSize) }
     val startPos = position()
     var bytesLeft = expectedSize
     var resultIndex = 0
@@ -55,7 +59,8 @@ fun ByteBuffer.decompress(expectedSize: Long, useSignedChecksum: Boolean): ByteB
     var currentByte: Int
     var checksum = 0
     var flags: Int = 0
-    fun incrementChecksum(character: Int) = if (useSignedChecksum) checksum += character.toByte() else checksum += character
+    fun incrementChecksum(character: Int) =
+        if (useSignedChecksum) checksum += character.toByte() else checksum += character
     while (bytesLeft > 0) {
         flags = flags shr 1
         if (flags and 0x100 == 0) {
@@ -100,11 +105,11 @@ fun ByteBuffer.decompress(expectedSize: Long, useSignedChecksum: Boolean): ByteB
             }
         }
     }
-    if(
+    if (
         get() == (checksum shr 0x18).toByte() &&
         get() == ((checksum shr 0x10) and 0xff).toByte() &&
         get() == ((checksum shr 0x8) and 0xff).toByte() &&
-        get() == (checksum and  0xff).toByte()
+        get() == (checksum and 0xff).toByte()
     ) return result
 
     throw IllegalArgumentException("Checksum mismatch")

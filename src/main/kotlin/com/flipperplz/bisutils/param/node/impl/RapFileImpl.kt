@@ -21,14 +21,14 @@ class RapFileImpl internal constructor(
 
     companion object {
         operator fun invoke(buffer: ByteBuffer, name: String): RapFileImpl? {
-            if(
-               buffer.get() != 0.toByte() ||
-               buffer.get() != 114.toByte() ||
-               buffer.get() != 97.toByte() ||
-               buffer.get() != 80.toByte() ||
-               buffer.getInt(ByteOrder.LITTLE_ENDIAN) != 0 ||
-               buffer.getInt(ByteOrder.LITTLE_ENDIAN) != 8
-              ) return null
+            if (
+                buffer.get() != 0.toByte() ||
+                buffer.get() != 114.toByte() ||
+                buffer.get() != 97.toByte() ||
+                buffer.get() != 80.toByte() ||
+                buffer.getInt(ByteOrder.LITTLE_ENDIAN) != 0 ||
+                buffer.getInt(ByteOrder.LITTLE_ENDIAN) != 8
+            ) return null
             fun loadChildClasses(child: RapClassImpl, buffer: ByteBuffer): Boolean {
                 with(mutableListOf<RapStatement>()) {
                     buffer.position(child.binaryOffset)
@@ -54,7 +54,7 @@ class RapFileImpl internal constructor(
                 file.slimCommands = this
             }
 
-            if(!file.childrenOfType<RapClassImpl>().all { loadChildClasses(it, buffer) }) return null
+            if (!file.childrenOfType<RapClassImpl>().all { loadChildClasses(it, buffer) }) return null
 
 
             buffer.position(enumOffset) //TODO: ENUMS

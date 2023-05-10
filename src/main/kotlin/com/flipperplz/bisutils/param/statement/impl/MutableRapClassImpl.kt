@@ -10,4 +10,4 @@ data class MutableRapClassImpl(
     override var slimSuperClass: String?,
     override var slimCommands: List<RapStatement>,
     override var slimClassName: String,
-): RapClass
+) : RapClass

@@ -2,7 +2,7 @@ package com.flipperplz.bisutils.param.node
 
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
-interface RapFile: RapStatementHolder {
+interface RapFile : RapStatementHolder {
     val fileName: String
     val slimEnum: Map<String, Int>
 

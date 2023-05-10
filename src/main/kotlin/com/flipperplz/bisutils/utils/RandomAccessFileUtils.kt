@@ -9,13 +9,13 @@ import java.nio.charset.Charset
 fun RandomAccessFile.readAsciiZ(charset: Charset = Charsets.UTF_8): String = generateSequence { read() }
     .takeWhile { Char(it) != '\u0000' }
     .toList()
-    .map { it.toByte()}
+    .map { it.toByte() }
     .toByteArray()
     .let { String(it, charset) }
 
 fun RandomAccessFile.pop() = seek(filePointer - 1)
 fun RandomAccessFile.popInt() = seek(filePointer - 4)
-fun RandomAccessFile.peek(): Byte =  readByte().also { pop() }
+fun RandomAccessFile.peek(): Byte = readByte().also { pop() }
 fun RandomAccessFile.peek(offset: Int): Byte {
     skipBytes(offset)
     return peek().also { seek(filePointer - offset) }
@@ -35,13 +35,16 @@ fun RandomAccessFile.peekAsciiZ(offset: Int): String {
 
 fun RandomAccessFile.peekBytes(count: Int, offset: Int): ByteArray {
     skipBytes(offset)
-    val bytes =  readBytes(count)
+    val bytes = readBytes(count)
     seek(filePointer - (offset + count))
     return bytes
 }
 
-fun RandomAccessFile.readInt32(endianness: ByteOrder = ByteOrder.LITTLE_ENDIAN): Int = ByteBuffer.wrap(readBytes(4)).order(endianness).int
-fun RandomAccessFile.readLong32(endianness: ByteOrder = ByteOrder.LITTLE_ENDIAN): Long = ByteBuffer.wrap(readBytes(4)).order(endianness).long
+fun RandomAccessFile.readInt32(endianness: ByteOrder = ByteOrder.LITTLE_ENDIAN): Int =
+    ByteBuffer.wrap(readBytes(4)).order(endianness).int
+
+fun RandomAccessFile.readLong32(endianness: ByteOrder = ByteOrder.LITTLE_ENDIAN): Long =
+    ByteBuffer.wrap(readBytes(4)).order(endianness).long
 
 fun RandomAccessFile.peekInt(): Int = readInt32().also { popInt() }
 fun RandomAccessFile.peekAsciiZ(): String = readAsciiZ().also { seek(filePointer - (it.length + 1)) }
@@ -50,10 +53,10 @@ fun RandomAccessFile.readBisLZSS(expectedSize: Int, useSignedChecksum: Boolean =
     val N = 4096
     val F = 18
     val THRESHOLD = 2
-    val text_buf = CharArray(N+F-1)
+    val text_buf = CharArray(N + F - 1)
     val dst = ByteArray(expectedSize)
 
-    if( expectedSize<=0 ) return dst
+    if (expectedSize <= 0) return dst
 
     val startPos = this.filePointer
     var bytesLeft = expectedSize
@@ -61,7 +64,7 @@ fun RandomAccessFile.readBisLZSS(expectedSize: Int, useSignedChecksum: Boolean =
 
     var i: Int
     var j: Int
-    var r = N-F
+    var r = N - F
     var flags = 0
     var c: Int
     var csum = 0
@@ -70,15 +73,15 @@ fun RandomAccessFile.readBisLZSS(expectedSize: Int, useSignedChecksum: Boolean =
         if (useSignedChecksum) csum += c.toByte() else csum += c
     }
 
-    for( spaceOut in 0 until N-F ) text_buf[spaceOut] = ' '
+    for (spaceOut in 0 until N - F) text_buf[spaceOut] = ' '
     flags = 0
-    while( bytesLeft > 0 ) {
-        if( ((flags shr 1) and 256) == 0 ) {
+    while (bytesLeft > 0) {
+        if (((flags shr 1) and 256) == 0) {
             c = this.read()
             flags = c or 0xff00
         }
 
-        if( (flags and 1) != 0) {
+        if ((flags and 1) != 0) {
             c = this.read()
             incrementCSum(c)
 
@@ -88,7 +91,7 @@ fun RandomAccessFile.readBisLZSS(expectedSize: Int, useSignedChecksum: Boolean =
             // continue decompression
             text_buf[r] = c.toChar()
             r++
-            r = r and (N-1)
+            r = r and (N - 1)
         } else {
             i = this.read()
             j = this.read()
@@ -96,13 +99,13 @@ fun RandomAccessFile.readBisLZSS(expectedSize: Int, useSignedChecksum: Boolean =
             j = j and 0x0f
             j += THRESHOLD
 
-            val ii = r-i
-            val jj = j+ii
+            val ii = r - i
+            val jj = j + ii
 
-            if (j+1 > bytesLeft) throw IOException("LZSS overflow")
+            if (j + 1 > bytesLeft) throw IOException("LZSS overflow")
 
-            for( x in ii..jj ) {
-                c = text_buf[x and (N-1)].code
+            for (x in ii..jj) {
+                c = text_buf[x and (N - 1)].code
                 incrementCSum(c)
 
                 // save byte
@@ -111,7 +114,7 @@ fun RandomAccessFile.readBisLZSS(expectedSize: Int, useSignedChecksum: Boolean =
                 // continue decompression
                 text_buf[r] = c.toChar()
                 r++
-                r = r and (N-1)
+                r = r and (N - 1)
             }
         }
     }
@@ -119,7 +122,7 @@ fun RandomAccessFile.readBisLZSS(expectedSize: Int, useSignedChecksum: Boolean =
     this.read(csData)
     val csr = ByteBuffer.wrap(csData).int
 
-    if( csr != csum ) throw IOException("Checksum mismatch")
+    if (csr != csum) throw IOException("Checksum mismatch")
     return dst
 }
 

@@ -6,6 +6,6 @@ interface RapStatementHolder : RapElement {
     override val slimCurrentlyValid: Boolean
         get() = slimCommands.all { it.slimCurrentlyValid }
 
-    override fun toEnforce(): String = slimCommands.joinToString(separator = "\n", postfix = "\n"){ it.toEnforce() }
+    override fun toEnforce(): String = slimCommands.joinToString(separator = "\n", postfix = "\n") { it.toEnforce() }
 
 }

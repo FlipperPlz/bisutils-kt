@@ -18,7 +18,7 @@ interface RapMacro : RapDirective, RapLiteral<RapMacro>, RapNamedElement {
         get() = null
 
     override val slimType: ParamElementTypes
-        get() = if(slimIsCommand) ParamElementTypes.C_MACRO else ParamElementTypes.L_MACRO
+        get() = if (slimIsCommand) ParamElementTypes.C_MACRO else ParamElementTypes.L_MACRO
 
     override val slimValue: RapMacro
         get() = this
@@ -36,7 +36,7 @@ interface RapMacro : RapDirective, RapLiteral<RapMacro>, RapNamedElement {
     override fun toEnforce(): String = slimMacroName + slimMacroArguments?.joinToString(
         prefix = "(",
         separator = ",",
-        postfix = if(slimIsCommand)
+        postfix = if (slimIsCommand)
             ");" else
             ")"
     ) {

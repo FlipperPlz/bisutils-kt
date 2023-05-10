@@ -12,7 +12,7 @@ interface RapDeleteStatement : RapStatement, RapNamedElement {
     override val slimCommandType: ParamCommandTypes
         get() = ParamCommandTypes.DELETE
     override val slimCurrentlyValid: Boolean
-        get() =  super<RapStatement>.slimCurrentlyValid && !slimDeleteTarget.isNullOrBlank()
+        get() = super<RapStatement>.slimCurrentlyValid && !slimDeleteTarget.isNullOrBlank()
 
     override val slimName: String?
         get() = slimDeleteTarget

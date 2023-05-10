@@ -3,7 +3,6 @@ package com.flipperplz.bisutils.param.statement
 import com.flipperplz.bisutils.param.node.RapElement
 import com.flipperplz.bisutils.param.node.RapStatementHolder
 import com.flipperplz.bisutils.param.utils.ParamCommandTypes
-import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapClass : RapElement, RapExternalClass, RapStatementHolder {
     override val statementId: Byte
