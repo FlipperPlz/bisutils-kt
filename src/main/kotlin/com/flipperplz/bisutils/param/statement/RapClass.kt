@@ -11,6 +11,7 @@ interface RapClass : RapElement, RapExternalClass, RapStatementHolder {
     override val slimCommandType: ParamCommandTypes
         get() = ParamCommandTypes.CLASS
 
+    //TODO(Ryann): Factor in if superClass exists at interface level
     override val slimCurrentlyValid: Boolean
         get() = super<RapExternalClass>.slimCurrentlyValid &&
                 super<RapStatementHolder>.slimCurrentlyValid &&
