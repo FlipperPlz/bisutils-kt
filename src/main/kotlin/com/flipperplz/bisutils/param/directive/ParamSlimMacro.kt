@@ -12,7 +12,7 @@ interface ParamSlimMacro : ParamSlimDirective, RapLiteral<ParamSlimMacro>, RapNa
         get() = ParamCommandTypes.MACRO
 
     override val slimLiteralType: ParamLiteralTypes
-        get() = ParamLiteralTypes.MACRO
+        get() = ParamLiteralTypes.PREPROCESSOR_MACRO
 
     override val literalId: Byte?
         get() = null

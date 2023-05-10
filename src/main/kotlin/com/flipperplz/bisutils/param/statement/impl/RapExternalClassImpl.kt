@@ -5,7 +5,7 @@ import com.flipperplz.bisutils.param.statement.RapExternalClass
 import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
-class RapExternalClassImpl internal constructor(
+data class RapExternalClassImpl(
     override val parent: RapElement?,
     override val slimClassName: String?
 ) : RapExternalClass {

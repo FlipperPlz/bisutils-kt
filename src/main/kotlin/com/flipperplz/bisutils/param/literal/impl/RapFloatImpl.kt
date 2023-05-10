@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.utils.getFloat
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class RapFloatImpl internal constructor(
+data class RapFloatImpl(
     override val parent: RapElement?,
     override val slimValue: Float?
 ): RapFloat {

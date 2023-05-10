@@ -11,7 +11,7 @@ import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
-data class RapVariableStatementImpl internal constructor(
+data class RapVariableStatementImpl(
     override val parent: RapElement?,
     override val slimName: String?
 ) : RapVariableStatement {

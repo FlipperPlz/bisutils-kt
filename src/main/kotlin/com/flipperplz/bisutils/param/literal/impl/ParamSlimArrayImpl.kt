@@ -7,5 +7,5 @@ import com.flipperplz.bisutils.param.node.RapLiteralBase
 
 data class ParamSlimArrayImpl(
     override val parent: RapElement?,
-    override val slimValue: MutableList<RapLiteralBase>
+    override var slimValue: MutableList<RapLiteralBase>
 ) : RapArray

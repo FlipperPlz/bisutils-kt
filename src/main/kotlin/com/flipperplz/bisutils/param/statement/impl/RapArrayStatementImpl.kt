@@ -8,7 +8,7 @@ import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
-class RapArrayStatementImpl internal constructor(
+data class RapArrayStatementImpl(
     override val parent: RapElement?,
     override val slimName: String?
 ) : RapVariableStatement {

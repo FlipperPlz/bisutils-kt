@@ -28,7 +28,7 @@ enum class ParamCommandTypes(
     EXTERNAL_CLASS("external", RapExternalClass::class, ParamElementTypes.C_CLASS_EXTERNAL),
     CLASS("class", RapClass::class, ParamElementTypes.C_CLASS),
     PREPROCESSOR_UNDEFINE("undefine", ParamSlimUndefine::class, ParamElementTypes.CP_UNDEF),
-    PREPROCESSOR_INCLUDE("include", ParamSlimInclude::class, ParamElementTypes.CP_INCLUDE),
+    PREPROCESSOR_INCLUDE("include", ParamSlimInclude::class, ParamElementTypes.C_INCLUDE),
     MACRO("__macro__", ParamSlimMacro::class, ParamElementTypes.C_MACRO),
     PREPROCESSOR_DEFINE("define", ParamSlimDefine::class, ParamElementTypes.CP_DEFINE);
 

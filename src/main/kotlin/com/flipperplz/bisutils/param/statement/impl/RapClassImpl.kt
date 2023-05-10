@@ -8,7 +8,7 @@ import com.flipperplz.bisutils.utils.getInt
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class RapClassImpl internal constructor(
+data class RapClassImpl(
     override val parent: RapElement?,
     override val slimClassName: String,
     val binaryOffset: Int

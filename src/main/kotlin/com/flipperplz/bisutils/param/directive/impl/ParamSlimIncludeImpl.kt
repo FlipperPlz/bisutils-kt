@@ -6,5 +6,6 @@ import com.flipperplz.bisutils.param.node.RapElement
 
 data class ParamSlimIncludeImpl(
     override val parent: RapElement?,
-    override var path: String?
+    override val slimValue: String?,
+    override val slimIsCommand: Boolean
 ) : ParamSlimInclude

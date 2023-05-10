@@ -1,16 +1,28 @@
 package com.flipperplz.bisutils.param.directive
 
 import com.flipperplz.bisutils.param.node.ParamSlimDirective
+import com.flipperplz.bisutils.param.node.RapLiteral
 import com.flipperplz.bisutils.param.utils.ParamCommandTypes
+import com.flipperplz.bisutils.param.utils.ParamElementTypes
+import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
 
 //TODO(Ryann): Should also be RapLiteral<RapLiteralBase>
-interface ParamSlimInclude : ParamSlimDirective {
+interface ParamSlimInclude : ParamSlimDirective, RapLiteral<String> {
+    val slimIsCommand: Boolean
     override val slimCommandType: ParamCommandTypes
         get() = ParamCommandTypes.PREPROCESSOR_INCLUDE
-    val path: String?
+    override val slimLiteralType: ParamLiteralTypes
+        get() = ParamLiteralTypes.PREPROCESSOR_INCLUDE
+    override val literalId: Byte?
+        get() = null
+
+
+    //TODO(Ryann): abstract ParamUniversalElement (Literal && Statement)
+    override val slimType: ParamElementTypes
+        get() = if(slimIsCommand) slimCommandType.type else slimLiteralType.type
 
     override val slimCurrentlyValid: Boolean
-        get() = super.slimCurrentlyValid && !path.isNullOrBlank()
+        get() = super<ParamSlimDirective>.slimCurrentlyValid && !slimValue.isNullOrBlank()
 
-    override fun toEnforce(): String = "#include <$path>\n"
+    override fun toEnforce(): String = "#include <$slimValue>\n"
 }
