@@ -1,17 +1,15 @@
 package com.flipperplz.bisutils.param.rap
 
 import com.flipperplz.bisutils.param.rap.node.RapStatement
-import com.flipperplz.bisutils.param.rap.statement.RapClass
 import com.flipperplz.bisutils.param.rap.statement.impl.RapClassImpl
-import com.flipperplz.bisutils.param.slim.node.ParamSlimCommand
-import com.flipperplz.bisutils.param.slim.util.childrenOfType
+import com.flipperplz.bisutils.param.slim.util.extensions.childrenOfType
 import com.flipperplz.bisutils.utils.getAsciiZ
 import com.flipperplz.bisutils.utils.getCompactInt
 import com.flipperplz.bisutils.utils.getInt
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-
+//TODO(Ryann): Base should be Ram extended should be Param (param is a superset of Rap)
 //TODO(Ryann): Change all to List and make lateinit. Rap should have mininal mutability
 class RapFileImpl internal constructor(
     override val fileName: String

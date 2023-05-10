@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.param.slim.util
+package com.flipperplz.bisutils.param.slim.util.extensions
 
 import com.flipperplz.bisutils.param.slim.commands.ParamSlimClass
 import com.flipperplz.bisutils.param.slim.literals.ParamSlimArray
