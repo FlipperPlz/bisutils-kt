@@ -2,10 +2,7 @@ package com.flipperplz.bisutils.param.slim.util
 
 import com.flipperplz.bisutils.param.slim.commands.ParamSlimClass
 import com.flipperplz.bisutils.param.slim.literals.ParamSlimArray
-import com.flipperplz.bisutils.param.slim.node.ParamSlimCommand
-import com.flipperplz.bisutils.param.slim.node.ParamSlimCommandHolder
-import com.flipperplz.bisutils.param.slim.node.ParamSlimLiteral
-import com.flipperplz.bisutils.param.slim.node.ParamSlimNamed
+import com.flipperplz.bisutils.param.slim.node.*
 
 
 inline operator fun <reified T: ParamSlimNamed> ParamSlimCommandHolder.get(name: String): T? =
@@ -25,13 +22,15 @@ inline infix fun ParamSlimCommandHolder.contains(command: ParamSlimCommand): Boo
 inline fun <reified T: ParamSlimCommand> ParamSlimCommandHolder.childrenOfType(): List<T> =
     slimCommands.filterIsInstance<T>()
 
-inline operator fun ParamSlimArray.get(index: Int): ParamSlimLiteral<*>? =
+inline fun ParamSlimCommandHolder.childClasses(): List<ParamSlimClass> = childrenOfType()
+
+inline operator fun ParamSlimArray.get(index: Int): ParamSlimLiteralBase? =
     slimValue?.get(index)
 
 inline operator fun ParamSlimCommandHolder.iterator(): Iterator<ParamSlimCommand> =
     slimCommands.iterator()
 
-inline operator fun ParamSlimArray.iterator(): Iterator<ParamSlimLiteral<*>> =
+inline operator fun ParamSlimArray.iterator(): Iterator<ParamSlimLiteralBase> =
     slimValue?.iterator() ?: iterator {  }
 
 // DELEGATION

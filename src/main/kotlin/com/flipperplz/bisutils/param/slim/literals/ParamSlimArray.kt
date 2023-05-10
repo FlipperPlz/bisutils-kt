@@ -1,9 +1,10 @@
 package com.flipperplz.bisutils.param.slim.literals
 
 import com.flipperplz.bisutils.param.slim.node.ParamSlimLiteral
+import com.flipperplz.bisutils.param.slim.node.ParamSlimLiteralBase
 import com.flipperplz.bisutils.param.slim.util.ParamLiteralTypes
 
-interface ParamSlimArray : ParamSlimLiteral<List<ParamSlimLiteral<*>>> {
+interface ParamSlimArray : ParamSlimLiteral<List<ParamSlimLiteralBase>> {
     override val slimLiteralType: ParamLiteralTypes
         get() = ParamLiteralTypes.ARRAY
 

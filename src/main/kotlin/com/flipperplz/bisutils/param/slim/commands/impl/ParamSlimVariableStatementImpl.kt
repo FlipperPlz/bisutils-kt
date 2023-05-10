@@ -10,5 +10,7 @@ data class ParamSlimVariableStatementImpl(
     var parentElement: ParamSlim?,
     override var slimName: String,
     override var slimOperator: ParamOperatorTypes = ParamOperatorTypes.ASSIGN,
-    override var slimValue: ParamSlimLiteral<*>
-) : ParamSlimVariableStatement
+) : ParamSlimVariableStatement {
+    override lateinit var slimValue: ParamSlimLiteral<*>
+
+}
