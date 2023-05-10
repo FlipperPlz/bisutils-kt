@@ -8,7 +8,7 @@ import com.flipperplz.bisutils.param.slim.util.ParamOperatorTypes
 import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
-class RapFlaggedArrayStatementImpl(
+class RapFlaggedArrayStatementImpl internal constructor(
     override val parentElement: RapElement?,
     override val slimOperator: ParamOperatorTypes,
     override val slimName: String?

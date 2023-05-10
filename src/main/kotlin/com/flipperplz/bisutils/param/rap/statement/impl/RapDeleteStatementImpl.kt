@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.param.slim.commands.ParamSlimDeleteStatement
 import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
-class RapDeleteStatementImpl(
+class RapDeleteStatementImpl internal constructor(
     override val parentElement: RapElement?,
     override val slimDeleteTarget: String?
 ) : RapDeleteStatement {

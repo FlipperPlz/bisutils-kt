@@ -7,7 +7,7 @@ import com.flipperplz.bisutils.utils.getInt
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class RapExternalClassImpl(
+class RapExternalClassImpl internal constructor(
     override val parentElement: RapElement?,
     override val slimClassName: String?
 ) : RapExternalClass {

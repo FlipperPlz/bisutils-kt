@@ -5,7 +5,7 @@ import com.flipperplz.bisutils.param.rap.literal.RapString
 import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
-class RapStringImpl(
+class RapStringImpl internal constructor(
     override val parentElement: RapElement?,
     override val slimValue: String?
 ): RapString {

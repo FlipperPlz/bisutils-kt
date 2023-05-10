@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.utils.getInt
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-data class RapIntImpl(
+data class RapIntImpl internal constructor(
     override val parentElement: RapElement?,
     override val slimValue: Int?
 ): RapInt {

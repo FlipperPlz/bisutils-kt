@@ -7,7 +7,7 @@ import com.flipperplz.bisutils.param.rap.statement.RapArrayStatement
 import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
-class RapArrayStatementImpl(
+class RapArrayStatementImpl internal constructor(
     override val parentElement: RapElement?,
     override val slimName: String?
 ) : RapArrayStatement {

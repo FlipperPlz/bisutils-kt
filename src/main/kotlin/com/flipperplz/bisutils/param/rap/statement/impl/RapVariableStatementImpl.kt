@@ -13,7 +13,7 @@ import com.flipperplz.bisutils.param.slim.util.ParamOperatorTypes
 import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
-data class RapVariableStatementImpl(
+data class RapVariableStatementImpl internal constructor(
     override val parentElement: RapElement?,
     override val slimName: String?
 ) : RapVariableStatement {
