@@ -1,10 +1,9 @@
 package com.flipperplz.bisutils.param.literal.impl
 
-import com.flipperplz.bisutils.param.literal.RapFloat
+import com.flipperplz.bisutils.param.literal.RapString
 import com.flipperplz.bisutils.param.node.RapElement
 
-
-data class ParamSlimFloatImpl(
+data class MutableRapStringImpl(
     override val parent: RapElement?,
-    override var slimValue: Float
-) : RapFloat
+    override var slimValue: String
+) : RapString

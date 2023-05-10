@@ -1,9 +1,9 @@
 package com.flipperplz.bisutils.param.utils
 
-import com.flipperplz.bisutils.param.directive.ParamSlimDefine
-import com.flipperplz.bisutils.param.directive.ParamSlimInclude
-import com.flipperplz.bisutils.param.directive.ParamSlimMacro
-import com.flipperplz.bisutils.param.directive.ParamSlimUndefine
+import com.flipperplz.bisutils.param.directive.RapDefine
+import com.flipperplz.bisutils.param.directive.RapInclude
+import com.flipperplz.bisutils.param.directive.RapMacro
+import com.flipperplz.bisutils.param.directive.RapUndefine
 import com.flipperplz.bisutils.param.node.RapStatement
 import com.flipperplz.bisutils.param.statement.RapClass
 import com.flipperplz.bisutils.param.statement.RapDeleteStatement
@@ -27,10 +27,10 @@ enum class ParamCommandTypes(
     ARRAY("array", RapVariableStatement::class, ParamElementTypes.C_VARIABLE_ARRAY),
     EXTERNAL_CLASS("external", RapExternalClass::class, ParamElementTypes.C_CLASS_EXTERNAL),
     CLASS("class", RapClass::class, ParamElementTypes.C_CLASS),
-    PREPROCESSOR_UNDEFINE("undefine", ParamSlimUndefine::class, ParamElementTypes.CP_UNDEF),
-    PREPROCESSOR_INCLUDE("include", ParamSlimInclude::class, ParamElementTypes.C_INCLUDE),
-    MACRO("__macro__", ParamSlimMacro::class, ParamElementTypes.C_MACRO),
-    PREPROCESSOR_DEFINE("define", ParamSlimDefine::class, ParamElementTypes.CP_DEFINE);
+    PREPROCESSOR_UNDEFINE("undefine", RapUndefine::class, ParamElementTypes.CP_UNDEF),
+    PREPROCESSOR_INCLUDE("include", RapInclude::class, ParamElementTypes.C_INCLUDE),
+    MACRO("__macro__", RapMacro::class, ParamElementTypes.C_MACRO),
+    PREPROCESSOR_DEFINE("define", RapDefine::class, ParamElementTypes.CP_DEFINE);
 
     /**
      * Checks if the element type is a kind of T.

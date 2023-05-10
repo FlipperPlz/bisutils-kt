@@ -3,7 +3,7 @@ package com.flipperplz.bisutils.param.literal
 import com.flipperplz.bisutils.param.node.RapLiteral
 import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
 
-interface ParamSlimReference : RapLiteral<String> {
+interface RapReference : RapLiteral<String> {
     override val slimBinarizable: Boolean
         get() = false
     override val literalId: Byte?

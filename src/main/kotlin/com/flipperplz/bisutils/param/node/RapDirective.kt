@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.param.node
 
-interface ParamSlimDirective : RapStatement {
+interface RapDirective : RapStatement {
     override val slimBinarizable: Boolean
         get() = false
 

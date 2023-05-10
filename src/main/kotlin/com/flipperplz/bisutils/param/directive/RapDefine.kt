@@ -1,10 +1,10 @@
 package com.flipperplz.bisutils.param.directive
 
-import com.flipperplz.bisutils.param.node.ParamSlimDirective
+import com.flipperplz.bisutils.param.node.RapDirective
 import com.flipperplz.bisutils.param.node.RapNamedElement
 import com.flipperplz.bisutils.param.utils.ParamCommandTypes
 
-interface ParamSlimDefine : ParamSlimDirective, RapNamedElement {
+interface RapDefine : RapDirective, RapNamedElement {
     override val slimCommandType: ParamCommandTypes
         get() = ParamCommandTypes.PREPROCESSOR_DEFINE
     val slimMacroName: String?
@@ -27,7 +27,7 @@ interface ParamSlimDefine : ParamSlimDirective, RapNamedElement {
     }
 
     override val slimCurrentlyValid: Boolean
-        get() = super<ParamSlimDirective>.slimCurrentlyValid && !slimMacroName.isNullOrBlank()
+        get() = super<RapDirective>.slimCurrentlyValid && !slimMacroName.isNullOrBlank()
 
     override fun toEnforce(): String {
         val builder = StringBuilder("#define $slimMacroName")

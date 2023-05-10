@@ -10,30 +10,30 @@ import com.flipperplz.bisutils.param.statement.RapClass
 import java.nio.ByteBuffer
 
 inline fun RapElement?.createValue(value: () -> String): RapString =
-    ParamSlimStringImpl(this, value())
+    MutableRapStringImpl(this, value())
 
-operator fun ParamSlimArrayImpl.set(i: Int, element: RapLiteralBase) { slimValue[i] = element }
+operator fun MutableRapArrayImpl.set(i: Int, element: RapLiteralBase) { slimValue[i] = element }
 
 inline fun createRapValue(parent: RapElement? = null, value: () -> String): RapString =
-    ParamSlimStringImpl(parent, value())
+    MutableRapStringImpl(parent, value())
 
 inline fun RapElement?.createValue(value: () -> Int): RapInt =
-    ParamSlimIntImpl(this, value())
+    MutableRapIntImpl(this, value())
 
 inline fun createRapValue(parent: RapElement? = null, value: () -> Int): RapInt =
-    ParamSlimIntImpl(parent, value())
+    MutableRapIntImpl(parent, value())
 
 inline fun RapElement?.createValue(value: () -> Float): RapFloat =
-    ParamSlimFloatImpl(this, value())
+    MutableRapFloatImpl(this, value())
 
 inline fun createRapValue(parent: RapElement? = null, value: () -> Float): RapFloat =
-    ParamSlimFloatImpl(parent, value())
+    MutableRapFloatImpl(parent, value())
 
 inline fun RapElement?.createValue(value: () -> MutableList<RapLiteralBase>): RapArray =
-    ParamSlimArrayImpl(this, value())
+    MutableRapArrayImpl(this, value())
 
 inline fun createRapValue(parent: RapElement? = null, value: () -> MutableList<RapLiteralBase>): RapArray =
-    ParamSlimArrayImpl(parent, value())
+    MutableRapArrayImpl(parent, value())
 
 inline operator fun <reified T: RapNamedElement> RapStatementHolder.get(name: String): T? =
     slimCommands.filterIsInstance<T>().firstOrNull {it.slimName.equals(name, true) }

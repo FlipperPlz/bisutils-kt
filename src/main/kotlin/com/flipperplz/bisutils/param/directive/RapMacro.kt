@@ -1,13 +1,13 @@
 package com.flipperplz.bisutils.param.directive
 
-import com.flipperplz.bisutils.param.node.ParamSlimDirective
+import com.flipperplz.bisutils.param.node.RapDirective
 import com.flipperplz.bisutils.param.node.RapLiteral
 import com.flipperplz.bisutils.param.node.RapNamedElement
 import com.flipperplz.bisutils.param.utils.ParamCommandTypes
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
 
-interface ParamSlimMacro : ParamSlimDirective, RapLiteral<ParamSlimMacro>, RapNamedElement {
+interface RapMacro : RapDirective, RapLiteral<RapMacro>, RapNamedElement {
     override val slimCommandType: ParamCommandTypes
         get() = ParamCommandTypes.MACRO
 
@@ -20,7 +20,7 @@ interface ParamSlimMacro : ParamSlimDirective, RapLiteral<ParamSlimMacro>, RapNa
     override val slimType: ParamElementTypes
         get() = if(slimIsCommand) ParamElementTypes.C_MACRO else ParamElementTypes.L_MACRO
 
-    override val slimValue: ParamSlimMacro
+    override val slimValue: RapMacro
         get() = this
 
     val slimIsCommand: Boolean
