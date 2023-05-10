@@ -9,3 +9,4 @@ interface ParamSlimCommand : ParamSlim {
     override val slimType: ParamElementTypes
         get() = slimCommandType.type
 }
+

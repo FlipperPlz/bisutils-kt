@@ -16,7 +16,7 @@ interface ParamSlimClass : ParamSlimExternalClass, ParamSlimCommandHolder {
 
     override fun toEnforce(): String {
         val builder = StringBuilder(super<ParamSlimExternalClass>.toEnforce())
-        if(slimSuperClass != null) builder.append(" : ").append(slimSuperClass)
+        if (slimSuperClass != null) builder.append(" : ").append(slimSuperClass)
         builder.append(" { \n")
         builder.append(super<ParamSlimCommandHolder>.toEnforce())
         return builder.append("};").toString()

@@ -2,11 +2,12 @@ package com.flipperplz.bisutils.param.slim.directive
 
 import com.flipperplz.bisutils.param.slim.node.ParamSlimDirective
 import com.flipperplz.bisutils.param.slim.node.ParamSlimLiteral
+import com.flipperplz.bisutils.param.slim.node.ParamSlimNamed
 import com.flipperplz.bisutils.param.slim.util.ParamCommandTypes
 import com.flipperplz.bisutils.param.slim.util.ParamElementTypes
 import com.flipperplz.bisutils.param.slim.util.ParamLiteralTypes
 
-interface ParamSlimMacro : ParamSlimDirective, ParamSlimLiteral<ParamSlimMacro> {
+interface ParamSlimMacro : ParamSlimDirective, ParamSlimLiteral<ParamSlimMacro>, ParamSlimNamed {
     override val slimCommandType: ParamCommandTypes
         get() = ParamCommandTypes.MACRO
 
@@ -22,6 +23,9 @@ interface ParamSlimMacro : ParamSlimDirective, ParamSlimLiteral<ParamSlimMacro> 
     val slimIsCommand: Boolean
     val slimMacroName: String?
     val slimMacroArguments: List<String>?
+
+    override val slimName: String?
+        get() = slimMacroName
 
     override val slimCurrentlyValid: Boolean
         get() = super<ParamSlimLiteral>.slimCurrentlyValid && slimMacroName.isNullOrBlank()

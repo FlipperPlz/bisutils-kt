@@ -32,7 +32,7 @@ sealed interface BisRapElement {
     sealed class BisRapLiteral<T>(override val parentElement: BisRapElement) : BisRapElement {
         abstract val value: T
         sealed class BisRapParameterValue<T>(parentElement: BisRapElement, override val value: T) :  BisRapLiteral<T>(parentElement) {
-            class BisRapString(parentElement: BisRapElement, value: String) : BisRapParameterValue<String>(parentElement, value);
+            class BisRapString(parentElement: BisRapElement, value: String) : BisRapParameterValue<String>(parentElement, value)
 
             sealed class BisRapNumeric<T : Number>(parentElement: BisRapElement, value: T) : BisRapParameterValue<T>(parentElement, value) {
                 override val children: List<BisRapElement>? = null

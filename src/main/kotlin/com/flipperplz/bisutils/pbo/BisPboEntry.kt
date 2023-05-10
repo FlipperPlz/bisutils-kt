@@ -44,7 +44,7 @@ abstract class BisPboDummyEntry : BisPboEntry {
     }
 }
 
-abstract class BisPboVersionEntry(): BisPboEntry {
+abstract class BisPboVersionEntry : BisPboEntry {
 
     abstract var properties: List<BisPboProperty>
     override var fileName: String = ""

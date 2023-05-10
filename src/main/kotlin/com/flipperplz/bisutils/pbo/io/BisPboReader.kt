@@ -15,7 +15,7 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
 
     private val pos: Long
         get() = buffer.filePointer
-    private var flagPtr: Long? = null;
+    private var flagPtr: Long? = null
 
     fun lightRead(): BisPboFile {
         val result = BisPboFile(buffer.fileName)

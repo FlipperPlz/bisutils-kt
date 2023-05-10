@@ -1,13 +1,13 @@
 package com.flipperplz.bisutils.param.slim.commands
 
-import com.flipperplz.bisutils.param.slim.node.ParamSlimCommand
 import com.flipperplz.bisutils.param.slim.node.ParamSlimLiteral
 import com.flipperplz.bisutils.param.slim.literals.ParamSlimArray
+import com.flipperplz.bisutils.param.slim.node.ParamSlimCommand
+import com.flipperplz.bisutils.param.slim.node.ParamSlimNamed
 import com.flipperplz.bisutils.param.slim.util.ParamCommandTypes
 import com.flipperplz.bisutils.param.slim.util.ParamOperatorTypes
 
-interface ParamSlimVariableStatement : ParamSlimCommand {
-    val slimName: String?;
+interface ParamSlimVariableStatement : ParamSlimCommand, ParamSlimNamed {
     val slimValue: ParamSlimLiteral<*>?
     val slimOperator: ParamOperatorTypes?
     override val slimCommandType: ParamCommandTypes

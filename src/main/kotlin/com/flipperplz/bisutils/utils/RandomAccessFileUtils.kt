@@ -102,7 +102,7 @@ fun RandomAccessFile.readBisLZSS(expectedSize: Int, useSignedChecksum: Boolean =
             if (j+1 > bytesLeft) throw IOException("LZSS overflow")
 
             for( x in ii..jj ) {
-                c = text_buf[x and (N-1)].toInt()
+                c = text_buf[x and (N-1)].code
                 incrementCSum(c)
 
                 // save byte

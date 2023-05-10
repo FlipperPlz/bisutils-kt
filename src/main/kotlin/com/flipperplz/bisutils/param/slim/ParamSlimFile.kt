@@ -6,7 +6,7 @@ interface ParamSlimFile : ParamSlimCommandHolder {
     val fileName: String
     val slimEnum: Map<String, Int>
 
-    override fun toEnforce(): String = super<ParamSlimCommandHolder>.toEnforce() + slimEnum.asSequence().joinToString(
+    override fun toEnforce(): String = super.toEnforce() + slimEnum.asSequence().joinToString(
         prefix = "enum {\n",
         postfix = "\n};",
         separator = ",\n"

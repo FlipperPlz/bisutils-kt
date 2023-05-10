@@ -32,7 +32,7 @@ fun ByteBuffer.getCompactInt(): Int {
         val v: Int = get().toInt()
         value = value or ((v and 0x7F) shl (7 * i))
         if ((v and 0x80) == 0) break
-        ++i;
+        ++i
     }
     return value
 }

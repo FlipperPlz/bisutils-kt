@@ -19,7 +19,7 @@ object BisRapWriter {
         fileWriter.close()
     }
 
-    fun writeTo(rapFile: BisRapFile, path: Path, beautifier: BisRapBeautifier = BisRapBeautifier.NONE) = BisRapWriter.writeTo(rapFile, path.toFile(), beautifier)
+    fun writeTo(rapFile: BisRapFile, path: Path, beautifier: BisRapBeautifier = BisRapBeautifier.NONE) = writeTo(rapFile, path.toFile(), beautifier)
 
     private fun writeElement(element: BisRapElement, beautifier: BisRapBeautifier = BisRapBeautifier.NONE, previousBuilder: StringBuilder? = null): StringBuilder {
         with(previousBuilder ?: StringBuilder()) {
@@ -104,7 +104,7 @@ object BisRapWriter {
                     else beautifier.operator2VariableValue(it)
                     writeElement(element.tokenValue, beautifier, it)
                     if(isArray) {
-                        beautifier.arrayEnd2Semi(it);
+                        beautifier.arrayEnd2Semi(it)
                         it.append(';')
                         beautifier.afterArrayStatement(it)
                     } else {
