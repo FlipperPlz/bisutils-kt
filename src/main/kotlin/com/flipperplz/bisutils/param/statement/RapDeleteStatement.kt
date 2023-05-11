@@ -17,5 +17,5 @@ interface RapDeleteStatement : RapStatement, RapNamedElement {
     override val slimName: String?
         get() = slimDeleteTarget
 
-    override fun toEnforce(): String = "delete $slimDeleteTarget;"
+    override fun toParam(): String = "delete $slimDeleteTarget;"
 }

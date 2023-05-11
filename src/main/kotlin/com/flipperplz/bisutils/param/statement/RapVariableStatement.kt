@@ -22,10 +22,10 @@ interface RapVariableStatement : RapStatement, RapNamedElement {
     override val slimCurrentlyValid: Boolean
         get() = !slimName.isNullOrBlank() && slimValue != null && (slimOperator == ParamOperatorTypes.ASSIGN || slimValue is RapArray)
 
-    override fun toEnforce(): String {
+    override fun toParam(): String {
         val builder = StringBuilder(slimName)
         if (slimValue is RapArray) builder.append("[]")
         builder.append(' ').append(slimOperator?.text).append(' ')
-        return builder.append(slimValue?.toEnforce()).append(';').toString()
+        return builder.append(slimValue?.toParam()).append(';').toString()
     }
 }

@@ -29,7 +29,7 @@ interface RapDefine : RapDirective, RapNamedElement {
     override val slimCurrentlyValid: Boolean
         get() = super<RapDirective>.slimCurrentlyValid && !slimMacroName.isNullOrBlank()
 
-    override fun toEnforce(): String {
+    override fun toParam(): String {
         val builder = StringBuilder("#define $slimMacroName")
         if (!slimMacroArguments.isNullOrEmpty()) builder.append(slimMacroArguments!!.joinToString(
             prefix = "(",

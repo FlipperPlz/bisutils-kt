@@ -24,5 +24,5 @@ interface RapInclude : RapDirective, RapLiteral<String> {
     override val slimCurrentlyValid: Boolean
         get() = super<RapDirective>.slimCurrentlyValid && !slimValue.isNullOrBlank()
 
-    override fun toEnforce(): String = "#include <$slimValue>\n"
+    override fun toParam(): String = "#include <$slimValue>\n"
 }

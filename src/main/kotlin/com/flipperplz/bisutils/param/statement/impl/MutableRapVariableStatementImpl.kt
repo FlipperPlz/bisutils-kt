@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.param.statement.RapVariableStatement
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 
 data class MutableRapVariableStatementImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override var slimName: String,
     override var slimOperator: ParamOperatorTypes = ParamOperatorTypes.ASSIGN,
 ) : RapVariableStatement {

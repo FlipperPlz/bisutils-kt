@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
 data class RapDeleteStatementImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override val slimDeleteTarget: String?
 ) : RapDeleteStatement {
     companion object {

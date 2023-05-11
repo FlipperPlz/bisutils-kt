@@ -15,7 +15,7 @@ import java.nio.ByteOrder
 class RapFileImpl internal constructor(
     override val fileName: String
 ) : RapFile {
-    override val parent: RapElement? = null
+    override val slimParent: RapElement? = null
     override lateinit var slimEnum: Map<String, Int>
     override lateinit var slimCommands: List<RapStatement>
 

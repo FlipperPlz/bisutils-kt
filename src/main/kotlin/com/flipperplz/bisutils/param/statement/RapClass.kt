@@ -18,11 +18,11 @@ interface RapClass : RapElement, RapExternalClass, RapStatementHolder {
                 (slimSuperClass?.isNotEmpty() ?: true)
 
 
-    override fun toEnforce(): String {
-        val builder = StringBuilder(super<RapExternalClass>.toEnforce())
+    override fun toParam(): String {
+        val builder = StringBuilder(super<RapExternalClass>.toParam())
         if (slimSuperClass != null) builder.append(" : ").append(slimSuperClass)
         builder.append(" { \n")
-        builder.append(super<RapStatementHolder>.toEnforce())
+        builder.append(super<RapStatementHolder>.toParam())
         return builder.append("};").toString()
     }
 }

@@ -3,7 +3,7 @@ package com.flipperplz.bisutils.param.node
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapElement {
-    val parent: RapElement?
+    val slimParent: RapElement?
 
     val slimType: ParamElementTypes
 
@@ -13,5 +13,5 @@ interface RapElement {
     val slimBinarizable: Boolean
         get() = true
 
-    fun toEnforce(): String
+    fun toParam(): String
 }

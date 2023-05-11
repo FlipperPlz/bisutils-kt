@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.param.statement.RapClass
 
 
 data class MutableRapClassImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override var slimSuperClass: String?,
     override var slimCommands: List<RapStatement>,
     override var slimClassName: String,

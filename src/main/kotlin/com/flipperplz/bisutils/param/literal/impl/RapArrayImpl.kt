@@ -7,7 +7,7 @@ import com.flipperplz.bisutils.utils.getCompactInt
 import java.nio.ByteBuffer
 
 data class RapArrayImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override val slimValue: MutableList<RapLiteralBase> = mutableListOf()
 ) : RapArray {
 

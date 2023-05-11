@@ -33,7 +33,7 @@ interface RapMacro : RapDirective, RapLiteral<RapMacro>, RapNamedElement {
     override val slimCurrentlyValid: Boolean
         get() = super<RapLiteral>.slimCurrentlyValid && slimMacroName.isNullOrBlank()
 
-    override fun toEnforce(): String = slimMacroName + slimMacroArguments?.joinToString(
+    override fun toParam(): String = slimMacroName + slimMacroArguments?.joinToString(
         prefix = "(",
         separator = ",",
         postfix = if (slimIsCommand)

@@ -14,7 +14,7 @@ interface RapExternalClass : RapStatement, RapNamedElement {
     override val slimCurrentlyValid: Boolean
         get() = super<RapStatement>.slimCurrentlyValid && !slimClassName.isNullOrBlank()
 
-    override fun toEnforce(): String = "class $slimClassName;"
+    override fun toParam(): String = "class $slimClassName;"
     override val slimName: String?
         get() = slimClassName
 }

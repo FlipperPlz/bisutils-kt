@@ -9,7 +9,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 data class RapClassImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override val slimClassName: String,
     val binaryOffset: Int
 ) : RapClass {

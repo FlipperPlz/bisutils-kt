@@ -10,5 +10,5 @@ interface RapFloat : RapNumerical {
         get() = ParamLiteralTypes.FLOAT
 
     override val slimValue: Float?
-    override fun toEnforce(): String = slimValue.toString()
+    override fun toParam(): String = slimValue.toString()
 }

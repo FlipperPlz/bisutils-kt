@@ -7,7 +7,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 data class RapFloatImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override val slimValue: Float?
 ) : RapFloat {
     companion object {

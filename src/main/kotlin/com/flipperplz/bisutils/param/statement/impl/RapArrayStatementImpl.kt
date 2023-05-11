@@ -9,7 +9,7 @@ import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
 data class RapArrayStatementImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override val slimName: String?
 ) : RapVariableStatement {
     override lateinit var slimValue: RapArray

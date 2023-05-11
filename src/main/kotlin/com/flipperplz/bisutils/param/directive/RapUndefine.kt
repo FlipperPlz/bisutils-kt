@@ -12,7 +12,7 @@ interface RapUndefine : RapDirective, RapNamedElement {
     override val slimCurrentlyValid: Boolean
         get() = super<RapDirective>.slimCurrentlyValid && !macroName.isNullOrBlank()
 
-    override fun toEnforce(): String = "#undef $macroName\n"
+    override fun toParam(): String = "#undef $macroName\n"
     override val slimName: String?
         get() = macroName
 }

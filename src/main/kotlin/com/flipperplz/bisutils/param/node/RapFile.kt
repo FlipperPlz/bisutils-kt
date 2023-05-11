@@ -9,7 +9,7 @@ interface RapFile : RapStatementHolder {
     override val slimType: ParamElementTypes
         get() = ParamElementTypes.FILE
 
-    override fun toEnforce(): String = super.toEnforce() + slimEnum.asSequence().joinToString(
+    override fun toParam(): String = super.toParam() + slimEnum.asSequence().joinToString(
         prefix = "enum {\n",
         postfix = "\n};",
         separator = ",\n"

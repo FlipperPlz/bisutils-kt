@@ -10,5 +10,5 @@ interface RapInt : RapNumerical {
         get() = ParamLiteralTypes.INTEGER
     override val slimValue: Int?
 
-    override fun toEnforce(): String = slimValue.toString()
+    override fun toParam(): String = slimValue.toString()
 }

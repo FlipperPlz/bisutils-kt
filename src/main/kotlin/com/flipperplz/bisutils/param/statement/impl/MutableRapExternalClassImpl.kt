@@ -5,6 +5,6 @@ import com.flipperplz.bisutils.param.statement.RapExternalClass
 
 
 data class MutableRapExternalClassImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override var slimClassName: String
 ) : RapExternalClass

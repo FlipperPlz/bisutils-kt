@@ -5,6 +5,6 @@ import com.flipperplz.bisutils.param.statement.RapDeleteStatement
 
 
 data class MutableRapDeleteStatementImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override var slimDeleteTarget: String
 ) : RapDeleteStatement

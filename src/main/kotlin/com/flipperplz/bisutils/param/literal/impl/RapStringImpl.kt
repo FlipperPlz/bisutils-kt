@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.utils.getAsciiZ
 import java.nio.ByteBuffer
 
 data class RapStringImpl(
-    override val parent: RapElement?,
+    override val slimParent: RapElement?,
     override val slimValue: String?
 ) : RapString {
     companion object {

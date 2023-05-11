@@ -11,5 +11,5 @@ interface RapReference : RapLiteral<String> {
     override val slimLiteralType: ParamLiteralTypes
         get() = ParamLiteralTypes.REFERENCE
 
-    override fun toEnforce(): String = "@$slimValue"
+    override fun toParam(): String = "@$slimValue"
 }
