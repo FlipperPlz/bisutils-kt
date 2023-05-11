@@ -7,9 +7,9 @@ package com.flipperplz.bisutils.param.node
 interface RapStatementHolder : RapElement {
     val slimCommands: List<RapStatement>
 
-    override val slimCurrentlyValid: Boolean
-        get() = slimCommands.all { it.slimCurrentlyValid }
+    override fun isCurrentlyValid(): Boolean = slimCommands.all { it.isCurrentlyValid() }
 
-    override fun toParam(): String = slimCommands.joinToString(separator = "\n", postfix = "\n") { it.toParam() }
+    override fun isBinarizable(): Boolean = slimCommands.all { it.isBinarizable() }
 
+    fun writeSlimCommands() = slimCommands.joinToString(separator = "\n", postfix = "\n") { it.toParam() }
 }

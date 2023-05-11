@@ -1,8 +1,5 @@
 package com.flipperplz.bisutils.param.node
 
-import com.flipperplz.bisutils.param.utils.ParamElementTypes
-import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
-
 /**
  * Rap literal base - A non-specific base used for defining literals in the language. [slimValue] is abstracted to a
  * more specific type in implementations. This interface is here to prevent unnecessary usage of
@@ -13,12 +10,6 @@ import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
  */
 interface RapLiteralBase : RapElement {
     val slimValue: Any?
-    val literalId: Byte?
 
-    val slimLiteralType: ParamLiteralTypes
-    override val slimType: ParamElementTypes
-        get() = slimLiteralType.type
-
-    override val slimCurrentlyValid: Boolean
-        get() = slimValue != null
+    override fun isCurrentlyValid(): Boolean = slimValue != null
 }

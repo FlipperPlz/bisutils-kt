@@ -1,15 +1,24 @@
 package com.flipperplz.bisutils.param.literal
 
+import com.flipperplz.bisutils.param.directive.RapInclude
 import com.flipperplz.bisutils.param.node.RapLiteral
-import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
+import com.flipperplz.bisutils.param.utils.ParamElementTypes
+import com.flipperplz.bisutils.param.utils.ParamStringType
 
 interface RapString : RapLiteral<String> {
-    override val literalId: Byte?
-        get() = 0
+    val slimStringType: ParamStringType
 
-    override val slimLiteralType: ParamLiteralTypes
-        get() = ParamLiteralTypes.STRING
+    override fun isBinarizable(): Boolean =
+        slimStringType != ParamStringType.ANGLE
+
+    override fun getRapElementType(): ParamElementTypes =
+        ParamElementTypes.L_STRING
+
+    override fun isCurrentlyValid(): Boolean =
+        super.isCurrentlyValid() &&
+        (slimStringType != ParamStringType.ANGLE || slimParent is RapInclude) &&
+        (slimValue?.length ?: 1025) <= 1024
 
     override fun toParam(): String =
-        if (slimValue != null) "\"${slimValue!!.replace("\"", "\"\"")}\"" else "//Unknown String"
+        slimStringType.stringify(slimValue ?: "")
 }

@@ -2,17 +2,17 @@ package com.flipperplz.bisutils.param.literal
 
 import com.flipperplz.bisutils.param.node.RapLiteral
 import com.flipperplz.bisutils.param.node.RapLiteralBase
-import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
+import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapArray : RapLiteral<List<RapLiteralBase>> {
-    override val literalId: Byte
-        get() = 3
+    override fun isBinarizable(): Boolean =
+        slimValue?.all { it.isBinarizable() } ?: true
 
-    override val slimLiteralType: ParamLiteralTypes
-        get() = ParamLiteralTypes.ARRAY
+    override fun isCurrentlyValid(): Boolean =
+        super.isCurrentlyValid() && slimValue?.all { it.isCurrentlyValid() } ?: false
 
-    override val slimCurrentlyValid: Boolean
-        get() = super.slimCurrentlyValid && slimValue?.all { it.slimCurrentlyValid } ?: false
+    override fun getRapElementType(): ParamElementTypes =
+        ParamElementTypes.L_ARRAY
 
     override fun toParam(): String =
         (slimValue ?: emptyList()).joinToString(", ", prefix = "{", postfix = "}") { it.toParam() }

@@ -1,14 +1,14 @@
 package com.flipperplz.bisutils.param.literal
 
-import com.flipperplz.bisutils.param.node.RapLiteral
-import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
+import com.flipperplz.bisutils.param.node.RapNumerical
+import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapInt : RapNumerical {
-    override val literalId: Byte
-        get() = 2
-    override val slimLiteralType: ParamLiteralTypes
-        get() = ParamLiteralTypes.INTEGER
-    override val slimValue: Int?
+    override fun getRapElementType(): ParamElementTypes =
+        ParamElementTypes.L_INT
 
-    override fun toParam(): String = slimValue.toString()
+    override fun isBinarizable(): Boolean =
+        true
+
+    override val slimValue: Int?
 }

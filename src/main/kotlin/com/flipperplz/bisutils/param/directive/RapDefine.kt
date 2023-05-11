@@ -1,36 +1,23 @@
 package com.flipperplz.bisutils.param.directive
 
 import com.flipperplz.bisutils.param.node.RapDirective
+import com.flipperplz.bisutils.param.node.RapElement
 import com.flipperplz.bisutils.param.node.RapNamedElement
-import com.flipperplz.bisutils.param.utils.ParamCommandTypes
+import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapDefine : RapDirective, RapNamedElement {
-    override val slimCommandType: ParamCommandTypes
-        get() = ParamCommandTypes.PREPROCESSOR_DEFINE
-    val slimMacroName: String?
     val slimMacroArguments: List<String>?
     val slimMacroValue: String?
 
-    override val slimName: String?
-        get() = slimMacroName
+    fun evaluateMacro(arguments: List<String>): List<RapElement>
 
-    fun evaluateMacro(vararg argument: String): String? {
-        if (slimMacroArguments.isNullOrEmpty()) return slimMacroValue
-        var currentString = slimMacroValue
-        slimMacroArguments?.let {
-            argument.withIndex().forEach { (i, arg) ->
-                currentString = currentString?.replace(it[i].toRegex(), arg)
-            }
-        }
+    override fun isCurrentlyValid(): Boolean =
+        !slimName.isNullOrBlank()
 
-        return currentString.toString()
-    }
-
-    override val slimCurrentlyValid: Boolean
-        get() = super<RapDirective>.slimCurrentlyValid && !slimMacroName.isNullOrBlank()
+    override fun getRapElementType(): ParamElementTypes = ParamElementTypes.CP_DEFINE
 
     override fun toParam(): String {
-        val builder = StringBuilder("#define $slimMacroName")
+        val builder = StringBuilder("#define $slimName")
         if (!slimMacroArguments.isNullOrEmpty()) builder.append(slimMacroArguments!!.joinToString(
             prefix = "(",
             separator = ", ",

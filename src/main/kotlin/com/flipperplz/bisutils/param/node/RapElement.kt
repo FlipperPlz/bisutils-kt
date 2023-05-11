@@ -18,19 +18,8 @@ import com.flipperplz.bisutils.param.utils.ParamElementTypes
  */
 interface RapElement {
     val slimParent: RapElement?
-
-    val slimType: ParamElementTypes
-
-    val slimCurrentlyValid: Boolean
-        get() = true
-
-    val slimBinarizable: Boolean
-        get() = true
-
-    /**
-     * To param
-     *
-     * @return
-     */
+    fun getRapElementType(): ParamElementTypes
+    fun isCurrentlyValid(): Boolean
+    fun isBinarizable(): Boolean
     fun toParam(): String
 }

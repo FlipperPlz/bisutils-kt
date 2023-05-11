@@ -37,6 +37,13 @@ class BisLexer(
         return currentChar
     }
 
+
+    fun jumpTo(position: Int) {
+        bufferPtr = position
+        currentChar = string.getOrElse(bufferPtr) { Char.MIN_VALUE }
+        previousChar = string.getOrElse(bufferPtr - 1) { Char.MIN_VALUE }
+    }
+
     fun isEOL(): Boolean = currentChar == '\n'
 
     fun isWhitespace(): Boolean = with(currentChar.code) {
@@ -59,6 +66,7 @@ class BisLexer(
         }
         return builder.toString()
     }
+
 
     inline fun skipWhile(condition: (BisLexer) -> Boolean) {
         while (condition(this)) moveForward()

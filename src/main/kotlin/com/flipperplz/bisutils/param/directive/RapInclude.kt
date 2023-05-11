@@ -1,28 +1,31 @@
 package com.flipperplz.bisutils.param.directive
 
+import com.flipperplz.bisutils.param.literal.RapArray
 import com.flipperplz.bisutils.param.node.RapDirective
+import com.flipperplz.bisutils.param.node.RapElement
 import com.flipperplz.bisutils.param.node.RapLiteral
-import com.flipperplz.bisutils.param.utils.ParamCommandTypes
+import com.flipperplz.bisutils.param.node.RapNamedElement
+import com.flipperplz.bisutils.param.statement.RapVariableStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
-import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
 
-//TODO(Ryann): Should also be RapLiteral<RapLiteralBase>
-interface RapInclude : RapDirective, RapLiteral<String> {
-    val slimIsCommand: Boolean
-    override val slimCommandType: ParamCommandTypes
-        get() = ParamCommandTypes.PREPROCESSOR_INCLUDE
-    override val slimLiteralType: ParamLiteralTypes
-        get() = ParamLiteralTypes.PREPROCESSOR_INCLUDE
-    override val literalId: Byte?
-        get() = null
+interface RapInclude : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement {
+    override fun getRapElementType(): ParamElementTypes =
+        if(isLiteralValue())
+            ParamElementTypes.L_INCLUDE else
+            ParamElementTypes.C_INCLUDE
 
+    fun isLiteralValue(): Boolean =
+        slimParent is RapArray || slimParent is RapVariableStatement
 
-    //TODO(Ryann): abstract ParamUniversalElement (Literal && Statement)
-    override val slimType: ParamElementTypes
-        get() = if (slimIsCommand) slimCommandType.type else slimLiteralType.type
+    fun shouldValidateInclude() : Boolean
 
-    override val slimCurrentlyValid: Boolean
-        get() = super<RapDirective>.slimCurrentlyValid && !slimValue.isNullOrBlank()
+    override fun isCurrentlyValid(): Boolean =
+        super.isCurrentlyValid() &&
+        !slimName.isNullOrBlank() && (
+            !shouldValidateInclude() ||
+            slimValue != null
+        )
 
-    override fun toParam(): String = "#include <$slimValue>\n"
+    override fun toParam(): String =
+        "#include <$slimValue>${if(!isLiteralValue()) "\n" else ""}"
 }

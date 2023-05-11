@@ -1,46 +1,39 @@
 package com.flipperplz.bisutils.param.directive
 
-import com.flipperplz.bisutils.param.node.RapDirective
-import com.flipperplz.bisutils.param.node.RapLiteral
-import com.flipperplz.bisutils.param.node.RapNamedElement
-import com.flipperplz.bisutils.param.utils.ParamCommandTypes
+import com.flipperplz.bisutils.param.literal.RapArray
+import com.flipperplz.bisutils.param.node.*
+import com.flipperplz.bisutils.param.statement.RapVariableStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
-import com.flipperplz.bisutils.param.utils.ParamLiteralTypes
 
-interface RapMacro : RapDirective, RapLiteral<RapMacro>, RapNamedElement {
-    override val slimCommandType: ParamCommandTypes
-        get() = ParamCommandTypes.MACRO
+interface RapMacro : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement {
+    val slimMacroArguments: List<String>
 
-    override val slimLiteralType: ParamLiteralTypes
-        get() = ParamLiteralTypes.PREPROCESSOR_MACRO
+    override val slimValue: List<RapElement>?
+        get() = locateMacro()?.evaluateMacro(slimMacroArguments)
 
-    override val literalId: Byte?
-        get() = null
+    fun locateMacro(): RapDefine?
 
-    override val slimType: ParamElementTypes
-        get() = if (slimIsCommand) ParamElementTypes.C_MACRO else ParamElementTypes.L_MACRO
+    fun isLiteralValue(): Boolean =
+        slimParent is RapArray ||
+        slimParent is RapVariableStatement
 
-    override val slimValue: RapMacro
-        get() = this
+    fun shouldValidateMacro(): Boolean
 
-    val slimIsCommand: Boolean
-    val slimMacroName: String?
-    val slimMacroArguments: List<String>?
+    override fun isCurrentlyValid(): Boolean =!slimName.isNullOrBlank() && (
+        shouldValidateMacro() &&
+        locateMacro()?.isCurrentlyValid() ?: false
+    )
 
-    override val slimName: String?
-        get() = slimMacroName
+    override fun getRapElementType(): ParamElementTypes =
+        if(isLiteralValue())
+            ParamElementTypes.L_INCLUDE else
+            ParamElementTypes.C_INCLUDE
 
-    override val slimCurrentlyValid: Boolean
-        get() = super<RapLiteral>.slimCurrentlyValid && slimMacroName.isNullOrBlank()
-
-    override fun toParam(): String = slimMacroName + slimMacroArguments?.joinToString(
+    override fun toParam(): String = slimName + slimMacroArguments.joinToString(
         prefix = "(",
         separator = ",",
-        postfix = if (slimIsCommand)
+        postfix = if (!isLiteralValue())
             ");" else
             ")"
-    ) {
-        it
-    }
-
+    ) { it }
 }
