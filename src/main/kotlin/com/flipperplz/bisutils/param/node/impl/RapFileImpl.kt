@@ -8,8 +8,11 @@ import com.flipperplz.bisutils.param.utils.extensions.childrenOfType
 import com.flipperplz.bisutils.utils.getAsciiZ
 import com.flipperplz.bisutils.utils.getCompactInt
 import com.flipperplz.bisutils.utils.getInt
+import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.channels.FileChannel
+import java.nio.file.StandardOpenOption
 
 //TODO(Ryann): Change all to List and make lateinit. Rap should have mininal mutability
 class RapFileImpl internal constructor(
@@ -20,6 +23,16 @@ class RapFileImpl internal constructor(
     override lateinit var slimCommands: List<RapStatement>
 
     companion object {
+
+        operator fun invoke(file: File): RapFileImpl? = invoke(
+            FileChannel.open(file.toPath(), StandardOpenOption.READ).use {
+                ByteBuffer.allocate(it.size().toInt()).apply {
+                    it.read(this)
+                    flip()
+                }
+            },
+            file.nameWithoutExtension
+        )
         operator fun invoke(buffer: ByteBuffer, name: String): RapFileImpl? {
             if (
                 buffer.get() != 0.toByte() ||
@@ -45,6 +58,7 @@ class RapFileImpl internal constructor(
 
             val enumOffset = buffer.getInt(ByteOrder.LITTLE_ENDIAN)
             val file = RapFileImpl(name)
+            file.slimEnum = mutableMapOf()
 
             with(mutableListOf<RapStatement>()) {
                 buffer.getAsciiZ()
