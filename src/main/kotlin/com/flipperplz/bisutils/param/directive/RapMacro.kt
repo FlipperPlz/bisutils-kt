@@ -2,14 +2,15 @@ package com.flipperplz.bisutils.param.directive
 
 import com.flipperplz.bisutils.param.literal.RapArray
 import com.flipperplz.bisutils.param.node.*
+import com.flipperplz.bisutils.param.node.RapProcessable
 import com.flipperplz.bisutils.param.statement.RapVariableStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
-interface RapMacro : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement {
+interface RapMacro : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement, RapProcessable {
     val slimMacroArguments: List<String>
 
     override val slimValue: List<RapElement>?
-        get() = locateMacro()?.evaluateMacro(slimMacroArguments)
+        get() = processSlim()
 
     fun locateMacro(): RapDefine?
 
@@ -18,6 +19,9 @@ interface RapMacro : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement
         slimParent is RapVariableStatement
 
     fun shouldValidateMacro(): Boolean
+
+    override fun processSlim(): List<RapElement>? =
+        locateMacro()?.evaluateMacro(slimMacroArguments)
 
     override fun isCurrentlyValid(): Boolean =!slimName.isNullOrBlank() && (
         shouldValidateMacro() &&

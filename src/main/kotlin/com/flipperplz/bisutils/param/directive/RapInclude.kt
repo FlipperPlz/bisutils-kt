@@ -5,10 +5,11 @@ import com.flipperplz.bisutils.param.node.RapDirective
 import com.flipperplz.bisutils.param.node.RapElement
 import com.flipperplz.bisutils.param.node.RapLiteral
 import com.flipperplz.bisutils.param.node.RapNamedElement
+import com.flipperplz.bisutils.param.node.RapProcessable
 import com.flipperplz.bisutils.param.statement.RapVariableStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
-interface RapInclude : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement {
+interface RapInclude : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement, RapProcessable {
     override fun getRapElementType(): ParamElementTypes =
         if(isLiteralValue())
             ParamElementTypes.L_INCLUDE else

@@ -3,9 +3,10 @@ package com.flipperplz.bisutils.param.directive
 import com.flipperplz.bisutils.param.node.RapDirective
 import com.flipperplz.bisutils.param.node.RapElement
 import com.flipperplz.bisutils.param.node.RapNamedElement
+import com.flipperplz.bisutils.param.node.RapProcessable
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
-interface RapDefine : RapDirective, RapNamedElement {
+interface RapDefine : RapDirective, RapNamedElement, RapProcessable {
     val slimMacroArguments: List<String>?
     val slimMacroValue: String?
 
@@ -13,6 +14,9 @@ interface RapDefine : RapDirective, RapNamedElement {
 
     override fun isCurrentlyValid(): Boolean =
         !slimName.isNullOrBlank()
+
+    override fun processSlim(): List<RapElement> =
+        emptyList()
 
     override fun getRapElementType(): ParamElementTypes = ParamElementTypes.CP_DEFINE
 
