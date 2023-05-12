@@ -1,5 +1,6 @@
 package com.flipperplz.bisutils.param.utils.extensions
 
+import com.flipperplz.bisutils.param.RapFile
 import com.flipperplz.bisutils.param.literal.RapArray
 import com.flipperplz.bisutils.param.literal.RapFloat
 import com.flipperplz.bisutils.param.literal.RapInt
@@ -16,16 +17,14 @@ inline fun RapElement?.createValue(crossinline value: () -> String): RapString =
         override var slimStringType: ParamStringType = ParamStringType.QUOTED
         override var slimValue: String? = value()
         override val slimParent: RapElement = this
+        override val containingFile: RapFile? = slimParent.containingFile
     }
 
-//operator fun MutableRapArrayImpl.set(i: Int, element: RapLiteralBase) {
-//    slimValue[i] = element
-//}
-//
 inline fun createRapValue(parent: RapElement? = null, crossinline value: () -> String): RapString =
     object : RapString {
         override var slimStringType: ParamStringType = ParamStringType.QUOTED
         override var slimValue: String? = value()
+        override val containingFile: RapFile? = parent?.containingFile
         override val slimParent: RapElement? = parent
     }
 
@@ -33,37 +32,45 @@ inline fun RapElement?.createValue(crossinline value: () -> Int): RapInt =
     object : RapInt {
         override val slimValue: Int = value()
         override val slimParent: RapElement = this
+        override val containingFile: RapFile? = slimParent.containingFile
     }
 
 inline fun createRapValue(parent: RapElement? = null, crossinline value: () -> Int): RapInt =
     object : RapInt {
         override val slimValue: Int = value()
         override val slimParent: RapElement? = parent
+        override val containingFile: RapFile? = parent?.containingFile
     }
 
 inline fun RapElement?.createValue(crossinline value: () -> Float): RapFloat =
     object : RapFloat {
         override val slimValue: Float = value()
         override val slimParent: RapElement = this
+        override val containingFile: RapFile? = slimParent.containingFile
     }
 
 inline fun createRapValue(parent: RapElement? = null, crossinline value: () -> Float): RapFloat =
     object : RapFloat {
         override val slimValue: Float = value()
         override val slimParent: RapElement? = parent
+        override val containingFile: RapFile? = slimParent?.containingFile
     }
 
 inline fun RapElement?.createValue(crossinline value: () -> List<RapLiteralBase>): RapArray =
     object : RapArray {
         override val slimValue: List<RapLiteralBase> = value()
         override val slimParent: RapElement = this
+        override val containingFile: RapFile? = slimParent.containingFile
     }
 
 inline fun createRapValue(parent: RapElement? = null, crossinline value: () -> List<RapLiteralBase>): RapArray =
     object : RapArray {
         override val slimValue: List<RapLiteralBase> = value()
         override val slimParent: RapElement? = parent
+        override val containingFile: RapFile? = slimParent?.containingFile
     }
+
+fun RapDirective.isWhitespace(char: Char): Boolean = char.code < 33
 
 inline operator fun <reified T : RapNamedElement> RapStatementHolder.get(name: String): T? =
     slimCommands.filterIsInstance<T>().firstOrNull { it.slimName.equals(name, true) }
