@@ -7,7 +7,7 @@ import com.flipperplz.bisutils.param.statement.RapVariableStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapMacro : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement, RapProcessable {
-    val slimMacroArguments: List<String>
+    val slimMacroArguments: List<String>?
 
     override val slimValue: List<RapElement>?
         get() = processSlim()
@@ -21,7 +21,7 @@ interface RapMacro : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement
     fun shouldValidateMacro(): Boolean
 
     override fun processSlim(): List<RapElement>? =
-        locateMacro()?.evaluateMacro(slimMacroArguments)
+        locateMacro()?.evaluateMacro(slimMacroArguments ?: emptyList())
 
     override fun isCurrentlyValid(): Boolean =!slimName.isNullOrBlank() && (
         shouldValidateMacro() &&
@@ -33,7 +33,7 @@ interface RapMacro : RapDirective, RapLiteral<List<RapElement>>, RapNamedElement
             ParamElementTypes.L_INCLUDE else
             ParamElementTypes.C_INCLUDE
 
-    override fun toParam(): String = slimName + slimMacroArguments.joinToString(
+    override fun toParam(): String = slimName + slimMacroArguments?.joinToString(
         prefix = "(",
         separator = ",",
         postfix = if (!isLiteralValue())

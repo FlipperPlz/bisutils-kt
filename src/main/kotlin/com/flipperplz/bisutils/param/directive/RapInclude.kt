@@ -20,6 +20,9 @@ interface RapInclude : RapDirective, RapLiteral<List<RapElement>>, RapNamedEleme
 
     fun shouldValidateInclude() : Boolean
 
+    override val slimValue: List<RapElement>?
+        get() = processSlim()
+
     override fun isCurrentlyValid(): Boolean =
         super.isCurrentlyValid() &&
         !slimName.isNullOrBlank() && (

@@ -46,14 +46,9 @@ class BisLexer(
 
     fun isEOL(): Boolean = currentChar == '\n'
 
-    fun isWhitespace(): Boolean = with(currentChar.code) {
-        this == 0x20 ||
-        this == 0x0c ||
-        this == 0x0a ||
-        this == 0x0d ||
-        this == 0x09 ||
-        this == 0x0b
-    }
+    fun isEOF(): Boolean = bufferPtr >= string.length
+
+    fun isWhitespace(): Boolean = Companion.isWhitespace(currentChar)
 
     fun isAlphaNumeric(): Boolean = currentChar.isLetterOrDigit()
 
@@ -64,6 +59,7 @@ class BisLexer(
             if(!condition(this)) break
             builder.append(currentChar)
         }
+        moveBackward()
         return builder.toString()
     }
 
@@ -78,6 +74,8 @@ class BisLexer(
     fun peekForward(): Char = string.getOrNull(bufferPtr + 1) ?: Char.MIN_VALUE
 
     fun peekBackward(): Char = string.getOrNull(bufferPtr - 1) ?: Char.MIN_VALUE
+
+    fun peekAt(pos: Int) = string[pos]
 
     private fun decrementCurrent() {
         if (currentChar == '\n') {
@@ -95,6 +93,17 @@ class BisLexer(
             col = 0
         } else {
             col++
+        }
+    }
+
+    companion object {
+        fun isWhitespace(currentChar: Char): Boolean = with(currentChar.code) {
+            this == 0x20 ||
+            this == 0x0c ||
+            this == 0x0a ||
+            this == 0x0d ||
+            this == 0x09 ||
+            this == 0x0b
         }
     }
 }

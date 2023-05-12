@@ -13,9 +13,6 @@ interface RapUndefine : RapDirective, RapNamedElement, RapProcessable {
     override fun isCurrentlyValid(): Boolean =
         !slimName.isNullOrBlank()
 
-    override fun processSlim(): List<RapElement>? =
-        emptyList()
-
     override fun toParam(): String =
         "#undef $slimName\n"
 }

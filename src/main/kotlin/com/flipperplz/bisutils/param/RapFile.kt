@@ -1,5 +1,6 @@
-package com.flipperplz.bisutils.param.node
+package com.flipperplz.bisutils.param
 
+import com.flipperplz.bisutils.param.node.RapStatementHolder
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 /**
@@ -10,13 +11,8 @@ import com.flipperplz.bisutils.param.utils.ParamElementTypes
  */
 interface RapFile : RapStatementHolder {
     val fileName: String
-    val slimEnum: Map<String, Int>
 
     override fun getRapElementType(): ParamElementTypes = ParamElementTypes.FILE
 
-    override fun toParam(): String = super.writeSlimCommands() + slimEnum.asSequence().joinToString(
-        prefix = "enum {\n",
-        postfix = "\n};",
-        separator = ",\n"
-    ) { "${it.key} = ${it.value}" }
+    override fun toParam(): String = super.writeSlimCommands()
 }

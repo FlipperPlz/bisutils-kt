@@ -10,13 +10,16 @@ interface RapDefine : RapDirective, RapNamedElement, RapProcessable {
     val slimMacroArguments: List<String>?
     val slimMacroValue: String?
 
-    fun evaluateMacro(arguments: List<String>): List<RapElement>
+    fun evaluateMacro(arguments: List<String>): List<RapElement>?
+
+    fun shouldEnsureUnique(): Boolean
+
+    fun hasUniqueName(): Boolean
 
     override fun isCurrentlyValid(): Boolean =
-        !slimName.isNullOrBlank()
+        !slimName.isNullOrBlank() && (!shouldEnsureUnique() || hasUniqueName() )
 
-    override fun processSlim(): List<RapElement> =
-        emptyList()
+    override fun processSlim(): List<RapElement> = listOf()
 
     override fun getRapElementType(): ParamElementTypes = ParamElementTypes.CP_DEFINE
 
