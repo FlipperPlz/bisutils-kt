@@ -5,7 +5,7 @@ import com.flipperplz.bisutils.param.node.RapStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapDeleteStatement : RapStatement, RapNamedElement {
-
+    companion object;
     override val slimName: String?
 
     override fun getRapElementType(): ParamElementTypes = ParamElementTypes.C_DELETE
@@ -17,6 +17,7 @@ interface RapDeleteStatement : RapStatement, RapNamedElement {
     override fun isCurrentlyValid(): Boolean =
         !slimName.isNullOrBlank() && (shouldValidateTarget() && locateTargetClass() != null)
 
+    override fun isBinarizable(): Boolean = true
 
     override fun toParam(): String = "delete $slimName;"
 }

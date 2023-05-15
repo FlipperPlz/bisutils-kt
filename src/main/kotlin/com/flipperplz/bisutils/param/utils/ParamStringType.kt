@@ -8,10 +8,6 @@ enum class ParamStringType(
         { "\"${it.replace("\n", "\\\n").replace("\"", "\"\"")}\"" },
         { it.trimStart('\"').trimEnd('\"').replace("\\\n", "\n").replace("\"\"", "\"")}
     ),
-    ANGLE(
-        { "<${it.replace("\n", "\\\n")}>" },
-        { it.trimStart('<').trimEnd('>').replace("\\\n", "\n")}
-    ),
     UNQUOTED(
         { it.replace("\n", "").replace(";", "").replace("}", "") },
         { it }

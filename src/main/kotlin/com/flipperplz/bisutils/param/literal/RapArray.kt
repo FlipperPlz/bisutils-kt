@@ -5,6 +5,7 @@ import com.flipperplz.bisutils.param.node.RapLiteralBase
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapArray : RapLiteral<List<RapLiteralBase>> {
+    companion object;
     override fun isBinarizable(): Boolean =
         slimValue?.all { it.isBinarizable() } ?: true
 

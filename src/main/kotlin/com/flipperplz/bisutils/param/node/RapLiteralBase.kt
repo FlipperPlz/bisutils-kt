@@ -9,6 +9,7 @@ package com.flipperplz.bisutils.param.node
  * [com.flipperplz.bisutils.param.literal.RapArray])
  */
 interface RapLiteralBase : RapElement {
+    companion object;
     val slimValue: Any?
 
     override fun isCurrentlyValid(): Boolean = slimValue != null

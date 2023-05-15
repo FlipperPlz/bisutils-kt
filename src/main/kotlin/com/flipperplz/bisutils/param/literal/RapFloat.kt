@@ -4,6 +4,8 @@ import com.flipperplz.bisutils.param.node.RapNumerical
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapFloat : RapNumerical {
+    companion object;
+
     override fun getRapElementType(): ParamElementTypes =
         ParamElementTypes.L_FLOAT
 
