@@ -7,10 +7,7 @@ import com.flipperplz.bisutils.param.node.*
 import com.flipperplz.bisutils.param.statement.*
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
-import com.flipperplz.bisutils.param.utils.mutability.ParamMutableArray
-import com.flipperplz.bisutils.param.utils.mutability.ParamMutableFloat
-import com.flipperplz.bisutils.param.utils.mutability.ParamMutableInt
-import com.flipperplz.bisutils.param.utils.mutability.ParamMutableString
+import com.flipperplz.bisutils.param.utils.mutability.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -18,11 +15,23 @@ object ParamSlimUtils {
     inline fun RapElement?.valueOf(crossinline value: () -> String): RapString =
         RapString(this, value())
 
+    inline fun RapElement?.mutableValueOf(crossinline value: () -> String): ParamMutableString =
+        ParamMutableString(this, ParamStringType.QUOTED, value())
+
+    inline fun mutableParamValueOf(parent: RapElement? = null, crossinline value: () -> String): ParamMutableString =
+        ParamMutableString(parent, ParamStringType.QUOTED, value())
+
     inline fun paramValueOf(parent: RapElement? = null, crossinline value: () -> String): RapString =
         RapString(parent, value())
 
     inline fun RapElement?.valueOf(crossinline value: () -> Int): RapInt =
         RapInt(this, value())
+
+    inline fun RapElement?.mutableValueOf(crossinline value: () -> Int): ParamMutableInt =
+        ParamMutableInt(this, value())
+
+    inline fun mutableParamValueOf(parent: RapElement? = null, crossinline value: () -> Int): ParamMutableInt =
+        ParamMutableInt(parent, value())
 
     inline fun paramValueOf(parent: RapElement? = null, crossinline value: () -> Int): RapInt =
         RapInt(parent, value())
@@ -30,11 +39,23 @@ object ParamSlimUtils {
     inline fun RapElement?.valueOf(crossinline value: () -> Float): RapFloat =
         RapFloat(this, value())
 
+    inline fun RapElement?.mutableValueOf(crossinline value: () -> Float): ParamMutableFloat =
+        ParamMutableFloat(this, value())
+
+    inline fun mutableParamValueOf(parent: RapElement? = null, crossinline value: () -> Float): ParamMutableFloat =
+        ParamMutableFloat(parent, value())
+
     inline fun paramValueOf(parent: RapElement? = null, crossinline value: () -> Float): RapFloat =
         RapFloat(parent, value())
 
     inline fun RapElement?.valueOf(crossinline value: () -> List<RapLiteralBase>): RapArray =
         RapArray(this, value())
+
+    inline fun RapElement?.mutableValueOf(crossinline value: () -> MutableList<RapLiteralBase>): ParamMutableArray =
+        ParamMutableArray(this, value())
+
+    inline fun mutableParamValueOf(parent: RapElement? = null, crossinline value: () -> MutableList<RapLiteralBase>): ParamMutableArray =
+        ParamMutableArray(parent, value())
 
     inline fun paramValueOf(parent: RapElement? = null, crossinline value: () -> List<RapLiteralBase>): RapArray =
         RapArray(parent, value())
@@ -274,15 +295,36 @@ object ParamSlimUtils {
     }
 
     fun RapArray.toMutableArray(): ParamMutableArray =
-        ParamMutableArray(slimParent, containingFile, slimValue?.toMutableList())
+        ParamMutableArray(slimParent, slimValue?.toMutableList())
 
     fun RapString.toMutableString(): ParamMutableString =
-        ParamMutableString(slimParent, containingFile, slimStringType, slimValue)
+        ParamMutableString(slimParent, slimStringType, slimValue)
 
     fun RapFloat.toMutableFloat(): ParamMutableFloat =
-        ParamMutableFloat(slimParent, containingFile, slimValue)
+        ParamMutableFloat(slimParent, slimValue)
 
     fun RapInt.toMutableInt(): ParamMutableInt =
-        ParamMutableInt(slimParent, containingFile, slimValue)
+        ParamMutableInt(slimParent, slimValue)
+
+    fun RapClass.toMutableClass(): ParamMutableClass = ParamMutableClass(
+        slimParent,
+        slimName,
+        slimSuperClass,
+        slimCommands.toMutableList(),
+        false,
+        null
+    )
+
+    fun RapExternalClass.toMutableExternalClass(): ParamMutableExternalClass =
+        ParamMutableExternalClass(slimParent, slimName)
+
+    fun RapVariableStatement.toMutableVariable(): ParamMutableVariableStatement =
+        ParamMutableVariableStatement(slimParent, slimName, slimValue, slimOperator)
+
+    fun RapDeleteStatement.toMutableDeleteStatement(): ParamMutableDeleteStatement =
+        ParamMutableDeleteStatement(slimParent, slimName)
+
+    fun RapFile.toMutableFile(): ParamMutableFile =
+        ParamMutableFile(fileName, slimCommands.toMutableList())
 }
 

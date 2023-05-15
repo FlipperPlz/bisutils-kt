@@ -7,7 +7,7 @@ import com.flipperplz.bisutils.param.node.RapStatement
 class ParamMutableFile(
     override var fileName: String,
     override var slimCommands: MutableList<RapStatement>,
-): ParamMutableElement(null, null), RapFile {
+): ParamMutableElement(null), RapFile {
     override var slimParent: RapElement? = null
     override var containingFile: RapFile? = null
 }

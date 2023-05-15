@@ -12,30 +12,25 @@ import com.flipperplz.bisutils.param.utils.ParamStringType
 
 abstract class ParamMutableLiteral(
     slimParent: RapElement? = null,
-    containingFile: RapFile? = slimParent?.containingFile
-): ParamMutableElement(slimParent, containingFile), RapLiteralBase
+): ParamMutableElement(slimParent), RapLiteralBase
 
 class ParamMutableString(
     slimParent: RapElement? = null,
-    containingFile: RapFile? = slimParent?.containingFile,
     override var slimStringType: ParamStringType = ParamStringType.QUOTED,
     override var slimValue: String? = null
-): ParamMutableLiteral(slimParent, containingFile), RapString
+): ParamMutableLiteral(slimParent), RapString
 
 class ParamMutableInt(
     slimParent: RapElement? = null,
-    containingFile: RapFile? = slimParent?.containingFile,
     override var slimValue: Int? = null,
-): ParamMutableLiteral(slimParent, containingFile), RapInt
+): ParamMutableLiteral(slimParent), RapInt
 
 class ParamMutableFloat(
     slimParent: RapElement? = null,
-    containingFile: RapFile? = slimParent?.containingFile,
     override var slimValue: Float? = null,
-): ParamMutableLiteral(slimParent, containingFile), RapFloat
+): ParamMutableLiteral(slimParent), RapFloat
 
 class ParamMutableArray(
     slimParent: RapElement? = null,
-    containingFile: RapFile? = slimParent?.containingFile,
     override var slimValue: MutableList<RapLiteralBase>? = null,
-): ParamMutableLiteral(slimParent, containingFile), RapArray
+): ParamMutableLiteral(slimParent), RapArray

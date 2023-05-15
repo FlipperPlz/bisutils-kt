@@ -5,5 +5,7 @@ import com.flipperplz.bisutils.param.node.RapElement
 
 abstract class ParamMutableElement(
     override var slimParent: RapElement? = null,
+) : RapElement {
     override var containingFile: RapFile? = slimParent?.containingFile
-) : RapElement
+
+}
