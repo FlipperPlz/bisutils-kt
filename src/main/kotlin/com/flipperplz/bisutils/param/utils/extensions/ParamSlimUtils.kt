@@ -1,24 +1,14 @@
 package com.flipperplz.bisutils.param.utils.extensions
 
 import com.flipperplz.bisutils.param.RapFile
-import com.flipperplz.bisutils.param.literal.RapArray
-import com.flipperplz.bisutils.param.literal.RapFloat
-import com.flipperplz.bisutils.param.literal.RapInt
-import com.flipperplz.bisutils.param.literal.RapString
+import com.flipperplz.bisutils.utils.*
+import com.flipperplz.bisutils.param.literal.*
 import com.flipperplz.bisutils.param.node.*
-import com.flipperplz.bisutils.param.statement.RapClass
-import com.flipperplz.bisutils.param.statement.RapDeleteStatement
-import com.flipperplz.bisutils.param.statement.RapExternalClass
+import com.flipperplz.bisutils.param.statement.*
+import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
-import com.flipperplz.bisutils.utils.getAsciiZ
-import com.flipperplz.bisutils.utils.getCompactInt
-import com.flipperplz.bisutils.utils.getFloat
-import com.flipperplz.bisutils.utils.getInt
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.jvm.isAccessible
 
 inline fun RapElement?.createValue(crossinline value: () -> String): RapString = RapString(this, value())
 
@@ -79,6 +69,35 @@ operator fun RapString.Companion.invoke(parent: RapElement?, value: String): Rap
     override val containingFile: RapFile? = parent?.containingFile
 }
 
+operator fun RapClass.Companion.invoke(
+    parent: RapElement?,
+    classname: String,
+    externalClassName: String? = null,
+    commands: List<RapStatement> = emptyList<RapStatement>(),
+    locateSuper: ((RapClass) -> RapExternalClass)? = null
+): RapClass = object : RapClass {
+    override val slimSuperClass: String? = externalClassName
+    override fun locateSuperClass(): RapExternalClass? = locateSuper?.let { it(this) }
+    override fun shouldValidateSuper(): Boolean = locateSuper != null
+    override val slimParent: RapElement? = parent
+    override val containingFile: RapFile? = parent?.containingFile
+    override val slimName: String = classname
+    override val slimCommands: List<RapStatement> = commands
+}
+
+operator fun RapVariableStatement.Companion.invoke(
+    parent: RapElement?,
+    name: String,
+    operator: ParamOperatorTypes,
+    value: RapLiteralBase
+): RapVariableStatement = object : RapVariableStatement {
+    override val slimValue: RapLiteralBase = value
+    override val slimOperator: ParamOperatorTypes = operator
+    override val slimParent: RapElement? = parent
+    override val containingFile: RapFile? = parent?.containingFile
+    override val slimName: String = name
+}
+
 operator fun RapDeleteStatement.Companion.invoke(
     parent: RapElement?,
     value: String,
@@ -127,20 +146,89 @@ operator fun RapArray.Companion.invoke(parent: RapElement?, buffer: ByteBuffer):
     }
 )
 
+internal class RapFileImpl(override val fileName: String) : RapFile {
+    override lateinit var slimCommands: List<RapStatement>
+}
+
+internal class RapClassImpl(
+    override val slimParent: RapElement?,
+    override val slimName: String?,
+    var binaryOffset: Int,
+) : RapClass {
+    override lateinit var slimCommands: List<RapStatement>
+    override lateinit var  slimSuperClass: String
+    override val containingFile: RapFile? = slimParent?.containingFile
+
+    override fun shouldValidateSuper(): Boolean = false
+    override fun locateSuperClass(): RapExternalClass? = null
+}
+
+operator fun RapFile.Companion.invoke(name: String, buffer: ByteBuffer): RapFile {
+
+    val file = RapFileImpl(name)
+    fun loadChildClasses(child: RapClassImpl, buffer: ByteBuffer): Boolean {
+        with(mutableListOf<RapStatement>()) {
+            buffer.position(child.binaryOffset)
+            child.slimSuperClass = buffer.getAsciiZ()
+
+            for (i in 0 until buffer.getCompactInt())
+                add(RapStatement(child, buffer) ?: return false)
+
+            child.slimCommands = this
+        }
+
+        return child.childrenOfType<RapClassImpl>().all { loadChildClasses(it, buffer) }
+    }
+
+    if(
+        buffer.get() != 0.toByte() ||
+        buffer.get() != 114.toByte() ||
+        buffer.get() != 97.toByte() ||
+        buffer.get() != 80.toByte() ||
+        buffer.getInt(ByteOrder.LITTLE_ENDIAN) != 0 ||
+        buffer.getInt(ByteOrder.LITTLE_ENDIAN) != 8
+    ) throw Exception("Read Failed")
+
+    val enumOffset = buffer.getInt(ByteOrder.LITTLE_ENDIAN)
+
+    with(mutableListOf<RapStatement>()) {
+        buffer.getAsciiZ()
+        for (i in 0 until buffer.getCompactInt())
+            add(RapStatement(file, buffer) ?: throw Exception())
+
+        file.slimCommands = this
+    }
+
+    if(!file.childrenOfType<RapClassImpl>().all { loadChildClasses(it, buffer) }) throw Exception()
+
+
+    buffer.position(enumOffset) //TODO: ENUMS
+
+    return file
+}
+
 operator fun RapStatement.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapStatement? = when(buffer.get()) {
-    0.toByte() -> TODO() // RapClass()
-    1.toByte() -> TODO() // RapVariableStatement
-    2.toByte() -> TODO() // RapArrayStatement
+    0.toByte() -> RapClassImpl(parent, buffer.getAsciiZ(), buffer.getInt(ByteOrder.LITTLE_ENDIAN))
+    1.toByte() -> with(buffer.get()) {
+        RapVariableStatement(parent, buffer.getAsciiZ(), ParamOperatorTypes.ASSIGN,
+            RapLiteralBase.readStatement(parent, toInt(), buffer) ?: throw Exception()
+        )
+    }
+    2.toByte() -> RapVariableStatement(parent, buffer.getAsciiZ(), ParamOperatorTypes.ASSIGN, RapArray(parent, buffer))
     3.toByte() -> RapExternalClass(parent, buffer)
     4.toByte() -> RapDeleteStatement(parent, buffer)
     5.toByte() -> TODO() // RapFlaggedArrayStatement
     else -> null
 }
 
-operator fun RapLiteralBase.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapLiteralBase? = when (buffer.get()) {
-    0.toByte() -> RapString(parent, buffer)
-    1.toByte() -> RapFloat(parent, buffer)
-    2.toByte() -> RapInt(parent, buffer)
-    3.toByte() -> RapArray(parent, buffer)
+operator fun RapLiteralBase.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapLiteralBase? =
+    RapLiteralBase.readStatement(parent, buffer.getInt(), buffer)
+
+fun RapLiteralBase.Companion.readStatement(parent: RapElement?, id: Int, buffer: ByteBuffer): RapLiteralBase? = when (id) {
+    0 -> RapString(parent, buffer)
+    1 -> RapFloat(parent, buffer)
+    2 -> RapInt(parent, buffer)
+    3 -> RapArray(parent, buffer)
     else -> null
 }
+

@@ -5,8 +5,10 @@ import com.flipperplz.bisutils.param.node.RapStatementHolder
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface RapClass : RapElement, RapExternalClass, RapStatementHolder {
+    companion object
     val slimSuperClass: String?
 
+    override fun isBinarizable(): Boolean = true
     override fun getRapElementType(): ParamElementTypes = ParamElementTypes.C_CLASS
 
     fun locateSuperClass(): RapExternalClass?

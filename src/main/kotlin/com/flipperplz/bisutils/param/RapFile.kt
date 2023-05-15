@@ -1,5 +1,6 @@
 package com.flipperplz.bisutils.param
 
+import com.flipperplz.bisutils.param.node.RapElement
 import com.flipperplz.bisutils.param.node.RapStatementHolder
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
@@ -10,7 +11,14 @@ import com.flipperplz.bisutils.param.utils.ParamElementTypes
  * define materials or custom configuration for a game addon
  */
 interface RapFile : RapStatementHolder {
+    companion object
     val fileName: String
+
+    override val slimParent: RapElement?
+        get() = null
+
+    override val containingFile: RapFile?
+        get() = this
 
     override fun getRapElementType(): ParamElementTypes = ParamElementTypes.FILE
 

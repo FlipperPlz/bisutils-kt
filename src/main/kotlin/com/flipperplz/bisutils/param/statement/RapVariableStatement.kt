@@ -8,6 +8,7 @@ import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 
 interface RapVariableStatement : RapStatement, RapNamedElement {
+    companion object;
     val slimValue: RapLiteralBase?
     val slimOperator: ParamOperatorTypes?
 
