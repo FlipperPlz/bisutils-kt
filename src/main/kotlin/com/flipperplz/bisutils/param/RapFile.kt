@@ -18,7 +18,7 @@ interface RapFile : RapStatementHolder {
         get() = null
 
     override val containingFile: RapFile?
-        get() = this
+        get() = null
 
     override fun getRapElementType(): ParamElementTypes = ParamElementTypes.FILE
 

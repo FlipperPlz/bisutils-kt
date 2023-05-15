@@ -7,6 +7,10 @@ import com.flipperplz.bisutils.param.node.*
 import com.flipperplz.bisutils.param.statement.*
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
+import com.flipperplz.bisutils.param.utils.mutability.ParamMutableArray
+import com.flipperplz.bisutils.param.utils.mutability.ParamMutableFloat
+import com.flipperplz.bisutils.param.utils.mutability.ParamMutableInt
+import com.flipperplz.bisutils.param.utils.mutability.ParamMutableString
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -268,5 +272,17 @@ object ParamSlimUtils {
         3 -> RapArray(parent, buffer)
         else -> null
     }
+
+    fun RapArray.toMutableArray(): ParamMutableArray =
+        ParamMutableArray(slimParent, containingFile, slimValue?.toMutableList())
+
+    fun RapString.toMutableString(): ParamMutableString =
+        ParamMutableString(slimParent, containingFile, slimStringType, slimValue)
+
+    fun RapFloat.toMutableFloat(): ParamMutableFloat =
+        ParamMutableFloat(slimParent, containingFile, slimValue)
+
+    fun RapInt.toMutableInt(): ParamMutableInt =
+        ParamMutableInt(slimParent, containingFile, slimValue)
 }
 
