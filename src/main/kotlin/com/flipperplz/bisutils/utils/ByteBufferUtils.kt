@@ -3,6 +3,8 @@ package com.flipperplz.bisutils.utils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
+import kotlin.experimental.or
+import kotlin.math.floor
 
 
 fun ByteBuffer.getBytes(count: Int): ByteArray {
@@ -26,6 +28,17 @@ fun ByteBuffer.getAsciiZ(charset: Charset = Charsets.UTF_8): String {
         builder.add(c)
     }
     return charset.decode(ByteBuffer.wrap(builder.toByteArray())).toString()
+}
+
+fun ByteBuffer.putCompactInt(value: Int) {
+    var data = value
+    do {
+        var current = data % 0x80
+        data = floor((data / 0x80000000).toDouble()).toInt()
+        if(data != 0) current = current or 0x80
+        put(current.toByte())
+    } while (data > 0x7F)
+    if(data != 0) put(data.toByte())
 }
 
 fun ByteBuffer.getCompactInt(): Int {
