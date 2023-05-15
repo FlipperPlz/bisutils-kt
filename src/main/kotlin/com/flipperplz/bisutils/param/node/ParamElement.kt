@@ -5,7 +5,7 @@ import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface ParamElement {
     val slimParent: ParamElement?
-    val containingFile: ParamFile?
+    val containingParamFile: ParamFile?
     fun getParamElementType(): ParamElementTypes
     fun isCurrentlyValid(): Boolean
     fun isBinarizable(): Boolean

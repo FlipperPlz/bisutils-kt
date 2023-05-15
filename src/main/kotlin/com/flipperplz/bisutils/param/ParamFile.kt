@@ -11,7 +11,7 @@ interface ParamFile : ParamStatementHolder {
     override val slimParent: ParamElement?
         get() = null
 
-    override val containingFile: ParamFile?
+    override val containingParamFile: ParamFile?
         get() = null
 
     override fun getParamElementType(): ParamElementTypes = ParamElementTypes.FILE

@@ -19,7 +19,7 @@ object ParamSlimUtils {
     ) : ParamVariableStatement {
         override lateinit var slimValue: ParamLiteralBase
 
-        override val containingFile: ParamFile? = slimParent?.containingFile
+        override val containingParamFile: ParamFile? = slimParent?.containingParamFile
     }
 
     internal class RapFileImpl(override val fileName: String) : ParamFile {
@@ -33,7 +33,7 @@ object ParamSlimUtils {
     ) : ParamClass {
         override lateinit var slimCommands: List<ParamStatement>
         override lateinit var  slimSuperClass: String
-        override val containingFile: ParamFile? = slimParent?.containingFile
+        override val containingParamFile: ParamFile? = slimParent?.containingParamFile
 
         override fun shouldValidateSuper(): Boolean = false
         override fun locateSuperClass(): ParamExternalClass? = null
@@ -147,7 +147,7 @@ object ParamSlimUtils {
         override val slimStringType: ParamStringType = ParamStringType.QUOTED
         override val slimValue: String = value
         override val slimParent: ParamElement? = parent
-        override val containingFile: ParamFile? = parent?.containingFile
+        override val containingParamFile: ParamFile? = parent?.containingParamFile
     }
 
     operator fun ParamClass.Companion.invoke(
@@ -161,7 +161,7 @@ object ParamSlimUtils {
         override fun locateSuperClass(): ParamExternalClass? = locateSuper?.let { it(this) }
         override fun shouldValidateSuper(): Boolean = locateSuper != null
         override val slimParent: ParamElement? = parent
-        override val containingFile: ParamFile? = parent?.containingFile
+        override val containingParamFile: ParamFile? = parent?.containingParamFile
         override val slimName: String = classname
         override val slimCommands: List<ParamStatement> = commands
     }
@@ -175,7 +175,7 @@ object ParamSlimUtils {
         override val slimValue: ParamLiteralBase = value
         override val slimOperator: ParamOperatorTypes = operator
         override val slimParent: ParamElement? = parent
-        override val containingFile: ParamFile? = parent?.containingFile
+        override val containingParamFile: ParamFile? = parent?.containingParamFile
         override val slimName: String = name
     }
 
@@ -188,7 +188,7 @@ object ParamSlimUtils {
         override fun locateTargetClass(): ParamExternalClass? = locateTarget?.let { it(this) }
         override fun shouldValidateTarget(): Boolean = locateTarget != null
         override val slimParent: ParamElement? = parent
-        override val containingFile: ParamFile? = parent?.containingFile
+        override val containingParamFile: ParamFile? = parent?.containingParamFile
     }
 
     operator fun ParamExternalClass.Companion.invoke(
@@ -197,25 +197,25 @@ object ParamSlimUtils {
     ): ParamExternalClass = object : ParamExternalClass {
         override val slimName: String = name
         override val slimParent: ParamElement? = parent
-        override val containingFile: ParamFile? = parent?.containingFile
+        override val containingParamFile: ParamFile? = parent?.containingParamFile
     }
 
     operator fun ParamFloat.Companion.invoke(parent: ParamElement?, value: Float): ParamFloat = object : ParamFloat {
         override val slimValue: Float = value
         override val slimParent: ParamElement? = parent
-        override val containingFile: ParamFile? = parent?.containingFile
+        override val containingParamFile: ParamFile? = parent?.containingParamFile
     }
 
     operator fun ParamInt.Companion.invoke(parent: ParamElement?, value: Int): ParamInt = object : ParamInt {
         override val slimValue: Int = value
         override val slimParent: ParamElement? = parent
-        override val containingFile: ParamFile? = parent?.containingFile
+        override val containingParamFile: ParamFile? = parent?.containingParamFile
     }
 
     operator fun ParamArray.Companion.invoke(parent: ParamElement?, value: List<ParamLiteralBase>): ParamArray = object : ParamArray {
         override val slimValue: List<ParamLiteralBase> = value
         override val slimParent: ParamElement? = parent
-        override val containingFile: ParamFile? = parent?.containingFile
+        override val containingParamFile: ParamFile? = parent?.containingParamFile
     }
 
     operator fun ParamArray.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamArray = ParamArray(

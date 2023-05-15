@@ -9,5 +9,5 @@ class ParamMutableFile(
     override var slimCommands: MutableList<ParamStatement>,
 ): ParamMutableElement(null), ParamFile {
     override var slimParent: ParamElement? = null
-    override var containingFile: ParamFile? = null
+    override var containingParamFile: ParamFile? = null
 }
