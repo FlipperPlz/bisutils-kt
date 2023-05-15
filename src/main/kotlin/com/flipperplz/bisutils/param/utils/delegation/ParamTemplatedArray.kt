@@ -1,16 +1,15 @@
 package com.flipperplz.bisutils.param.utils.delegation
 
-import com.flipperplz.bisutils.param.literal.RapArray
-import com.flipperplz.bisutils.param.node.RapLiteralBase
+import com.flipperplz.bisutils.param.literal.ParamArray
+import com.flipperplz.bisutils.param.node.ParamLiteralBase
 import kotlin.reflect.KClass
-import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
 
-class RapTemplatedArray(
-    array: RapArray,
-    vararg val template: KClass<RapLiteralBase>,
+class ParamTemplatedArray(
+    array: ParamArray,
+    vararg val template: KClass<ParamLiteralBase>,
     val allowEmpty: Boolean = true
-) : RapArray by array {
+) : ParamArray by array {
     override fun isCurrentlyValid(): Boolean {
         if (!super.isCurrentlyValid()) return false
         var current = 0

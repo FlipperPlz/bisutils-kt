@@ -1,5 +1,5 @@
 package com.flipperplz.bisutils.param.node
 
-interface RapStatement : RapElement {
+interface ParamStatement : ParamElement {
     companion object
 }

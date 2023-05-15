@@ -1,12 +1,12 @@
 package com.flipperplz.bisutils.param.literal
 
-import com.flipperplz.bisutils.param.node.RapNumerical
+import com.flipperplz.bisutils.param.node.ParamNumerical
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
-interface RapFloat : RapNumerical {
+interface ParamFloat : ParamNumerical {
     companion object;
 
-    override fun getRapElementType(): ParamElementTypes =
+    override fun getParamElementType(): ParamElementTypes =
         ParamElementTypes.L_FLOAT
 
     override fun isBinarizable(): Boolean =

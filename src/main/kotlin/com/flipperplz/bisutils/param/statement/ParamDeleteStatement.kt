@@ -1,18 +1,18 @@
 package com.flipperplz.bisutils.param.statement
 
-import com.flipperplz.bisutils.param.node.RapNamedElement
-import com.flipperplz.bisutils.param.node.RapStatement
+import com.flipperplz.bisutils.param.node.ParamNamedElement
+import com.flipperplz.bisutils.param.node.ParamStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
-interface RapDeleteStatement : RapStatement, RapNamedElement {
+interface ParamDeleteStatement : ParamStatement, ParamNamedElement {
     companion object;
     override val slimName: String?
 
-    override fun getRapElementType(): ParamElementTypes = ParamElementTypes.C_DELETE
+    override fun getParamElementType(): ParamElementTypes = ParamElementTypes.C_DELETE
 
     fun shouldValidateTarget(): Boolean
 
-    fun locateTargetClass(): RapExternalClass?
+    fun locateTargetClass(): ParamExternalClass?
 
     override fun isCurrentlyValid(): Boolean =
         !slimName.isNullOrBlank() && (shouldValidateTarget() && locateTargetClass() != null)

@@ -1,14 +1,14 @@
 package com.flipperplz.bisutils.param.statement
 
-import com.flipperplz.bisutils.param.node.RapNamedElement
-import com.flipperplz.bisutils.param.node.RapStatement
+import com.flipperplz.bisutils.param.node.ParamNamedElement
+import com.flipperplz.bisutils.param.node.ParamStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 //TODO: Validate name exists in master cfg
-interface RapExternalClass : RapStatement, RapNamedElement {
+interface ParamExternalClass : ParamStatement, ParamNamedElement {
     companion object;
 
-    override fun getRapElementType(): ParamElementTypes = ParamElementTypes.C_CLASS_EXTERNAL
+    override fun getParamElementType(): ParamElementTypes = ParamElementTypes.C_CLASS_EXTERNAL
 
     override fun isCurrentlyValid(): Boolean = slimName != null
 

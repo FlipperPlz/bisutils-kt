@@ -1,19 +1,19 @@
 package com.flipperplz.bisutils.param.statement
 
-import com.flipperplz.bisutils.param.literal.RapArray
-import com.flipperplz.bisutils.param.node.RapLiteralBase
-import com.flipperplz.bisutils.param.node.RapNamedElement
-import com.flipperplz.bisutils.param.node.RapStatement
+import com.flipperplz.bisutils.param.literal.ParamArray
+import com.flipperplz.bisutils.param.node.ParamLiteralBase
+import com.flipperplz.bisutils.param.node.ParamNamedElement
+import com.flipperplz.bisutils.param.node.ParamStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 
-interface RapVariableStatement : RapStatement, RapNamedElement {
+interface ParamVariableStatement : ParamStatement, ParamNamedElement {
     companion object;
-    val slimValue: RapLiteralBase?
+    val slimValue: ParamLiteralBase?
     val slimOperator: ParamOperatorTypes?
 
-    override fun getRapElementType(): ParamElementTypes = when {
-        slimValue is RapArray -> if(slimOperator != ParamOperatorTypes.ASSIGN)
+    override fun getParamElementType(): ParamElementTypes = when {
+        slimValue is ParamArray -> if(slimOperator != ParamOperatorTypes.ASSIGN)
             ParamElementTypes.C_VARIABLE_ARRAY_FLAGGED else
             ParamElementTypes.C_VARIABLE_ARRAY
         slimOperator != ParamOperatorTypes.ASSIGN ->  ParamElementTypes.C_VARIABLE_ARRAY_FLAGGED
@@ -24,14 +24,14 @@ interface RapVariableStatement : RapStatement, RapNamedElement {
         !slimName.isNullOrBlank() &&
         slimValue?.isCurrentlyValid() ?: false &&
         slimOperator != null &&
-        (slimOperator == ParamOperatorTypes.ASSIGN || slimValue is RapArray)
+        (slimOperator == ParamOperatorTypes.ASSIGN || slimValue is ParamArray)
 
     override fun isBinarizable(): Boolean =
-        slimValue?.isBinarizable() ?: false
+        isCurrentlyValid() && slimValue?.isBinarizable() ?: false
 
     override fun toParam(): String {
         val builder = StringBuilder(slimName)
-        if (slimValue is RapArray) builder.append("[]")
+        if (slimValue is ParamArray) builder.append("[]")
         builder.append(' ').append(slimOperator?.text).append(' ')
         return builder.append(slimValue?.toParam()).append(';').toString()
     }

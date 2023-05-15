@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.param.utils.extensions
 
-import com.flipperplz.bisutils.param.RapFile
+import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.utils.*
 import com.flipperplz.bisutils.param.literal.*
 import com.flipperplz.bisutils.param.node.*
@@ -12,231 +12,231 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 object ParamSlimUtils {
-    inline fun RapElement?.valueOf(crossinline value: () -> String): RapString =
-        RapString(this, value())
+    internal class RapVariableImpl(
+        override val slimParent: ParamElement?,
+        override val slimOperator: ParamOperatorTypes?,
+        override val slimName: String?,
+    ) : ParamVariableStatement {
+        override lateinit var slimValue: ParamLiteralBase
 
-    inline fun RapElement?.mutableValueOf(crossinline value: () -> String): ParamMutableString =
+        override val containingFile: ParamFile? = slimParent?.containingFile
+    }
+
+    internal class RapFileImpl(override val fileName: String) : ParamFile {
+        override lateinit var slimCommands: List<ParamStatement>
+    }
+
+    internal class RapClassImpl(
+        override val slimParent: ParamElement?,
+        override val slimName: String?,
+        var binaryOffset: Int,
+    ) : ParamClass {
+        override lateinit var slimCommands: List<ParamStatement>
+        override lateinit var  slimSuperClass: String
+        override val containingFile: ParamFile? = slimParent?.containingFile
+
+        override fun shouldValidateSuper(): Boolean = false
+        override fun locateSuperClass(): ParamExternalClass? = null
+    }
+
+    inline fun ParamElement?.valueOf(crossinline value: () -> String): ParamString =
+        ParamString(this, value())
+
+    inline fun ParamElement?.mutableValueOf(crossinline value: () -> String): ParamMutableString =
         ParamMutableString(this, ParamStringType.QUOTED, value())
 
-    inline fun mutableParamValueOf(parent: RapElement? = null, crossinline value: () -> String): ParamMutableString =
+    inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> String): ParamMutableString =
         ParamMutableString(parent, ParamStringType.QUOTED, value())
 
-    inline fun paramValueOf(parent: RapElement? = null, crossinline value: () -> String): RapString =
-        RapString(parent, value())
+    inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> String): ParamString =
+        ParamString(parent, value())
 
-    inline fun RapElement?.valueOf(crossinline value: () -> Int): RapInt =
-        RapInt(this, value())
+    inline fun ParamElement?.valueOf(crossinline value: () -> Int): ParamInt =
+        ParamInt(this, value())
 
-    inline fun RapElement?.mutableValueOf(crossinline value: () -> Int): ParamMutableInt =
+    inline fun ParamElement?.mutableValueOf(crossinline value: () -> Int): ParamMutableInt =
         ParamMutableInt(this, value())
 
-    inline fun mutableParamValueOf(parent: RapElement? = null, crossinline value: () -> Int): ParamMutableInt =
+    inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamMutableInt =
         ParamMutableInt(parent, value())
 
-    inline fun paramValueOf(parent: RapElement? = null, crossinline value: () -> Int): RapInt =
-        RapInt(parent, value())
+    inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamInt =
+        ParamInt(parent, value())
 
-    inline fun RapElement?.valueOf(crossinline value: () -> Float): RapFloat =
-        RapFloat(this, value())
+    inline fun ParamElement?.valueOf(crossinline value: () -> Float): ParamFloat =
+        ParamFloat(this, value())
 
-    inline fun RapElement?.mutableValueOf(crossinline value: () -> Float): ParamMutableFloat =
+    inline fun ParamElement?.mutableValueOf(crossinline value: () -> Float): ParamMutableFloat =
         ParamMutableFloat(this, value())
 
-    inline fun mutableParamValueOf(parent: RapElement? = null, crossinline value: () -> Float): ParamMutableFloat =
+    inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamMutableFloat =
         ParamMutableFloat(parent, value())
 
-    inline fun paramValueOf(parent: RapElement? = null, crossinline value: () -> Float): RapFloat =
-        RapFloat(parent, value())
+    inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamFloat =
+        ParamFloat(parent, value())
 
-    inline fun RapElement?.valueOf(crossinline value: () -> List<RapLiteralBase>): RapArray =
-        RapArray(this, value())
+    inline fun ParamElement?.valueOf(crossinline value: () -> List<ParamLiteralBase>): ParamArray =
+        ParamArray(this, value())
 
-    inline fun RapElement?.mutableValueOf(crossinline value: () -> MutableList<RapLiteralBase>): ParamMutableArray =
+    inline fun ParamElement?.mutableValueOf(crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
         ParamMutableArray(this, value())
 
-    inline fun mutableParamValueOf(parent: RapElement? = null, crossinline value: () -> MutableList<RapLiteralBase>): ParamMutableArray =
+    inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
         ParamMutableArray(parent, value())
 
-    inline fun paramValueOf(parent: RapElement? = null, crossinline value: () -> List<RapLiteralBase>): RapArray =
-        RapArray(parent, value())
+    inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> List<ParamLiteralBase>): ParamArray =
+        ParamArray(parent, value())
 
-    inline operator fun <reified T : RapNamedElement> RapStatementHolder.get(name: String): T? =
+    inline operator fun <reified T : ParamNamedElement> ParamStatementHolder.get(name: String): T? =
         slimCommands.filterIsInstance<T>().firstOrNull {
             it.slimName.equals(name, true)
         }
 
-    operator fun RapStatementHolder.get(name: String): RapStatement? =
+    operator fun ParamStatementHolder.get(name: String): ParamStatement? =
         slimCommands.firstOrNull {
-            it is RapNamedElement && it.slimName.equals(name, true)
+            it is ParamNamedElement && it.slimName.equals(name, true)
         }
 
-    operator fun RapStatementHolder.rem(name: String): RapClass =
-        slimCommands.filterIsInstance<RapClass>().first {
+    operator fun ParamStatementHolder.rem(name: String): ParamClass =
+        slimCommands.filterIsInstance<ParamClass>().first {
             it.slimName.equals(name, true)
         }
 
     //TODO(RYANN): order should be made, first deletes then classes then variables then preprocessor shit
-    infix fun RapStatementHolder.contains(name: String): Boolean =
+    infix fun ParamStatementHolder.contains(name: String): Boolean =
         get(name) == null
 
-    infix fun RapStatementHolder.contains(command: RapStatement): Boolean =
+    infix fun ParamStatementHolder.contains(command: ParamStatement): Boolean =
         slimCommands.contains(command)
 
-    inline fun <reified T : RapStatement> RapStatementHolder.childrenOfType(): List<T> =
+    inline fun <reified T : ParamStatement> ParamStatementHolder.childrenOfType(): List<T> =
         slimCommands.filterIsInstance<T>()
 
-    fun RapStatementHolder.childClasses(): List<RapClass> =
+    fun ParamStatementHolder.childClasses(): List<ParamClass> =
         childrenOfType()
 
-    operator fun RapArray.get(index: Int): RapLiteralBase? =
+    operator fun ParamArray.get(index: Int): ParamLiteralBase? =
         slimValue?.get(index)
 
-    operator fun RapStatementHolder.iterator(): Iterator<RapStatement> =
+    operator fun ParamStatementHolder.iterator(): Iterator<ParamStatement> =
         slimCommands.iterator()
 
-    operator fun RapArray.iterator(): Iterator<RapLiteralBase> =
+    operator fun ParamArray.iterator(): Iterator<ParamLiteralBase> =
         slimValue?.iterator() ?: iterator { }
 
-    operator fun RapString.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapString =
-        RapString(parent, buffer.getAsciiZ())
+    operator fun ParamString.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamString =
+        ParamString(parent, buffer.getAsciiZ())
 
-    operator fun RapFloat.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapFloat =
-        RapFloat(parent, buffer.getFloat(ByteOrder.LITTLE_ENDIAN))
+    operator fun ParamFloat.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamFloat =
+        ParamFloat(parent, buffer.getFloat(ByteOrder.LITTLE_ENDIAN))
 
-    operator fun RapInt.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapInt =
-        RapInt(parent, buffer.getInt(ByteOrder.LITTLE_ENDIAN))
+    operator fun ParamInt.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamInt =
+        ParamInt(parent, buffer.getInt(ByteOrder.LITTLE_ENDIAN))
 
-    operator fun RapExternalClass.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapExternalClass =
-        RapExternalClass(parent, buffer.getAsciiZ())
+    operator fun ParamExternalClass.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamExternalClass =
+        ParamExternalClass(parent, buffer.getAsciiZ())
 
-    operator fun RapDeleteStatement.Companion.invoke(
-        parent: RapElement?,
+    operator fun ParamDeleteStatement.Companion.invoke(
+        parent: ParamElement?,
         buffer: ByteBuffer,
-        locateTarget: ((RapDeleteStatement) -> RapExternalClass)? = null
-    ): RapDeleteStatement =
-        RapDeleteStatement(parent, buffer.getAsciiZ(), locateTarget)
+        locateTarget: ((ParamDeleteStatement) -> ParamExternalClass)? = null
+    ): ParamDeleteStatement =
+        ParamDeleteStatement(parent, buffer.getAsciiZ(), locateTarget)
 
-    operator fun RapString.Companion.invoke(parent: RapElement?, value: String): RapString = object : RapString {
+    operator fun ParamString.Companion.invoke(parent: ParamElement?, value: String): ParamString = object : ParamString {
         override val slimStringType: ParamStringType = ParamStringType.QUOTED
         override val slimValue: String = value
-        override val slimParent: RapElement? = parent
-        override val containingFile: RapFile? = parent?.containingFile
+        override val slimParent: ParamElement? = parent
+        override val containingFile: ParamFile? = parent?.containingFile
     }
 
-    operator fun RapClass.Companion.invoke(
-        parent: RapElement?,
+    operator fun ParamClass.Companion.invoke(
+        parent: ParamElement?,
         classname: String,
         externalClassName: String? = null,
-        commands: List<RapStatement> = emptyList<RapStatement>(),
-        locateSuper: ((RapClass) -> RapExternalClass)? = null
-    ): RapClass = object : RapClass {
+        commands: List<ParamStatement> = emptyList<ParamStatement>(),
+        locateSuper: ((ParamClass) -> ParamExternalClass)? = null
+    ): ParamClass = object : ParamClass {
         override val slimSuperClass: String? = externalClassName
-        override fun locateSuperClass(): RapExternalClass? = locateSuper?.let { it(this) }
+        override fun locateSuperClass(): ParamExternalClass? = locateSuper?.let { it(this) }
         override fun shouldValidateSuper(): Boolean = locateSuper != null
-        override val slimParent: RapElement? = parent
-        override val containingFile: RapFile? = parent?.containingFile
+        override val slimParent: ParamElement? = parent
+        override val containingFile: ParamFile? = parent?.containingFile
         override val slimName: String = classname
-        override val slimCommands: List<RapStatement> = commands
+        override val slimCommands: List<ParamStatement> = commands
     }
 
-    operator fun RapVariableStatement.Companion.invoke(
-        parent: RapElement?,
+    operator fun ParamVariableStatement.Companion.invoke(
+        parent: ParamElement?,
         name: String,
         operator: ParamOperatorTypes,
-        value: RapLiteralBase
-    ): RapVariableStatement = object : RapVariableStatement {
-        override val slimValue: RapLiteralBase = value
+        value: ParamLiteralBase
+    ): ParamVariableStatement = object : ParamVariableStatement {
+        override val slimValue: ParamLiteralBase = value
         override val slimOperator: ParamOperatorTypes = operator
-        override val slimParent: RapElement? = parent
-        override val containingFile: RapFile? = parent?.containingFile
+        override val slimParent: ParamElement? = parent
+        override val containingFile: ParamFile? = parent?.containingFile
         override val slimName: String = name
     }
 
-    operator fun RapDeleteStatement.Companion.invoke(
-        parent: RapElement?,
+    operator fun ParamDeleteStatement.Companion.invoke(
+        parent: ParamElement?,
         value: String,
-        locateTarget: ((RapDeleteStatement) -> RapExternalClass)? = null
-    ): RapDeleteStatement = object : RapDeleteStatement {
+        locateTarget: ((ParamDeleteStatement) -> ParamExternalClass)? = null
+    ): ParamDeleteStatement = object : ParamDeleteStatement {
         override val slimName: String = value
-        override fun locateTargetClass(): RapExternalClass? = locateTarget?.let { it(this) }
+        override fun locateTargetClass(): ParamExternalClass? = locateTarget?.let { it(this) }
         override fun shouldValidateTarget(): Boolean = locateTarget != null
-        override val slimParent: RapElement? = parent
-        override val containingFile: RapFile? = parent?.containingFile
+        override val slimParent: ParamElement? = parent
+        override val containingFile: ParamFile? = parent?.containingFile
     }
 
-    operator fun RapExternalClass.Companion.invoke(
-        parent: RapElement?,
+    operator fun ParamExternalClass.Companion.invoke(
+        parent: ParamElement?,
         name: String
-    ): RapExternalClass = object : RapExternalClass {
+    ): ParamExternalClass = object : ParamExternalClass {
         override val slimName: String = name
-        override val slimParent: RapElement? = parent
-        override val containingFile: RapFile? = parent?.containingFile
+        override val slimParent: ParamElement? = parent
+        override val containingFile: ParamFile? = parent?.containingFile
     }
 
-    operator fun RapFloat.Companion.invoke(parent: RapElement?, value: Float): RapFloat = object : RapFloat {
+    operator fun ParamFloat.Companion.invoke(parent: ParamElement?, value: Float): ParamFloat = object : ParamFloat {
         override val slimValue: Float = value
-        override val slimParent: RapElement? = parent
-        override val containingFile: RapFile? = parent?.containingFile
+        override val slimParent: ParamElement? = parent
+        override val containingFile: ParamFile? = parent?.containingFile
     }
 
-    operator fun RapInt.Companion.invoke(parent: RapElement?, value: Int): RapInt = object : RapInt {
+    operator fun ParamInt.Companion.invoke(parent: ParamElement?, value: Int): ParamInt = object : ParamInt {
         override val slimValue: Int = value
-        override val slimParent: RapElement? = parent
-        override val containingFile: RapFile? = parent?.containingFile
+        override val slimParent: ParamElement? = parent
+        override val containingFile: ParamFile? = parent?.containingFile
     }
 
-    operator fun RapArray.Companion.invoke(parent: RapElement?, value: List<RapLiteralBase>): RapArray = object : RapArray {
-        override val slimValue: List<RapLiteralBase> = value
-        override val slimParent: RapElement? = parent
-        override val containingFile: RapFile? = parent?.containingFile
+    operator fun ParamArray.Companion.invoke(parent: ParamElement?, value: List<ParamLiteralBase>): ParamArray = object : ParamArray {
+        override val slimValue: List<ParamLiteralBase> = value
+        override val slimParent: ParamElement? = parent
+        override val containingFile: ParamFile? = parent?.containingFile
     }
 
-    operator fun RapArray.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapArray = RapArray(
+    operator fun ParamArray.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamArray = ParamArray(
         parent,
-        mutableListOf<RapLiteralBase>().apply {
+        mutableListOf<ParamLiteralBase>().apply {
             repeat(buffer.getCompactInt()) {
-                add(RapLiteralBase(parent, buffer) ?: throw Exception())
+                add(ParamLiteralBase(parent, buffer) ?: throw Exception())
             }
         }
     )
 
-    internal class RapVariableImpl(
-        override val slimParent: RapElement?,
-        override val slimOperator: ParamOperatorTypes?,
-        override val slimName: String?,
-    ) : RapVariableStatement {
-        override lateinit var slimValue: RapLiteralBase
-
-        override val containingFile: RapFile? = slimParent?.containingFile
-    }
-
-    internal class RapFileImpl(override val fileName: String) : RapFile {
-        override lateinit var slimCommands: List<RapStatement>
-    }
-
-    internal class RapClassImpl(
-        override val slimParent: RapElement?,
-        override val slimName: String?,
-        var binaryOffset: Int,
-    ) : RapClass {
-        override lateinit var slimCommands: List<RapStatement>
-        override lateinit var  slimSuperClass: String
-        override val containingFile: RapFile? = slimParent?.containingFile
-
-        override fun shouldValidateSuper(): Boolean = false
-        override fun locateSuperClass(): RapExternalClass? = null
-    }
-
-    operator fun RapFile.Companion.invoke(name: String, buffer: ByteBuffer): RapFile {
+    operator fun ParamFile.Companion.invoke(name: String, buffer: ByteBuffer): ParamFile {
 
         val file = RapFileImpl(name)
         fun loadChildClasses(child: RapClassImpl, buffer: ByteBuffer): Boolean {
-            with(mutableListOf<RapStatement>()) {
+            with(mutableListOf<ParamStatement>()) {
                 buffer.position(child.binaryOffset)
                 child.slimSuperClass = buffer.getAsciiZ()
 
                 for (i in 0 until buffer.getCompactInt())
-                    add(RapStatement(child, buffer) ?: return false)
+                    add(ParamStatement(child, buffer) ?: return false)
 
                 child.slimCommands = this
             }
@@ -249,10 +249,10 @@ object ParamSlimUtils {
 
         val enumOffset = buffer.getInt(ByteOrder.LITTLE_ENDIAN)
 
-        with(mutableListOf<RapStatement>()) {
+        with(mutableListOf<ParamStatement>()) {
             buffer.getAsciiZ()
             for (i in 0 until buffer.getCompactInt())
-                add(RapStatement(file, buffer) ?: throw Exception())
+                add(ParamStatement(file, buffer) ?: throw Exception())
 
             file.slimCommands = this
         }
@@ -265,48 +265,48 @@ object ParamSlimUtils {
         return file
     }
 
-    operator fun RapStatement.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapStatement? = when(buffer.get()) {
+    operator fun ParamStatement.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamStatement? = when(buffer.get()) {
         0.toByte() -> RapClassImpl(parent, buffer.getAsciiZ(), buffer.getInt(ByteOrder.LITTLE_ENDIAN))
         1.toByte() -> with(buffer.get().toInt()) {
             RapVariableImpl(parent, ParamOperatorTypes.ASSIGN, buffer.getAsciiZ()).apply {
-                slimValue = RapLiteralBase.readStatement(this@apply, this@with, buffer) ?: throw Exception()
+                slimValue = ParamLiteralBase.readStatement(this@apply, this@with, buffer) ?: throw Exception()
             }
         }
         2.toByte() -> RapVariableImpl(parent, ParamOperatorTypes.ASSIGN, buffer.getAsciiZ()).apply {
-            slimValue = RapArray(this, buffer)
+            slimValue = ParamArray(this, buffer)
         }
-        3.toByte() -> RapExternalClass(parent, buffer)
-        4.toByte() -> RapDeleteStatement(parent, buffer)
+        3.toByte() -> ParamExternalClass(parent, buffer)
+        4.toByte() -> ParamDeleteStatement(parent, buffer)
         5.toByte() -> RapVariableImpl(parent, ParamOperatorTypes.forFlag(buffer.get()), buffer.getAsciiZ()).apply {
-            slimValue = RapArray(this, buffer)
+            slimValue = ParamArray(this, buffer)
         }
         else -> null
     }
 
-    operator fun RapLiteralBase.Companion.invoke(parent: RapElement?, buffer: ByteBuffer): RapLiteralBase? =
-        RapLiteralBase.readStatement(parent, buffer.getInt(), buffer)
+    operator fun ParamLiteralBase.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamLiteralBase? =
+        ParamLiteralBase.readStatement(parent, buffer.getInt(), buffer)
 
-    fun RapLiteralBase.Companion.readStatement(parent: RapElement?, id: Int, buffer: ByteBuffer): RapLiteralBase? = when (id) {
-        0 -> RapString(parent, buffer)
-        1 -> RapFloat(parent, buffer)
-        2 -> RapInt(parent, buffer)
-        3 -> RapArray(parent, buffer)
+    fun ParamLiteralBase.Companion.readStatement(parent: ParamElement?, id: Int, buffer: ByteBuffer): ParamLiteralBase? = when (id) {
+        0 -> ParamString(parent, buffer)
+        1 -> ParamFloat(parent, buffer)
+        2 -> ParamInt(parent, buffer)
+        3 -> ParamArray(parent, buffer)
         else -> null
     }
 
-    fun RapArray.toMutableArray(): ParamMutableArray =
+    fun ParamArray.toMutableArray(): ParamMutableArray =
         ParamMutableArray(slimParent, slimValue?.toMutableList())
 
-    fun RapString.toMutableString(): ParamMutableString =
+    fun ParamString.toMutableString(): ParamMutableString =
         ParamMutableString(slimParent, slimStringType, slimValue)
 
-    fun RapFloat.toMutableFloat(): ParamMutableFloat =
+    fun ParamFloat.toMutableFloat(): ParamMutableFloat =
         ParamMutableFloat(slimParent, slimValue)
 
-    fun RapInt.toMutableInt(): ParamMutableInt =
+    fun ParamInt.toMutableInt(): ParamMutableInt =
         ParamMutableInt(slimParent, slimValue)
 
-    fun RapClass.toMutableClass(): ParamMutableClass = ParamMutableClass(
+    fun ParamClass.toMutableClass(): ParamMutableClass = ParamMutableClass(
         slimParent,
         slimName,
         slimSuperClass,
@@ -315,16 +315,16 @@ object ParamSlimUtils {
         null
     )
 
-    fun RapExternalClass.toMutableExternalClass(): ParamMutableExternalClass =
+    fun ParamExternalClass.toMutableExternalClass(): ParamMutableExternalClass =
         ParamMutableExternalClass(slimParent, slimName)
 
-    fun RapVariableStatement.toMutableVariable(): ParamMutableVariableStatement =
+    fun ParamVariableStatement.toMutableVariable(): ParamMutableVariableStatement =
         ParamMutableVariableStatement(slimParent, slimName, slimValue, slimOperator)
 
-    fun RapDeleteStatement.toMutableDeleteStatement(): ParamMutableDeleteStatement =
+    fun ParamDeleteStatement.toMutableDeleteStatement(): ParamMutableDeleteStatement =
         ParamMutableDeleteStatement(slimParent, slimName)
 
-    fun RapFile.toMutableFile(): ParamMutableFile =
+    fun ParamFile.toMutableFile(): ParamMutableFile =
         ParamMutableFile(fileName, slimCommands.toMutableList())
 }
 

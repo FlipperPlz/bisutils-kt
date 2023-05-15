@@ -1,10 +1,10 @@
 package com.flipperplz.bisutils.param.literal
 
-import com.flipperplz.bisutils.param.node.RapLiteral
-import com.flipperplz.bisutils.param.node.RapLiteralBase
+import com.flipperplz.bisutils.param.node.ParamLiteral
+import com.flipperplz.bisutils.param.node.ParamLiteralBase
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
-interface RapArray : RapLiteral<List<RapLiteralBase>> {
+interface ParamArray : ParamLiteral<List<ParamLiteralBase>> {
     companion object;
     override fun isBinarizable(): Boolean =
         slimValue?.all { it.isBinarizable() } ?: true
@@ -12,7 +12,7 @@ interface RapArray : RapLiteral<List<RapLiteralBase>> {
     override fun isCurrentlyValid(): Boolean =
         super.isCurrentlyValid() && slimValue?.all { it.isCurrentlyValid() } ?: false
 
-    override fun getRapElementType(): ParamElementTypes =
+    override fun getParamElementType(): ParamElementTypes =
         ParamElementTypes.L_ARRAY
 
     override fun toParam(): String =
