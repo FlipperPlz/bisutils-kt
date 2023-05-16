@@ -7,6 +7,7 @@ import com.flipperplz.bisutils.param.node.*
 import com.flipperplz.bisutils.param.statement.*
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
+import com.flipperplz.bisutils.param.utils.extensions.ParamSlimUtils.mutableValueOf
 import com.flipperplz.bisutils.param.utils.mutability.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -43,10 +44,10 @@ object ParamSlimUtils {
         ParamString(this, value())
 
     inline fun ParamElement?.mutableValueOf(crossinline value: () -> String): ParamMutableString =
-        ParamMutableString(this, ParamStringType.QUOTED, value())
+        ParamMutableString(this, this?.containingParamFile, ParamStringType.QUOTED, value())
 
     inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> String): ParamMutableString =
-        ParamMutableString(parent, ParamStringType.QUOTED, value())
+        ParamMutableString(parent, parent?.containingParamFile, ParamStringType.QUOTED, value())
 
     inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> String): ParamString =
         ParamString(parent, value())
@@ -55,10 +56,10 @@ object ParamSlimUtils {
         ParamInt(this, value())
 
     inline fun ParamElement?.mutableValueOf(crossinline value: () -> Int): ParamMutableInt =
-        ParamMutableInt(this, value())
+        ParamMutableInt(this, this?.containingParamFile, value())
 
     inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamMutableInt =
-        ParamMutableInt(parent, value())
+        ParamMutableInt(parent, parent?.containingParamFile, value())
 
     inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamInt =
         ParamInt(parent, value())
@@ -67,10 +68,10 @@ object ParamSlimUtils {
         ParamFloat(this, value())
 
     inline fun ParamElement?.mutableValueOf(crossinline value: () -> Float): ParamMutableFloat =
-        ParamMutableFloat(this, value())
+        ParamMutableFloat(this, this?.containingParamFile, value())
 
     inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamMutableFloat =
-        ParamMutableFloat(parent, value())
+        ParamMutableFloat(parent, parent?.containingParamFile, value())
 
     inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamFloat =
         ParamFloat(parent, value())
@@ -79,10 +80,10 @@ object ParamSlimUtils {
         ParamArray(this, value())
 
     inline fun ParamElement?.mutableValueOf(crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
-        ParamMutableArray(this, value())
+        ParamMutableArray(this, this?.containingParamFile, value())
 
     inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
-        ParamMutableArray(parent, value())
+        ParamMutableArray(parent, parent?.containingParamFile, value())
 
     inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> List<ParamLiteralBase>): ParamArray =
         ParamArray(parent, value())
@@ -306,19 +307,20 @@ object ParamSlimUtils {
     }
 
     fun ParamArray.toMutableArray(): ParamMutableArray =
-        ParamMutableArray(slimParent, slimValue?.toMutableList())
+        ParamMutableArray(slimParent, slimParent?.containingParamFile, slimValue?.toMutableList())
 
     fun ParamString.toMutableString(): ParamMutableString =
-        ParamMutableString(slimParent, slimStringType, slimValue)
+        ParamMutableString(slimParent, slimParent?.containingParamFile, slimStringType, slimValue)
 
     fun ParamFloat.toMutableFloat(): ParamMutableFloat =
-        ParamMutableFloat(slimParent, slimValue)
+        ParamMutableFloat(slimParent, slimParent?.containingParamFile, slimValue)
 
     fun ParamInt.toMutableInt(): ParamMutableInt =
-        ParamMutableInt(slimParent, slimValue)
+        ParamMutableInt(slimParent, slimParent?.containingParamFile, slimValue)
 
     fun ParamClass.toMutableClass(): ParamMutableClass = ParamMutableClass(
         slimParent,
+        slimParent?.containingParamFile,
         slimName,
         slimSuperClass,
         slimCommands.toMutableList(),
@@ -327,13 +329,13 @@ object ParamSlimUtils {
     )
 
     fun ParamExternalClass.toMutableExternalClass(): ParamMutableExternalClass =
-        ParamMutableExternalClass(slimParent, slimName)
+        ParamMutableExternalClass(slimParent, slimParent?.containingParamFile, slimName)
 
     fun ParamVariableStatement.toMutableVariable(): ParamMutableVariableStatement =
-        ParamMutableVariableStatement(slimParent, slimName, slimValue, slimOperator)
+        ParamMutableVariableStatement(slimParent, slimParent?.containingParamFile, slimName, slimValue, slimOperator)
 
     fun ParamDeleteStatement.toMutableDeleteStatement(): ParamMutableDeleteStatement =
-        ParamMutableDeleteStatement(slimParent, slimName)
+        ParamMutableDeleteStatement(slimParent, slimParent?.containingParamFile, slimName)
 
     fun ParamFile.toMutableFile(): ParamMutableFile =
         ParamMutableFile(fileName, slimCommands.toMutableList())
