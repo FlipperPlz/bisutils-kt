@@ -109,8 +109,9 @@ object ParamSlimUtils {
     infix fun ParamStatementHolder.contains(command: ParamStatement): Boolean =
         slimCommands.contains(command)
 
-    inline fun <reified T : ParamStatement> ParamStatementHolder.childrenOfType(): List<T> =
+    inline fun <reified T : ParamElement> ParamStatementHolder.childrenOfType(): List<T> =
         slimCommands.filterIsInstance<T>()
+
 
     fun ParamStatementHolder.childClasses(): List<ParamClass> =
         childrenOfType()
@@ -226,6 +227,16 @@ object ParamSlimUtils {
             }
         }
     )
+
+    fun ParamStatementHolder.findElement(name: String): ParamNamedElement? {
+        childrenOfType<ParamNamedElement>().forEach {
+            if(it is ParamStatementHolder) it.findElement(name)?.let { found ->
+                return found
+            }
+            if(name.equals(name, false)) return it
+        }
+        return null
+    }
 
     operator fun ParamFile.Companion.invoke(name: String, buffer: ByteBuffer): ParamFile {
 
