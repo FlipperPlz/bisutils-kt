@@ -1,5 +1,6 @@
 package com.flipperplz.bisutils.param.utils.mutability
 
+import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.literal.ParamArray
 import com.flipperplz.bisutils.param.literal.ParamFloat
 import com.flipperplz.bisutils.param.literal.ParamInt
@@ -7,29 +8,32 @@ import com.flipperplz.bisutils.param.literal.ParamString
 import com.flipperplz.bisutils.param.node.ParamElement
 import com.flipperplz.bisutils.param.node.ParamLiteralBase
 import com.flipperplz.bisutils.param.utils.ParamStringType
+import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableElement
 
 
-abstract class ParamMutableLiteral(
-    slimParent: ParamElement? = null,
-): ParamMutableElement(slimParent), ParamLiteralBase
+interface ParamMutableLiteral: ParamMutableElement, ParamLiteralBase
 
 class ParamMutableString(
-    slimParent: ParamElement? = null,
+    override var slimParent: ParamElement? = null,
+    override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimStringType: ParamStringType = ParamStringType.QUOTED,
     override var slimValue: String? = null
-): ParamMutableLiteral(slimParent), ParamString
+): ParamMutableLiteral, ParamString
 
 class ParamMutableInt(
-    slimParent: ParamElement? = null,
+    override var slimParent: ParamElement? = null,
+    override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimValue: Int? = null,
-): ParamMutableLiteral(slimParent), ParamInt
+): ParamMutableLiteral, ParamInt
 
 class ParamMutableFloat(
-    slimParent: ParamElement? = null,
+    override var slimParent: ParamElement? = null,
+    override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimValue: Float? = null,
-): ParamMutableLiteral(slimParent), ParamFloat
+): ParamMutableLiteral, ParamFloat
 
 class ParamMutableArray(
-    slimParent: ParamElement? = null,
+    override var slimParent: ParamElement? = null,
+    override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimValue: MutableList<ParamLiteralBase>? = null,
-): ParamMutableLiteral(slimParent), ParamArray
+): ParamMutableLiteral, ParamArray

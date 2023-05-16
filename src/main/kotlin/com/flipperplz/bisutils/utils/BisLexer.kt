@@ -1,8 +1,12 @@
 package com.flipperplz.bisutils.utils
 
+import java.nio.ByteBuffer
+
 class BisLexer(
-    val string: String
+    private var string: String
 ) {
+    var tokenBuffer: MutableList<Char> = mutableListOf()
+        private set
     var bufferPtr: Int = -1
         private set
     var currentChar: Char = Char.MIN_VALUE
@@ -24,6 +28,37 @@ class BisLexer(
 
         incrementCurrent()
         return currentChar
+    }
+
+    fun getPositionstring(): String = "$line:$col"
+
+    fun pushToTokenBuffer() {
+        tokenBuffer.add(currentChar)
+    }
+
+    fun clearTokenBuffer() {
+        tokenBuffer.clear()
+    }
+
+    fun resetPosition() {
+        bufferPtr = 0
+        previousChar = Char.MIN_VALUE
+        currentChar = string.firstOrNull() ?: Char.MIN_VALUE
+    }
+
+    fun swapBuffers() {
+        val currentBuffer = string.toMutableList()
+        string = tokenBuffer.toString()
+        tokenBuffer = currentBuffer
+        resetPosition()
+    }
+
+    fun pushToTokenBuffer(char: Char) {
+        tokenBuffer.add(char)
+    }
+
+    fun pushToTokenBuffer(string: String) {
+        tokenBuffer.addAll(string.toList())
     }
 
     fun moveBackward() : Char {
