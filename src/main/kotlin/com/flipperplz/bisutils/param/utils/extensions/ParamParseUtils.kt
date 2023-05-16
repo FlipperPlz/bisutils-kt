@@ -2,14 +2,22 @@ package com.flipperplz.bisutils.param.utils.extensions
 
 import com.flipperplz.bisutils.BisPreProcessor
 import com.flipperplz.bisutils.param.ParamFile
+import com.flipperplz.bisutils.param.literal.ParamArray
+import com.flipperplz.bisutils.param.literal.ParamString
 import com.flipperplz.bisutils.param.node.ParamElement
-import com.flipperplz.bisutils.param.node.ParamStatementHolder
+import com.flipperplz.bisutils.param.node.ParamLiteralBase
+import com.flipperplz.bisutils.param.statement.ParamClass
 import com.flipperplz.bisutils.param.statement.ParamDeleteStatement
+import com.flipperplz.bisutils.param.statement.ParamEnum
 import com.flipperplz.bisutils.param.statement.ParamExternalClass
+import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
+import com.flipperplz.bisutils.param.utils.ParamStringType
 import com.flipperplz.bisutils.param.utils.mutability.*
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
 import com.flipperplz.bisutils.utils.BisLexer
 import java.util.Stack
+import kotlin.math.ceil
+import kotlin.math.floor
 
 object ParamParseUtils {
 
@@ -31,12 +39,15 @@ object ParamParseUtils {
                         skipWhile { (it.isWhitespace() || it.currentChar == ';') && !it.isEOF() }
                         if(isEOF()) moveBackward()
                         contextStack.pop()
+                        contextStack.peek().slimCommands.add(currentContext as? ParamClass ?: throw Exception())
                         if(contextStack.isEmpty())  break
+                        continue
                     }
                     !isEOF() -> moveBackward()
                 }
 
-                when (readIdentifier()) {
+                val word = readIdentifier()
+                when (word) {
                     "delete" -> {
                         val context = readIdentifier()
                         skipWhile { it.isWhitespace() }
@@ -83,13 +94,93 @@ object ParamParseUtils {
                             enumValue++
                             skipWhile { it.isWhitespace() }
                         } while (currentChar == ',')
-                        currentContext.slimCommands.add(enum)
+                        currentContext.slimCommands.add(enum as ParamEnum)
+                    }
+                    "__EXEC" -> {
+                        skipWhile { it.isWhitespace() }
+                        if(currentChar != '(') throw Exception("${getPositionstring()} Error: expected '(' instead got '$currentChar'.")
+                        val expression = getUntil { it.currentChar == ')' }.trimEnd(')', ' ')
+                        skipWhile { it.currentChar == ';' || it.isWhitespace() }
+                        continue
+                    }
+                    else ->  {
+                        skipWhile { it.isWhitespace() }
+                        val identifier = readIdentifier()
+                        if(currentChar == '[') {
+                            skipWhile { it.isWhitespace() }
+                            if(currentChar != ']')
+                                throw Exception("${getPositionstring()} Error: Unexpected character '$currentChar', expected ']'.")
+                            skipWhile { it.isWhitespace() }
+                            val operatorText = getWhile {
+                                it.currentChar == '=' ||
+                                it.currentChar == '+' ||
+                                it.currentChar == '-'
+                            }
+                            val operator: ParamOperatorTypes = when(operatorText) {
+                                "=" -> ParamOperatorTypes.ASSIGN
+                                "+=" -> ParamOperatorTypes.ADD_ASSIGN
+                                "-=" -> ParamOperatorTypes.SUB_ASSIGN
+                                else -> throw Exception("${getPositionstring()} Error: Unexpected operator '$operatorText', expected '=', '+=', or '-='.")
+                            }
+                            currentContext.slimCommands.add(ParamMutableVariableStatement(currentContext, file, identifier).apply {
+                                slimValue = readArray(lexer, this, file)
+                            })
+                        } else if(currentChar == '=') {
+                            currentContext.slimCommands.add(ParamMutableVariableStatement(currentContext, file, identifier).apply {
+                                slimValue = readLiteral(lexer, this, file, ';')
+                            })
+                            continue
+                        } else throw Exception("${getPositionstring()} Error: Unexpected character '$currentChar', expected '=' or '['.")
+                        continue
                     }
                 }
             }
         }
 
         return file
+    }
+
+    private fun readArray(lexer: BisLexer, paramMutableVariableStatement: ParamMutableVariableStatement, file: ParamMutableFile): ParamArray? {
+        TODO()
+    }
+
+    private fun readLiteral(lexer: BisLexer, parent: ParamElement, file: ParamFile, vararg delimiters: Char): ParamLiteralBase {
+        lexer.skipWhile { it.isWhitespace() }
+        lexer.readParamString(parent, file, *delimiters).also { string ->
+            return if(string.slimStringType == ParamStringType.QUOTED) string else with(string.slimValue?.toFloatOrNull()) {
+                if(this != null) {
+                    if(ceil(this/3) == floor(this/3) && this <= Int.MAX_VALUE)
+                        ParamMutableInt(parent, file, this.toInt())
+                    else ParamMutableFloat(parent, file, this)
+                } else string
+            }
+        }
+    }
+
+    fun BisLexer.readParamString(parent: ParamElement, file: ParamFile, vararg delimiters: Char): ParamString {
+        skipWhile { it.isWhitespace() }
+        val type = if(currentChar == '\"') ParamStringType.QUOTED else ParamStringType.UNQUOTED
+        val builder = StringBuilder()
+        while (with(moveForward()) {
+            !delimiters.contains(this)
+        }) {
+            if(currentChar == '"' && type == ParamStringType.QUOTED) {
+                //TODO(Bohemia): you guys seriously need to take another look at this logic...
+                if(moveForward() != '"') {
+                    skipWhile { it.isWhitespace() }
+                    if(currentChar != '\\') break
+                    if(moveForward() != 'n') throw Exception("${getPositionstring()} Error: Unexpected character '$currentChar', expected 'n'")
+                    skipWhile { it.isWhitespace() }
+                    if(currentChar != '"') throw Exception("${getPositionstring()} Error: Unexpected character '$currentChar', expected 'n'")
+                    builder.append('\"')
+                }
+                builder.append(currentChar)
+            }
+            if(isEOL() || isEOF()) throw Exception("${getPositionstring()} Error: End of line/file encountered.")
+            builder.append(currentChar)
+        }
+
+        return ParamMutableString(parent, file, type, builder.toString())
     }
 
     fun BisLexer.readIdentifier(): String {
