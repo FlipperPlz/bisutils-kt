@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.param.utils.extensions
+package com.flipperplz.bisutils.param.parser
 
 import com.flipperplz.bisutils.BisPreProcessor
 import com.flipperplz.bisutils.param.ParamFile
@@ -32,26 +32,24 @@ fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): Pa
             when {
                 isWhitespace() || isEOL() -> continue
                 isEOF() -> { contextStack.pop(); continue; }
-                c == '#' -> throw Exception("${getPositionstring()} Error: Unexpected directive '${getWhile { !isWhitespace() }}'.")
+                c == '#' -> throw ParamParseException(lexer, ParamParseError.UnexpectedInput)
                 c == '}' -> {
                     moveForward()
                     while (isWhitespace() && !isEOF()) moveForward()
-                    if(isEOF()) throw Exception("${getPositionstring()} Error: Premature end of file, expected ';'.")
-                    if(currentChar != ';') throw Exception("${getPositionstring()} Error: Unknown input '$currentChar', expected ';'.")
+                    if(isEOF()) throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, null, null)
+                    if(currentChar != ';') throw ParamParseException(lexer, ParamParseError.UnexpectedInput, null, null, listOf(";"))
                     contextStack.pop()
                     continue
                 }
                 else -> moveBackward()
             }
 
-
-            val keyword = readIdentifier()
-            when (keyword) {
+            when (val keyword = readIdentifier()) {
                 "delete" -> {
                     val context = readIdentifier()
                     if(!traverseWhitespace(false))
-                        throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected identifier.")
-                    if(currentChar != ';') throw Exception("${getPositionstring()} Error: Missing ';' after delete statement.")
+                        throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "delete", null, listOf("identifier"))
+                    if(currentChar != ';') throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "delete", null, listOf(";"))
                     val delete = ParamMutableDeleteStatement(slimName = context, slimParent = currentContext, containingParamFile = file)
                     currentContext.slimCommands.add(delete as ParamDeleteStatement)
                     continue
@@ -60,7 +58,7 @@ fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): Pa
                     val className = readIdentifier()
                     var base = ""
                     if(!traverseWhitespace(false))
-                        throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected ';', ':', or '}'.")
+                        throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "class", null, listOf(":", ";", "{"))
 
                     when(currentChar) {
                         ';' -> {
@@ -72,42 +70,34 @@ fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): Pa
                             moveForward()
                             base = readIdentifier()
                             if(!traverseWhitespace(false))
-                                throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected ';', ':', or '{'.")
+                                throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "class", null, listOf(":", ";", "{"))
                             if(lexer.currentChar != '{')
-                                throw Exception("${lexer.getPositionstring()} Error: Unexpected input '$currentChar', expected '{'.")
+                                throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "class", null, listOf("{"))
                         }
                         '{' -> { }
-                        else -> throw Exception("${lexer.getPositionstring()} Error: Unexpected input '$currentChar', expected ';', ':', or '{'.")
+                        else -> throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "class", null, listOf(":", ";", "{"))
                     }
-                    val clazz = ParamMutableClass(
-                        slimParent = currentContext,
-                        containingParamFile = file,
-                        className,
-                        base,
-                        mutableListOf()
-                    )
-                    contextStack.push(clazz).also {
+                    contextStack.push(ParamMutableClass(currentContext, file, className, base, mutableListOf())).also {
                         currentContext.slimCommands.add(it as ParamClass)
                     }
-                    continue
                 }
                 "enum" -> {
                     readIdentifier()
                     if(!traverseWhitespace(false))
-                        throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected '{'.")
-                    if(currentChar != '{') throw Exception("${getPositionstring()} Error: expected '{' instead got '$currentChar'.")
+                        throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "enum", null, listOf("{"))
+                    if(currentChar != '{') throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "enum", null, listOf("{"))
 
                     var enumValue = 0
                     val enum = ParamMutableEnum(slimParent = currentContext, enumValues = mutableMapOf())
                     do {
-                        @Suppress("UNUSED_VARIABLE") val enumName = readIdentifier()
+                        val enumName = readIdentifier()
                         if(!traverseWhitespace(false))
-                            throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected '='.")
-                        if(currentChar == '=') Unit //TODO: Set Enum Value
-                        enum.enumValues[name] = enumValue
+                            throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "enum", null, listOf(",", "}", "="))
+                        if(currentChar != '=') Unit //TODO: Set Enum Value
+                        enum.enumValues[enumName] = enumValue
                         enumValue++
                         if(!traverseWhitespace(false))
-                            throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected ',' or '}'.")
+                            throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "enum", null, listOf(",", "}"))
                     } while (currentChar == ',')
                     currentContext.slimCommands.add(enum as ParamEnum)
                 }
@@ -124,11 +114,12 @@ fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): Pa
                 else ->  {
                     if(currentChar == '[') {
                         if(!traverseWhitespace(false))
-                            throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected ']'.")
+                            throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "array_variable", null, listOf("]"))
                         if(currentChar != ']')
-                            throw Exception("${getPositionstring()} Error: Unexpected character '$currentChar', expected ']'.")
+                            throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "array_variable", null, listOf("]"))
+
                         if(!traverseWhitespace(false))
-                            throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected '=', '+=', or '-='.")
+                            throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "array_variable", null, listOf("=", "+=", "-="))
                         val operatorText = getWhile {
                             currentChar == '=' || currentChar == '+' || currentChar == '-'
                         }
@@ -136,16 +127,12 @@ fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): Pa
                             "=" -> ParamOperatorTypes.ASSIGN
                             "+=" -> ParamOperatorTypes.ADD_ASSIGN
                             "-=" -> ParamOperatorTypes.SUB_ASSIGN
-                            else -> throw Exception("${getPositionstring()} Error: Unexpected operator '$operatorText', expected '=', '+=', or '-='.")
+                            else -> throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "array_variable", "Found $operatorText.", listOf("=", "+=", "-="))
                         }
-                        currentContext.slimCommands.add(
-                            ParamMutableVariableStatement(
-                                currentContext, file, keyword
-                            ).apply {
-                                slimValue = readArray(lexer, this, file)
-                                slimOperator = operator
-                            } as ParamVariableStatement
-                        )
+                        currentContext.slimCommands.add(ParamMutableVariableStatement(currentContext, file, keyword).apply {
+                            slimValue = readArray(lexer, this, file)
+                            slimOperator = operator
+                        } as ParamVariableStatement)
                         skipWhile { currentChar == ';' || isWhitespace() }
 
                     } else if(currentChar == '=') {
@@ -154,10 +141,10 @@ fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): Pa
                         })
                         traverseWhitespace(false)
                         if(currentChar != ';')
-                            throw Exception("${getPositionstring()} Error: Unexpected character '$currentChar', expected ';'.")
+                            throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "variable", null, listOf(";"))
 
                         continue
-                    } else throw Exception("${getPositionstring()} Error: Unexpected character '$currentChar', expected '=' or '['.")
+                    } else throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "variable", null, listOf("=", "["))
                     continue
                 }
             }
@@ -172,7 +159,7 @@ private fun readArray(lexer: BisLexer, parent: ParamElement, file: ParamMutableF
     val contextStack = Stack<ParamMutableArray>().apply { push(array) }
     var currentContext: ParamMutableArray
 
-    if(lexer.moveForward() != '{')  throw Exception("${lexer.getPositionstring()} Error: Unexpected character '${lexer.currentChar}', expected '{'")
+    if(lexer.moveForward() != '{')  throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "array", null, listOf("{"))
     while (contextStack.isNotEmpty()) {
         currentContext = contextStack.peek()
         lexer.traverseWhitespace()
@@ -189,7 +176,7 @@ private fun readArray(lexer: BisLexer, parent: ParamElement, file: ParamMutableF
                 lexer.traverseWhitespace()
 
                 if(with(lexer.peekForward() ) { this != ',' && this != '}'} )
-                    throw Exception("${lexer.getPositionstring()} Error: Unexpected character '${lexer.currentChar}', expected ',', or '}'")
+                    throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "array", null, listOf(",", "}"))
                 continue
             }
             ',' -> continue
@@ -221,7 +208,7 @@ private fun readLiteral(lexer: BisLexer, parent: ParamElement, file: ParamFile, 
 
 fun readParamString(lexer: BisLexer, parent: ParamElement, file: ParamFile, vararg delimiters: Char): ParamString {
     if(!lexer.traverseWhitespace(true))
-        throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected literal.")
+        throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "string")
     val type = if(lexer.peekForward() == '\"')
         ParamStringType.QUOTED.also {
             lexer.moveForward()
@@ -233,23 +220,26 @@ fun readParamString(lexer: BisLexer, parent: ParamElement, file: ParamFile, vara
             //TODO(Bohemia): you guys seriously need to take another look at this logic...
             if(lexer.moveForward() != '"') {
                 if(!lexer.traverseWhitespace(true))
-                    throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected literal.")
+                    throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "quoted_string")
 
                 if(lexer.moveForward() != '\\')
                     continue
                 if(lexer.moveForward() != 'n')
-                    throw Exception("${lexer.getPositionstring()} Error: Unexpected character '${lexer.currentChar}', expected 'n'")
+                    throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "quoted_string", null, listOf("n"))
                 if(!lexer.traverseWhitespace(true))
-                    throw Exception("${lexer.getPositionstring()} Error: Premature end of file, expected literal.")
+                    throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "quoted_string")
                 if(lexer.isNextEOF())
 
-                if(lexer.currentChar != '"') throw Exception("${lexer.getPositionstring()} Error: Unexpected character '${lexer.currentChar}', expected '\"'")
+                if(lexer.currentChar != '"')
+                    throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "quoted_string", null, listOf("\""))
                 builder.append('\"')
             }
             builder.append(lexer.currentChar)
             continue
         }
-        if(lexer.isEOL() || lexer.isEOF()) throw Exception("${lexer.getPositionstring()} Error: End of line/file encountered.")
+        if(lexer.isEOL()) throw ParamParseException(lexer, ParamParseError.PrematureLineEnd, "string")
+        if(lexer.isEOF()) throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "string")
+
         builder.append(lexer.currentChar)
     }
 
@@ -258,7 +248,7 @@ fun readParamString(lexer: BisLexer, parent: ParamElement, file: ParamFile, vara
 
 fun BisLexer.readIdentifier(): String {
     if((isWhitespace() || isEOL()) && !traverseWhitespace(true))
-        throw Exception("${getPositionstring()} Error: Premature end of file, expected identifier.")
+        throw ParamParseException(this, ParamParseError.PrematureFileEnd, "string", null, listOf("identifier"))
 
     val builder = StringBuilder()
     do {

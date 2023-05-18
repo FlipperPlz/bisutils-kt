@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils
 
-import com.flipperplz.bisutils.param.utils.extensions.readParam
+import com.flipperplz.bisutils.param.parser.readParam
 import com.flipperplz.bisutils.utils.BisLexer
 
 fun main() {
