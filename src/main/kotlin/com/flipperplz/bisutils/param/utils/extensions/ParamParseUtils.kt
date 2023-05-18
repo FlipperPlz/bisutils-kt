@@ -22,7 +22,7 @@ fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): Pa
 
     val file = ParamMutableFile(name)
     val contextStack = Stack<ParamMutableStatementHolder>().apply { push(file) }
-    var currentContext: ParamMutableStatementHolder = file
+    var currentContext: ParamMutableStatementHolder
 
     with(lexer) {
         while (contextStack.isNotEmpty()) {
@@ -30,18 +30,17 @@ fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): Pa
 
             val c = moveForward()
             when {
-                c == '#' -> throw Exception("${getPositionstring()} Error: Unexpected directive '${getWhile { !isWhitespace() }}'.")
-                c == '}' -> {
-                    jumpTo(bufferPtr+2)
-                    while ( isWhitespace() || currentChar == ';' && !isEOF()) moveForward()
-                    if(isEOF())
-                        throw Exception("${getPositionstring()} Error: Premature end of file, expected ';'.")
-                    contextStack.pop()
-                    moveBackward()
-                    continue
-                }
                 isWhitespace() || isEOL() -> continue
                 isEOF() -> { contextStack.pop(); continue; }
+                c == '#' -> throw Exception("${getPositionstring()} Error: Unexpected directive '${getWhile { !isWhitespace() }}'.")
+                c == '}' -> {
+                    moveForward()
+                    while (isWhitespace() && !isEOF()) moveForward()
+                    if(isEOF()) throw Exception("${getPositionstring()} Error: Premature end of file, expected ';'.")
+                    if(currentChar != ';') throw Exception("${getPositionstring()} Error: Unknown input '$currentChar', expected ';'.")
+                    contextStack.pop()
+                    continue
+                }
                 else -> moveBackward()
             }
 
@@ -80,13 +79,16 @@ fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): Pa
                         '{' -> { }
                         else -> throw Exception("${lexer.getPositionstring()} Error: Unexpected input '$currentChar', expected ';', ':', or '{'.")
                     }
-                    contextStack.push(ParamMutableClass(
+                    val clazz = ParamMutableClass(
                         slimParent = currentContext,
                         containingParamFile = file,
                         className,
                         base,
                         mutableListOf()
-                    ))
+                    )
+                    contextStack.push(clazz).also {
+                        currentContext.slimCommands.add(it as ParamClass)
+                    }
                     continue
                 }
                 "enum" -> {
