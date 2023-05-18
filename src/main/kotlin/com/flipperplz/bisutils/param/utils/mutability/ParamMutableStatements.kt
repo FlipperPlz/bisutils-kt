@@ -50,5 +50,5 @@ class ParamMutableClass(
 class ParamMutableEnum(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
-    override var enumValues: MutableMap<String, Int>?,
+    override var enumValues: MutableMap<String, Int>,
 ): ParamMutableStatement, ParamEnum

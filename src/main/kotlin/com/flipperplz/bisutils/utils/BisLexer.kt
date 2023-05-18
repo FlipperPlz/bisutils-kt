@@ -5,8 +5,6 @@ import java.nio.ByteBuffer
 class BisLexer(
     private var string: String
 ) {
-    var tokenBuffer: MutableList<Char> = mutableListOf()
-        private set
     var bufferPtr: Int = -1
         private set
     var currentChar: Char = Char.MIN_VALUE
@@ -32,33 +30,10 @@ class BisLexer(
 
     fun getPositionstring(): String = "$line:$col"
 
-    fun pushToTokenBuffer() {
-        tokenBuffer.add(currentChar)
-    }
-
-    fun clearTokenBuffer() {
-        tokenBuffer.clear()
-    }
-
     fun resetPosition() {
         bufferPtr = 0
         previousChar = Char.MIN_VALUE
         currentChar = string.firstOrNull() ?: Char.MIN_VALUE
-    }
-
-    fun swapBuffers() {
-        val currentBuffer = string.toMutableList()
-        string = tokenBuffer.toString()
-        tokenBuffer = currentBuffer
-        resetPosition()
-    }
-
-    fun pushToTokenBuffer(char: Char) {
-        tokenBuffer.add(char)
-    }
-
-    fun pushToTokenBuffer(string: String) {
-        tokenBuffer.addAll(string.toList())
     }
 
     fun moveBackward() : Char {
@@ -83,24 +58,25 @@ class BisLexer(
 
     fun isEOF(): Boolean = bufferPtr >= string.length
 
+    fun isNextEOF() = bufferPtr+1 >= string.length
+
     fun isWhitespace(): Boolean = Companion.isWhitespace(currentChar)
 
     fun isAlphaNumeric(): Boolean = currentChar.isLetterOrDigit()
 
-    inline fun getWhile(condition: (BisLexer) -> Boolean): String {
+    inline fun getWhile(endOnLastChar: Boolean = false, condition: () -> Boolean): String {
         val builder = StringBuilder()
-        while (true) {
+        do {
             moveForward()
-            if(!condition(this)) break
-            builder.append(currentChar)
-        }
-        moveBackward()
+            builder.append(moveForward())
+        } while (condition() && with(builder.append(currentChar)) {true })
+        if(!endOnLastChar) moveBackward()
         return builder.toString()
     }
 
 
-    inline fun skipWhile(condition: (BisLexer) -> Boolean) {
-        while (condition(this)) moveForward()
+    inline fun skipWhile(condition: () -> Boolean) {
+        while (condition()) moveForward()
     }
 
     inline fun getUntil(condition: (BisLexer) -> Boolean): String =
@@ -123,12 +99,21 @@ class BisLexer(
 
     private fun incrementCurrent() {
         if (currentChar == '\n') {
-            lineWidths[line] = col - 1
+            lineWidths.add(line, col - 1)
             line++
             col = 0
         } else {
             col++
         }
+    }
+
+    fun nextIsWhitespace(): Boolean = isWhitespace(peekForward())
+
+    fun traverseWhitespace(endOnWhitespace: Boolean = true): Boolean {
+        if(!isWhitespace() && !isEOL()) return true
+        while (with(peekForward()) { (isWhitespace(this) || this == '\n') && !isNextEOF()}) moveForward()
+        if(!endOnWhitespace) moveForward()
+        return !(if(!endOnWhitespace) isEOF() else isNextEOF())
     }
 
     companion object {
