@@ -1,12 +1,12 @@
 package com.flipperplz.bisutils.param.utils.mutability
 
 import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.literal.ParamArray
-import com.flipperplz.bisutils.param.literal.ParamFloat
-import com.flipperplz.bisutils.param.literal.ParamInt
-import com.flipperplz.bisutils.param.literal.ParamString
-import com.flipperplz.bisutils.param.node.ParamElement
-import com.flipperplz.bisutils.param.node.ParamLiteralBase
+import com.flipperplz.bisutils.param.ast.literal.ParamArray
+import com.flipperplz.bisutils.param.ast.literal.ParamFloat
+import com.flipperplz.bisutils.param.ast.literal.ParamInt
+import com.flipperplz.bisutils.param.ast.literal.ParamString
+import com.flipperplz.bisutils.param.ast.node.ParamElement
+import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
 import com.flipperplz.bisutils.param.utils.ParamStringType
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableElement
 

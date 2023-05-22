@@ -1,7 +1,7 @@
 package com.flipperplz.bisutils.param.utils.delegation
 
-import com.flipperplz.bisutils.param.literal.ParamArray
-import com.flipperplz.bisutils.param.node.ParamLiteralBase
+import com.flipperplz.bisutils.param.ast.literal.ParamArray
+import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
 import kotlin.reflect.KClass
 import kotlin.reflect.full.starProjectedType
 

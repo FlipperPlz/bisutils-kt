@@ -1,7 +1,7 @@
 package com.flipperplz.bisutils.param
 
-import com.flipperplz.bisutils.param.node.ParamElement
-import com.flipperplz.bisutils.param.node.ParamStatementHolder
+import com.flipperplz.bisutils.param.ast.node.ParamElement
+import com.flipperplz.bisutils.param.ast.node.ParamStatementHolder
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface ParamFile : ParamStatementHolder {

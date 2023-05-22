@@ -1,25 +1,51 @@
 package com.flipperplz.bisutils
 
-import com.flipperplz.bisutils.param.parser.readParam
-import com.flipperplz.bisutils.utils.BisLexer
+import com.flipperplz.bisutils.parsing.BisLexer
 
 fun main() {
 
     val v = BisLexer(
         """
-        class CfgPatches {
-            class MyClass : Test {
-                text="you know daddy loves your right?";
-                type=1;
+class CfgPatches 
+{
+    class TestMod
+    {
+        requiredAddons[]=
+        {
+            "DZ_Data", 
+        };
+    };
+};
+
+class CfgMods   
+{
+    class TestMod
+    {
+        type = "mod";
+        inputs = "mods\testmod\inputs\my_new_inputs.xml";
+        dependencies[]={"Game"}; 
+
+        class defs
+        {
+            class imageSets
+            {
+                files[]={"mods/testmod/gui/imagesets/mod1.imageset", "mods/testmod/gui/imagesets/mod2.imageset" };
             };
-            class MyClass : TestResponse {
-                text=yea I know papa 0.0;
-                type=3.141592;
+
+            class widgetStyles
+            {
+                files[]={"mods/testmod/gui/looknfeel/mod1.styles", "mods/testmod/gui/looknfeel/mod2.styles"};
+            };
+            class engineScriptModule
+            {
+                value="";
+                files[]={"mods/testmod/scripts/1_Core"}; 
             };
         };
+    };
+};
     """.trimIndent()
     )
-    val clazz = readParam("config", v, null)
     println()
 }
 

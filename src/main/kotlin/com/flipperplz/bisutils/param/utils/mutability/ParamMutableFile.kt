@@ -1,9 +1,8 @@
 package com.flipperplz.bisutils.param.utils.mutability
 
 import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.node.ParamElement
-import com.flipperplz.bisutils.param.node.ParamStatement
-import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableElement
+import com.flipperplz.bisutils.param.ast.node.ParamElement
+import com.flipperplz.bisutils.param.ast.node.ParamStatement
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
 
 class ParamMutableFile(

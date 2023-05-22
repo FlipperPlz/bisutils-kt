@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.param.node
+package com.flipperplz.bisutils.param.ast.node
 
 interface ParamStatementHolder : ParamElement {
     val slimCommands: List<ParamStatement>

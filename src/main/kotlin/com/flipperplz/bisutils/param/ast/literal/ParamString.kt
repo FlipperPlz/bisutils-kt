@@ -1,6 +1,6 @@
-package com.flipperplz.bisutils.param.literal
+package com.flipperplz.bisutils.param.ast.literal
 
-import com.flipperplz.bisutils.param.node.ParamLiteral
+import com.flipperplz.bisutils.param.ast.node.ParamLiteral
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
 

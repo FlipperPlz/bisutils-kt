@@ -1,9 +1,9 @@
-package com.flipperplz.bisutils.param.statement
+package com.flipperplz.bisutils.param.ast.statement
 
-import com.flipperplz.bisutils.param.literal.ParamArray
-import com.flipperplz.bisutils.param.node.ParamLiteralBase
-import com.flipperplz.bisutils.param.node.ParamNamedElement
-import com.flipperplz.bisutils.param.node.ParamStatement
+import com.flipperplz.bisutils.param.ast.literal.ParamArray
+import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
+import com.flipperplz.bisutils.param.ast.node.ParamNamedElement
+import com.flipperplz.bisutils.param.ast.node.ParamStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 

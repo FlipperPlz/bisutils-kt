@@ -1,7 +1,7 @@
-package com.flipperplz.bisutils.param.statement
+package com.flipperplz.bisutils.param.ast.statement
 
-import com.flipperplz.bisutils.param.node.ParamNamedElement
-import com.flipperplz.bisutils.param.node.ParamStatement
+import com.flipperplz.bisutils.param.ast.node.ParamNamedElement
+import com.flipperplz.bisutils.param.ast.node.ParamStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 //TODO: Validate name exists in master cfg

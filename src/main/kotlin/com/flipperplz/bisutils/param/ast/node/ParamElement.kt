@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.param.node
+package com.flipperplz.bisutils.param.ast.node
 
 import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.utils.ParamElementTypes

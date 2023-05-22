@@ -1,7 +1,7 @@
-package com.flipperplz.bisutils.param.literal
+package com.flipperplz.bisutils.param.ast.literal
 
-import com.flipperplz.bisutils.param.node.ParamLiteral
-import com.flipperplz.bisutils.param.node.ParamLiteralBase
+import com.flipperplz.bisutils.param.ast.node.ParamLiteral
+import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface ParamArray : ParamLiteral<List<ParamLiteralBase>> {

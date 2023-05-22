@@ -1,6 +1,6 @@
-package com.flipperplz.bisutils.param.literal
+package com.flipperplz.bisutils.param.ast.literal
 
-import com.flipperplz.bisutils.param.node.ParamNumerical
+import com.flipperplz.bisutils.param.ast.node.ParamNumerical
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
 interface ParamFloat : ParamNumerical {

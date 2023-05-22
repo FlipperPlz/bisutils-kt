@@ -2,17 +2,16 @@ package com.flipperplz.bisutils.param.utils.extensions
 
 import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.utils.*
-import com.flipperplz.bisutils.param.literal.*
-import com.flipperplz.bisutils.param.node.*
-import com.flipperplz.bisutils.param.statement.*
+import com.flipperplz.bisutils.param.ast.literal.*
+import com.flipperplz.bisutils.param.ast.node.*
+import com.flipperplz.bisutils.param.ast.statement.*
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
-import com.flipperplz.bisutils.param.utils.extensions.ParamSlimUtils.mutableValueOf
 import com.flipperplz.bisutils.param.utils.mutability.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-object ParamSlimUtils {
+//object ParamSlimUtils {
     internal class RapVariableImpl(
         override val slimParent: ParamElement?,
         override val slimOperator: ParamOperatorTypes?,
@@ -87,6 +86,8 @@ object ParamSlimUtils {
 
     inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> List<ParamLiteralBase>): ParamArray =
         ParamArray(parent, value())
+
+    operator fun ParamMutableArray.plusAssign(push: ParamLiteralBase?) { push?.let { slimValue?.add(it) } }
 
     inline operator fun <reified T : ParamNamedElement> ParamStatementHolder.get(name: String): T? =
         slimCommands.filterIsInstance<T>().firstOrNull {
@@ -339,5 +340,5 @@ object ParamSlimUtils {
 
     fun ParamFile.toMutableFile(): ParamMutableFile =
         ParamMutableFile(fileName, slimCommands.toMutableList())
-}
+//}
 

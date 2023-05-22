@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils
 
-import com.flipperplz.bisutils.utils.BisLexer
+import com.flipperplz.bisutils.parsing.BisLexer
 
 interface BisPreProcessor {
     fun processText(lexer: BisLexer): Boolean {

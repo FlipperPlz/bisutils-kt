@@ -1,7 +1,7 @@
-package com.flipperplz.bisutils.param.statement
+package com.flipperplz.bisutils.param.ast.statement
 
-import com.flipperplz.bisutils.param.node.ParamElement.Companion.REGEX_ALPHANUM
-import com.flipperplz.bisutils.param.node.ParamStatement
+import com.flipperplz.bisutils.param.ast.node.ParamElement.Companion.REGEX_ALPHANUM
+import com.flipperplz.bisutils.param.ast.node.ParamStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import java.lang.StringBuilder
 
