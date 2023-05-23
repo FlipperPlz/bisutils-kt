@@ -40,6 +40,7 @@ open class BisLexer(private var string: String) {
     fun peekBackward(): Char? = string.getOrNull(bufferPtr - 1)
 
     fun peekAt(pos: Int): Char? = string.getOrNull(pos)
+
     fun regionMatches(text: String): Boolean = string.regionMatches(bufferPtr, text, 0, text.length)
 
 }

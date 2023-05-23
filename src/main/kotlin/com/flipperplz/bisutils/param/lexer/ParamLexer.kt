@@ -36,6 +36,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
         return builder.toString()
     }
 
+    @Throws(LexerException::class)
     fun readOperator(): ParamOperatorTypes = when (currentChar) {
         '+' -> { if(moveForward() == '=') ParamOperatorTypes.ADD_ASSIGN else throw unexpectedInputException() }
         '-' -> { if(moveForward() == '=') ParamOperatorTypes.ADD_ASSIGN else throw unexpectedInputException() }
@@ -43,6 +44,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
         else -> throw unexpectedInputException()
     }
 
+    @Throws(LexerException::class)
     fun readString(vararg delimiters: Char): String {
         traverseWhitespace()
         val quoted = if(currentChar == '\"') true.also { moveForward() } else false

@@ -12,6 +12,8 @@ import com.flipperplz.bisutils.parsing.LexicalError
 import java.util.Stack
 
 object ParamParser {
+
+    @Throws(LexerException::class)
     fun parse(lexer: ParamLexer, name: String, preProcessor: ParamPreProcessor? = null): ParamFile = mutableParamFile(name).apply {
         val finalLexer = preProcessor?.processText(lexer) ?: lexer
         val contextStack = Stack<ParamMutableStatementHolder>().also { it.add(this) }
