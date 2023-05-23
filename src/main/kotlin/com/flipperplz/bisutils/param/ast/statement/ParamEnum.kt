@@ -1,12 +1,14 @@
 package com.flipperplz.bisutils.param.ast.statement
 
+import com.flipperplz.bisutils.param.ast.literal.ParamInt
 import com.flipperplz.bisutils.param.ast.node.ParamElement.Companion.REGEX_ALPHANUM
+import com.flipperplz.bisutils.param.ast.node.ParamNumerical
 import com.flipperplz.bisutils.param.ast.node.ParamStatement
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import java.lang.StringBuilder
 
 interface ParamEnum: ParamStatement {
-    val enumValues: Map<String, Int>?
+    val enumValues: Map<String, ParamNumerical>?
 
     override fun isBinarizable(): Boolean = true
 

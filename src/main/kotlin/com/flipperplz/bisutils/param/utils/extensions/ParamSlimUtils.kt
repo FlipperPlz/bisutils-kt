@@ -1,10 +1,14 @@
 package com.flipperplz.bisutils.param.utils.extensions
 
+import com.flipperplz.bisutils.BisPreProcessor
 import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.utils.*
 import com.flipperplz.bisutils.param.ast.literal.*
 import com.flipperplz.bisutils.param.ast.node.*
 import com.flipperplz.bisutils.param.ast.statement.*
+import com.flipperplz.bisutils.param.lexer.ParamLexer
+import com.flipperplz.bisutils.param.parser.ParamParser
+import com.flipperplz.bisutils.param.parser.ParamPreProcessor
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
 import com.flipperplz.bisutils.param.utils.mutability.*
@@ -40,57 +44,61 @@ import java.nio.ByteOrder
         override fun locateSuperClass(): ParamExternalClass? = null
     }
 
-    inline fun ParamElement?.valueOf(crossinline value: () -> String): ParamString =
+    inline fun ParamElement?.stringOf(crossinline value: () -> String): ParamString =
         ParamString(this, value())
 
-    inline fun ParamElement?.mutableValueOf(crossinline value: () -> String): ParamMutableString =
+    inline fun ParamElement?.mutableStringOf(crossinline value: () -> String): ParamMutableString =
         ParamMutableStringImpl(this, this?.containingParamFile, ParamStringType.QUOTED, value())
 
-    inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> String): ParamMutableString =
+    inline fun mutableParamStringOf(parent: ParamElement? = null, crossinline value: () -> String): ParamMutableString =
         ParamMutableStringImpl(parent, parent?.containingParamFile, ParamStringType.QUOTED, value())
 
-    inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> String): ParamString =
+    inline fun paramStringOf(parent: ParamElement? = null, crossinline value: () -> String): ParamString =
         ParamString(parent, value())
 
-    inline fun ParamElement?.valueOf(crossinline value: () -> Int): ParamInt =
+    inline fun ParamElement?.intOf(crossinline value: () -> Int): ParamInt =
         ParamInt(this, value())
 
-    inline fun ParamElement?.mutableValueOf(crossinline value: () -> Int): ParamMutableInt =
+    inline fun ParamElement?.mutableIntOf(crossinline value: () -> Int): ParamMutableInt =
         ParamMutableIntImpl(this, this?.containingParamFile, value())
 
-    inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamMutableInt =
+    inline fun mutableParamIntOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamMutableInt =
         ParamMutableIntImpl(parent, parent?.containingParamFile, value())
 
-    inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamInt =
+    inline fun paramIntOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamInt =
         ParamInt(parent, value())
 
     fun mutableParamFile(name: String): ParamMutableFile = ParamMutableFileImpl(name)
 
-    inline fun ParamElement?.valueOf(crossinline value: () -> Float): ParamFloat =
+    inline fun ParamElement?.floatOf(crossinline value: () -> Float): ParamFloat =
         ParamFloat(this, value())
 
-    inline fun ParamElement?.mutableValueOf(crossinline value: () -> Float): ParamMutableFloat =
+    inline fun ParamElement?.mutableFloatOf(crossinline value: () -> Float): ParamMutableFloat =
         ParamMutableFloatImpl(this, this?.containingParamFile, value())
 
-    inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamMutableFloat =
+    inline fun mutableParamFloatOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamMutableFloat =
         ParamMutableFloatImpl(parent, parent?.containingParamFile, value())
 
-    inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamFloat =
+    inline fun paramFloatOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamFloat =
         ParamFloat(parent, value())
 
-    inline fun ParamElement?.valueOf(crossinline value: () -> List<ParamLiteralBase>): ParamArray =
+    inline fun ParamElement?.arrayOf(crossinline value: () -> List<ParamLiteralBase>): ParamArray =
         ParamArray(this, value())
 
-    inline fun ParamElement?.mutableValueOf(crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
+    inline fun ParamElement?.mutableArrayOf(crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
         ParamMutableArrayImpl(this, this?.containingParamFile, value())
 
-    inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
+    inline fun mutableParamArrayOf(parent: ParamElement? = null, crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
         ParamMutableArrayImpl(parent, parent?.containingParamFile, value())
 
-    inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> List<ParamLiteralBase>): ParamArray =
+    inline fun paramArrayOf(parent: ParamElement? = null, crossinline value: () -> List<ParamLiteralBase>): ParamArray =
         ParamArray(parent, value())
 
     operator fun ParamMutableArray.plusAssign(push: ParamLiteralBase?) { push?.let { slimValue?.add(it) } }
+
+    operator fun ParamFile.Companion.invoke(lexer: ParamLexer, name: String, preProcessor: ParamPreProcessor? = null): ParamFile = ParamParser.parse(lexer, name, preProcessor)
+
+    fun parseParamFile(lexer: ParamLexer, name: String, preProcessor: ParamPreProcessor? = null): ParamFile = ParamParser.parse(lexer, name, preProcessor)
 
     inline operator fun <reified T : ParamNamedElement> ParamStatementHolder.get(name: String): T? =
         slimCommands.filterIsInstance<T>().firstOrNull {

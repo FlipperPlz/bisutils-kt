@@ -43,32 +43,47 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
         else -> throw unexpectedInputException()
     }
 
-    @Throws(LexerException::class)
-    fun readString(parent: ParamElement, file: ParamFile, vararg delimiters: Char): ParamString {
+    fun readString(vararg delimiters: Char): String {
         traverseWhitespace()
-        val type = if(currentChar == '\"')
-            ParamStringType.QUOTED.also {
-                moveForward()
-            } else ParamStringType.UNQUOTED
+        val quoted = if(currentChar == '\"') true.also { moveForward() } else false
         val builder = StringBuilder()
         while (!delimiters.contains(currentChar ?: throw eofException())) {
-            if(currentChar == '"' && type == ParamStringType.QUOTED) {
-                //TODO(Bohemia): you guys seriously need to take another look at this logic...
+            if((currentChar == '\n' || currentChar == '\r')) {
+               if(!quoted) {
+                   traverseWhitespace()
+                   if(currentChar != '#') break
+                    //TODO: Preprocess line
+                   break
+               }
+                throw eolException()
+            }
+
+            if(currentChar == '"' && quoted) {
                 if(moveForward() != '"') {
                     traverseWhitespace()
-                    if(currentChar != '\\') continue
+                    if(currentChar != '\\') return "\"${builder.toString()}\""
                     if(moveForward() != 'n') throw unexpectedInputException()
                     traverseWhitespace()
                     if(currentChar != '"') throw unexpectedInputException()
-                    builder.append('\"')
+                    builder.append('\n')
+                    moveForward()
+                    continue
                 }
             }
-
             builder.append(currentChar)
             moveForward()
         }
 
-        return ParamMutableStringImpl(parent, file, type, builder.toString())
+        return if(quoted) "\"${builder.toString()}\"" else builder.toString()
+    }
+
+    @Throws(LexerException::class)
+    fun readString(parent: ParamElement, file: ParamFile, vararg delimiters: Char): ParamString {
+        var string = readString(*delimiters)
+        val type = if(string.startsWith('"')) ParamStringType.QUOTED.also {
+            string = string.trimStart('"').trimEnd('"')
+        } else ParamStringType.UNQUOTED
+        return ParamMutableStringImpl(parent, file, type, string)
     }
 
     @Throws(LexerException::class)
