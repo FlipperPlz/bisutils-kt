@@ -3,19 +3,102 @@ package com.flipperplz.bisutils.param.parser
 import com.flipperplz.bisutils.BisPreProcessor
 import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.lexer.ParamLexer
+import com.flipperplz.bisutils.param.utils.ParamElementTypes
+import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
+import com.flipperplz.bisutils.param.utils.extensions.mutableParamFile
+import com.flipperplz.bisutils.param.utils.extensions.plusAssign
 import com.flipperplz.bisutils.param.utils.mutability.*
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
 import com.flipperplz.bisutils.parsing.BisLexer
+import com.flipperplz.bisutils.parsing.LexerException
+import com.flipperplz.bisutils.parsing.LexicalError
 import java.util.Stack
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class ParamParser(lexer: ParamLexer, name: String, preProcessor: BisPreProcessor? = null) {
 
-    fun parse(): ParamFile {
-        TODO()
+class ParamParser(lexer: ParamLexer, name: String, preProcessor: BisPreProcessor? = null) : ParamMutableFile by mutableParamFile(name) {
+    init {
+        if(preProcessor?.processText(lexer) == false) throw LexerException(lexer, LexicalError.PreprocessorError)
+        val contextStack = Stack<ParamMutableStatementHolder>().apply { add(this@ParamParser) }
+        while (contextStack.isNotEmpty()) {
+            val currentContext = contextStack.peek()
+            lexer.moveForward()
+            lexer.traverseWhitespace(true)
+            when {
+                lexer.isEOF() -> { contextStack.pop(); continue; }
+                lexer.currentChar == '#' -> throw LexerException(lexer, LexicalError.PreprocessorError)
+                lexer.currentChar == '}' -> {
+                    lexer.moveForward(); lexer.traverseWhitespace(false)
+                    if(lexer.currentChar != ';') throw lexer.unexpectedInputException()
+                    contextStack.pop(); continue
+                }
+            }
+            var keyword: String = lexer.readIdentifier()
+            when(keyword) {
+                "delete" -> {
+                    if(lexer.traverseWhitespace() <= 0) throw lexer.unexpectedInputException()
+                    keyword = lexer.readIdentifier(); lexer.traverseWhitespace()
+                    if(lexer.currentChar != ';') throw lexer.unexpectedInputException()
+                    currentContext += ParamMutableDeleteStatementImpl(slimName = keyword, slimParent = currentContext, containingParamFile = this)
+                    continue
+                }
+                "class" -> {
+                    if(lexer.traverseWhitespace() <= 0) throw lexer.unexpectedInputException()
+                    keyword = lexer.readIdentifier(); lexer.traverseWhitespace()
+                    var baseClass: String?
+                    when(lexer.currentChar) {
+                        ';' -> {
+                            currentContext += ParamMutableExternalClassImpl(currentContext, this, keyword)
+                            continue;
+                        }
+                        ':' -> {
+                            lexer.moveForward(); lexer.traverseWhitespace(); baseClass = lexer.readIdentifier()
+                            lexer.traverseWhitespace()
+                        }
+                        '{' -> { baseClass = null }
+                        else -> throw lexer.unexpectedInputException()
+                    }
+                    if(lexer.currentChar != '{') throw lexer.unexpectedInputException()
+                    with(ParamMutableClassImpl(currentContext, this, keyword, baseClass, mutableListOf())) {
+                        currentContext += this
+                        contextStack.push(this)
+                    }
+                    continue
+                }
+                else -> {
+                    if (lexer.currentChar == '[') { lexer.moveForward(); lexer.traverseWhitespace()
+                        if (lexer.currentChar != ']') { throw lexer.unexpectedInputException() }; lexer.traverseWhitespace()
+                        val operator: ParamOperatorTypes = lexer.readOperator(); lexer.moveForward(); lexer.traverseWhitespace()
+                        currentContext.slimCommands.add(ParamMutableVariableStatementImpl(currentContext, this, keyword).apply {
+                            slimValue = lexer.readArray(this, this@ParamParser)
+                            slimOperator = operator
+                        })
+                        while (lexer.currentChar == ';') lexer.moveForward()
+                        continue
+                    } else if (lexer.currentChar == '=') {
+                        currentContext.slimCommands.add(
+                            ParamMutableVariableStatementImpl(currentContext, this, keyword).apply {
+                                slimValue = lexer.readLiteral(this, this@ParamParser, ';')
+                            }
+                        )
+                        lexer.traverseWhitespace()
+                        if (lexer.currentChar != ';') throw lexer.unexpectedInputException()
+                        continue
+                    }
+                    throw lexer.unexpectedInputException()
+                }
+            }
+        }
     }
 
+    override fun getParamElementType(): ParamElementTypes = ParamElementTypes.FILE
+
+    override fun isBinarizable(): Boolean = super.isBinarizable()
+
+    override fun isCurrentlyValid(): Boolean = super.isCurrentlyValid()
+
+    override fun toParam(): String = super.toParam()
 //
 //    fun readParam(name: String, lexer: BisLexer, preProcessor: BisPreProcessor?): ParamFile {
 //        if(preProcessor?.processText(lexer) == false) throw Exception("Preprocess failed.")
@@ -44,15 +127,7 @@ class ParamParser(lexer: ParamLexer, name: String, preProcessor: BisPreProcessor
 //            }
 //
 //            when (val keyword = readIdentifier()) {
-//                "delete" -> {
-//                    val context = readIdentifier()
-//                    if(!traverseWhitespace(false))
-//                        throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "delete", null, listOf("identifier"))
-//                    if(currentChar != ';') throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "delete", null, listOf(";"))
-//                    val delete = ParamMutableDeleteStatement(slimName = context, slimParent = currentContext, containingParamFile = file)
-//                    currentContext.slimCommands.add(delete as ParamDeleteStatement)
-//                    continue
-//                }
+
 //                "class" -> {
 //                    val className = readIdentifier()
 //                    var base = ""
@@ -111,37 +186,6 @@ class ParamParser(lexer: ParamLexer, name: String, preProcessor: BisPreProcessor
 //                    continue
 //                }
 //                else ->  {
-//                    if(currentChar == '[') {
-//                        moveForward()
-//                        if((isWhitespace() || isEOL()) && !traverseWhitespace(false))
-//                            throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "array_variable", null, listOf("]"))
-//                        if(currentChar != ']')
-//                            throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "array_variable", null, listOf("]"))
-//                        if(!traverseWhitespace(true))
-//                            throw ParamParseException(lexer, ParamParseError.PrematureFileEnd, "array_variable", null, listOf("=", "+=", "-="))
-//
-//                        val operator: ParamOperatorTypes = when(val text = getWhile { with(peekForward()) {this == '+' || this == '-' || this == '='} }) {
-//                            "=" -> ParamOperatorTypes.ASSIGN
-//                            "+=" -> ParamOperatorTypes.ADD_ASSIGN
-//                            "-=" -> ParamOperatorTypes.SUB_ASSIGN
-//                            else -> throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "array_variable", "Found $text.", listOf("=", "+=", "-="))
-//                        }
-//                        currentContext.slimCommands.add(ParamMutableVariableStatement(currentContext, file, keyword).apply {
-//                            slimValue = readArray(lexer, this, file)
-//                            slimOperator = operator
-//                        } as ParamVariableStatement)
-//                        skipWhile { currentChar == ';' || isWhitespace() }
-//
-//                    } else if(currentChar == '=') {
-//                        currentContext.slimCommands.add(ParamMutableVariableStatement(currentContext, file, keyword).apply {
-//                            slimValue = readLiteral(lexer, this, file, ';')
-//                        })
-//                        traverseWhitespace(false)
-//                        if(currentChar != ';') throw unexpectedInputException()
-//
-//                        continue
-//                    } else throw ParamParseException(lexer, ParamParseError.UnexpectedInput, "variable", null, listOf("=", "["))
-//                    continue
 //                }
 //            }
 //        }

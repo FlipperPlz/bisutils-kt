@@ -4,6 +4,7 @@ import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.ast.literal.ParamString
 import com.flipperplz.bisutils.param.ast.node.ParamElement
 import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
+import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
 import com.flipperplz.bisutils.param.utils.extensions.plusAssign
 import com.flipperplz.bisutils.param.utils.mutability.*
@@ -35,6 +36,13 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
         return builder.toString()
     }
 
+    fun readOperator(): ParamOperatorTypes = when (currentChar) {
+        '+' -> { if(moveForward() == '=') ParamOperatorTypes.ADD_ASSIGN else throw unexpectedInputException() }
+        '-' -> { if(moveForward() == '=') ParamOperatorTypes.ADD_ASSIGN else throw unexpectedInputException() }
+        '=' -> ParamOperatorTypes.ASSIGN
+        else -> throw unexpectedInputException()
+    }
+
     @Throws(LexerException::class)
     fun readString(parent: ParamElement, file: ParamFile, vararg delimiters: Char): ParamString {
         traverseWhitespace()
@@ -60,7 +68,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
             moveForward()
         }
 
-        return ParamMutableString(parent, file, type, builder.toString())
+        return ParamMutableStringImpl(parent, file, type, builder.toString())
     }
 
     @Throws(LexerException::class)
@@ -68,15 +76,15 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
         return if(string.slimStringType == ParamStringType.QUOTED) string else with(string.slimValue?.toFloatOrNull()) {
             if(this != null) {
                 if(ceil(this/3) == floor(this/3) && this <= Int.MAX_VALUE)
-                    ParamMutableInt(parent, file, this.toInt())
-                else ParamMutableFloat(parent, file, this)
+                    ParamMutableIntImpl(parent, file, this.toInt())
+                else ParamMutableFloatImpl(parent, file, this)
             } else string
         }
     }
 
     @Throws(LexerException::class)
     fun readArray(parent: ParamElement, file: ParamMutableFile): ParamMutableArray {
-        val array = ParamMutableArray(parent, file)
+        val array = ParamMutableArrayImpl(parent, file)
         val contextStack = Stack<ParamMutableArray>().apply { push(array); traverseWhitespace() }
         if(currentChar != '{') throw unexpectedInputException()
         while (contextStack.isNotEmpty()) {
@@ -101,15 +109,17 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
     }
 
     @Throws(LexerException::class)
-    fun traverseWhitespace(allowEOF: Boolean = false) {
+    fun traverseWhitespace(allowEOF: Boolean = false): Int {
+        var count: Int = 0
         while(true){
             if(isEOF()) { if(allowEOF) break else throw eofException() }
             when(currentChar) {
-                '\r' -> { line++; if(moveForward() != '\n') continue else moveForward() }
-                '\n' -> { line++; moveForward() }
-                else -> { if(!whitespaces.contains(currentChar)) break else moveForward() }
+                '\r' -> { line++; count++; if(moveForward() != '\n') continue  }
+                '\n' -> { line++; count++; moveForward() }
+                else -> { if(!whitespaces.contains(currentChar)) break else count++; }
             }
         }
+        return count;
     }
 
 }

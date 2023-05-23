@@ -13,27 +13,52 @@ import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableElement
 
 interface ParamMutableLiteral: ParamMutableElement, ParamLiteralBase
 
-class ParamMutableString(
+class ParamMutableStringImpl(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimStringType: ParamStringType = ParamStringType.QUOTED,
     override var slimValue: String? = null
-): ParamMutableLiteral, ParamString
+): ParamMutableString
 
-class ParamMutableInt(
+interface ParamMutableString : ParamMutableLiteral, ParamString {
+    override var slimParent: ParamElement?
+    override var containingParamFile: ParamFile?
+    override var slimStringType: ParamStringType
+    override var slimValue: String?
+}
+
+class ParamMutableIntImpl(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimValue: Int? = null,
-): ParamMutableLiteral, ParamInt
+): ParamMutableInt
 
-class ParamMutableFloat(
+interface ParamMutableInt : ParamMutableLiteral, ParamInt {
+    override var slimParent: ParamElement?
+    override var containingParamFile: ParamFile?
+    override var slimValue: Int?
+}
+
+class ParamMutableFloatImpl(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimValue: Float? = null,
-): ParamMutableLiteral, ParamFloat
+): ParamMutableFloat
 
-class ParamMutableArray(
+interface ParamMutableFloat : ParamMutableLiteral, ParamFloat {
+    override var slimParent: ParamElement?
+    override var containingParamFile: ParamFile?
+    override var slimValue: Float?
+}
+
+class ParamMutableArrayImpl(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimValue: MutableList<ParamLiteralBase>? = null,
-): ParamMutableLiteral, ParamArray
+): ParamMutableArray
+
+interface ParamMutableArray : ParamMutableLiteral, ParamArray {
+    override var slimParent: ParamElement?
+    override var containingParamFile: ParamFile?
+    override var slimValue: MutableList<ParamLiteralBase>?
+}

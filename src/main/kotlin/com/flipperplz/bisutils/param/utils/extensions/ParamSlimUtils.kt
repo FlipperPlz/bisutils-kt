@@ -8,6 +8,7 @@ import com.flipperplz.bisutils.param.ast.statement.*
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
 import com.flipperplz.bisutils.param.utils.mutability.*
+import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -43,10 +44,10 @@ import java.nio.ByteOrder
         ParamString(this, value())
 
     inline fun ParamElement?.mutableValueOf(crossinline value: () -> String): ParamMutableString =
-        ParamMutableString(this, this?.containingParamFile, ParamStringType.QUOTED, value())
+        ParamMutableStringImpl(this, this?.containingParamFile, ParamStringType.QUOTED, value())
 
     inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> String): ParamMutableString =
-        ParamMutableString(parent, parent?.containingParamFile, ParamStringType.QUOTED, value())
+        ParamMutableStringImpl(parent, parent?.containingParamFile, ParamStringType.QUOTED, value())
 
     inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> String): ParamString =
         ParamString(parent, value())
@@ -55,22 +56,24 @@ import java.nio.ByteOrder
         ParamInt(this, value())
 
     inline fun ParamElement?.mutableValueOf(crossinline value: () -> Int): ParamMutableInt =
-        ParamMutableInt(this, this?.containingParamFile, value())
+        ParamMutableIntImpl(this, this?.containingParamFile, value())
 
     inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamMutableInt =
-        ParamMutableInt(parent, parent?.containingParamFile, value())
+        ParamMutableIntImpl(parent, parent?.containingParamFile, value())
 
     inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> Int): ParamInt =
         ParamInt(parent, value())
+
+    fun mutableParamFile(name: String): ParamMutableFile = ParamMutableFileImpl(name)
 
     inline fun ParamElement?.valueOf(crossinline value: () -> Float): ParamFloat =
         ParamFloat(this, value())
 
     inline fun ParamElement?.mutableValueOf(crossinline value: () -> Float): ParamMutableFloat =
-        ParamMutableFloat(this, this?.containingParamFile, value())
+        ParamMutableFloatImpl(this, this?.containingParamFile, value())
 
     inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamMutableFloat =
-        ParamMutableFloat(parent, parent?.containingParamFile, value())
+        ParamMutableFloatImpl(parent, parent?.containingParamFile, value())
 
     inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> Float): ParamFloat =
         ParamFloat(parent, value())
@@ -79,10 +82,10 @@ import java.nio.ByteOrder
         ParamArray(this, value())
 
     inline fun ParamElement?.mutableValueOf(crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
-        ParamMutableArray(this, this?.containingParamFile, value())
+        ParamMutableArrayImpl(this, this?.containingParamFile, value())
 
     inline fun mutableParamValueOf(parent: ParamElement? = null, crossinline value: () -> MutableList<ParamLiteralBase>): ParamMutableArray =
-        ParamMutableArray(parent, parent?.containingParamFile, value())
+        ParamMutableArrayImpl(parent, parent?.containingParamFile, value())
 
     inline fun paramValueOf(parent: ParamElement? = null, crossinline value: () -> List<ParamLiteralBase>): ParamArray =
         ParamArray(parent, value())
@@ -308,18 +311,22 @@ import java.nio.ByteOrder
     }
 
     fun ParamArray.toMutableArray(): ParamMutableArray =
-        ParamMutableArray(slimParent, slimParent?.containingParamFile, slimValue?.toMutableList())
+        ParamMutableArrayImpl(slimParent, slimParent?.containingParamFile, slimValue?.toMutableList())
 
     fun ParamString.toMutableString(): ParamMutableString =
-        ParamMutableString(slimParent, slimParent?.containingParamFile, slimStringType, slimValue)
+        ParamMutableStringImpl(slimParent, slimParent?.containingParamFile, slimStringType, slimValue)
 
     fun ParamFloat.toMutableFloat(): ParamMutableFloat =
-        ParamMutableFloat(slimParent, slimParent?.containingParamFile, slimValue)
+        ParamMutableFloatImpl(slimParent, slimParent?.containingParamFile, slimValue)
 
     fun ParamInt.toMutableInt(): ParamMutableInt =
-        ParamMutableInt(slimParent, slimParent?.containingParamFile, slimValue)
+        ParamMutableIntImpl(slimParent, slimParent?.containingParamFile, slimValue)
 
-    fun ParamClass.toMutableClass(): ParamMutableClass = ParamMutableClass(
+    operator fun ParamMutableStatementHolder.plusAssign(statement: ParamStatement ) { slimCommands += statement }
+
+    operator fun ParamMutableStatementHolder.minusAssign(statement: ParamStatement ) { slimCommands -= statement }
+
+    fun ParamClass.toMutableClass(): ParamMutableClass = ParamMutableClassImpl(
         slimParent,
         slimParent?.containingParamFile,
         slimName,
@@ -330,15 +337,15 @@ import java.nio.ByteOrder
     )
 
     fun ParamExternalClass.toMutableExternalClass(): ParamMutableExternalClass =
-        ParamMutableExternalClass(slimParent, slimParent?.containingParamFile, slimName)
+        ParamMutableExternalClassImpl(slimParent, slimParent?.containingParamFile, slimName)
 
     fun ParamVariableStatement.toMutableVariable(): ParamMutableVariableStatement =
-        ParamMutableVariableStatement(slimParent, slimParent?.containingParamFile, slimName, slimValue, slimOperator)
+        ParamMutableVariableStatementImpl(slimParent, slimParent?.containingParamFile, slimName, slimValue, slimOperator)
 
     fun ParamDeleteStatement.toMutableDeleteStatement(): ParamMutableDeleteStatement =
-        ParamMutableDeleteStatement(slimParent, slimParent?.containingParamFile, slimName)
+        ParamMutableDeleteStatementImpl(slimParent, slimParent?.containingParamFile, slimName)
 
     fun ParamFile.toMutableFile(): ParamMutableFile =
-        ParamMutableFile(fileName, slimCommands.toMutableList())
+        ParamMutableFileImpl(fileName, slimCommands.toMutableList())
 //}
 

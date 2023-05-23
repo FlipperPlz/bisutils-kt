@@ -9,40 +9,71 @@ import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatement
 
 interface ParamMutableStatement: ParamMutableElement, ParamStatement
 
-class ParamMutableDeleteStatement(
+class ParamMutableDeleteStatementImpl(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimName: String?,
-    var shouldValidateTarget: Boolean = false,
-    var locateTargetClass: ((ParamDeleteStatement) -> ParamExternalClass?)? = null
-): ParamMutableStatement, ParamDeleteStatement {
+    override var shouldValidateTarget: Boolean = false,
+    override var locateTargetClass: ((ParamDeleteStatement) -> ParamExternalClass?)? = null
+): ParamMutableDeleteStatement
+
+interface ParamMutableDeleteStatement : ParamMutableStatement, ParamDeleteStatement {
+    override var slimParent: ParamElement?
+    override var containingParamFile: ParamFile?
+    override var slimName: String?
+    var shouldValidateTarget: Boolean
+    var locateTargetClass: ((ParamDeleteStatement) -> ParamExternalClass?)?
     override fun shouldValidateTarget(): Boolean = shouldValidateTarget
     override fun locateTargetClass(): ParamExternalClass? = locateTargetClass?.let { it(this) }
 }
 
-class ParamMutableVariableStatement(
+class ParamMutableVariableStatementImpl(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimName: String? = null,
     override var slimValue: ParamLiteralBase? = null,
     override var slimOperator: ParamOperatorTypes? = ParamOperatorTypes.ASSIGN,
-): ParamMutableStatement, ParamVariableStatement
+): ParamMutableVariableStatement
 
-open class ParamMutableExternalClass(
+interface ParamMutableVariableStatement : ParamMutableStatement, ParamVariableStatement{
+    override var slimParent: ParamElement?
+    override var containingParamFile: ParamFile?
+    override var slimName: String?
+    override var slimValue: ParamLiteralBase?
+    override var slimOperator: ParamOperatorTypes?
+}
+
+open class ParamMutableExternalClassImpl(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimName: String? = null,
-): ParamMutableStatement, ParamExternalClass
+): ParamMutableExternalClass
 
-class ParamMutableClass(
-    slimParent: ParamElement?,
-    containingParamFile: ParamFile? = slimParent?.containingParamFile,
-    className: String? = null,
+interface ParamMutableExternalClass: ParamMutableStatement, ParamExternalClass {
+    override var slimParent: ParamElement?
+    override var containingParamFile: ParamFile?
+    override var slimName: String?
+}
+
+class ParamMutableClassImpl(
+    override var slimParent: ParamElement?,
+    override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
+    override var slimName: String? = null,
     override var slimSuperClass: String? = null,
     override var slimCommands: MutableList<ParamStatement> = mutableListOf(),
-    var shouldLocateSuperClass: Boolean = false,
-    var locateSuperClass: ((ParamClass) -> ParamExternalClass?)? = null
-): ParamMutableExternalClass(slimParent, containingParamFile, className), ParamMutableStatementHolder, ParamClass {
+    override var shouldLocateSuperClass: Boolean = false,
+    override var locateSuperClass: ((ParamClass) -> ParamExternalClass?)? = null
+): ParamMutableClass
+
+interface ParamMutableClass : ParamMutableExternalClass, ParamMutableStatementHolder, ParamClass {
+    override var slimParent: ParamElement?
+    override var containingParamFile: ParamFile?
+    override var slimName: String?
+    override var slimSuperClass: String?
+    override var slimCommands: MutableList<ParamStatement>
+    var shouldLocateSuperClass: Boolean
+    var locateSuperClass: ((ParamClass) -> ParamExternalClass?)?
+
     override fun shouldValidateSuper(): Boolean = shouldLocateSuperClass
     override fun locateSuperClass(): ParamExternalClass? = locateSuperClass?.let { it(this) }
 }
