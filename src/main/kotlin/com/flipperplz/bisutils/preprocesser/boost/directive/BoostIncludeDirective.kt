@@ -8,7 +8,8 @@ interface BoostIncludeDirective: BoostDirective {
     val path: String
 
     override fun getType(): DirectiveType = DirectiveType.B_INCLUDE
-    override fun toBoost(): String = "include ${stringType.stringify(path)}"
+    override fun getDirectiveText(): String? = stringType.stringify(path)
+
 
     enum class StringType(val debugName: String, val prefix: Char, val suffix: Char) {
         QUOTED("boost::include.quoted-string", '"', '"'),
