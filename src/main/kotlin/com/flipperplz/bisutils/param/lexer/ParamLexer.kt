@@ -11,15 +11,14 @@ import com.flipperplz.bisutils.param.utils.extensions.plusAssign
 import com.flipperplz.bisutils.param.utils.mutability.*
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.parsing.LexerException
+import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.floor
 
 
 class ParamLexer(paramText: String) : BisLexer(paramText) {
-    companion object {
-        val whitespaces: List<Char> = mutableListOf(' ', '\t', '\u000B', '\u000C')
-    }
+
     var line: Int = 1
         private set
 
@@ -149,7 +148,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
             when(currentChar) {
                 '\r' -> { line++; count++; if(moveForward() != '\n') continue  }
                 '\n' -> { line++; count++; moveForward() }
-                else -> { if(!whitespaces.contains(currentChar)) break else moveForward().also { count++ }; }
+                else -> { if(!BoostPreprocessor.whitespaces.contains(currentChar)) break else moveForward().also { count++ }; }
             }
         }
         return count;

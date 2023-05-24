@@ -33,6 +33,12 @@ open class BisLexer(private var string: String) {
             currentChar = it
         }
     }
+    fun removeRange(from: Int, to: Int) {
+        string = string.removeRange(from, to)
+    }
+    fun removeRange(range: IntRange) {
+        string = string.removeRange(range)
+    }
 
 
     fun peekForward(): Char? = string.getOrNull(bufferPtr + 1)

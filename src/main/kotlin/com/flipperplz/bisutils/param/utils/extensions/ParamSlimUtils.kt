@@ -1,6 +1,5 @@
 package com.flipperplz.bisutils.param.utils.extensions
 
-import com.flipperplz.bisutils.BisPreProcessor
 import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.utils.*
 import com.flipperplz.bisutils.param.ast.literal.*
@@ -8,11 +7,11 @@ import com.flipperplz.bisutils.param.ast.node.*
 import com.flipperplz.bisutils.param.ast.statement.*
 import com.flipperplz.bisutils.param.lexer.ParamLexer
 import com.flipperplz.bisutils.param.parser.ParamParser
-import com.flipperplz.bisutils.param.parser.ParamPreProcessor
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
 import com.flipperplz.bisutils.param.utils.mutability.*
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
+import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -96,9 +95,9 @@ import java.nio.ByteOrder
 
     operator fun ParamMutableArray.plusAssign(push: ParamLiteralBase?) { push?.let { slimValue?.add(it) } }
 
-    operator fun ParamFile.Companion.invoke(lexer: ParamLexer, name: String, preProcessor: ParamPreProcessor? = null): ParamFile = ParamParser.parse(lexer, name, preProcessor)
+    operator fun ParamFile.Companion.invoke(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile = ParamParser.parse(lexer, name, preProcessor)
 
-    fun parseParamFile(lexer: ParamLexer, name: String, preProcessor: ParamPreProcessor? = null): ParamFile = ParamParser.parse(lexer, name, preProcessor)
+    fun parseParamFile(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile = ParamParser.parse(lexer, name, preProcessor)
 
     inline operator fun <reified T : ParamNamedElement> ParamStatementHolder.get(name: String): T? =
         slimCommands.filterIsInstance<T>().firstOrNull {
