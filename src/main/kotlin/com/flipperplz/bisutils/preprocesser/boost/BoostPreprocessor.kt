@@ -25,12 +25,13 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
         }
         return count;
     }
+
     private fun BisLexer.traverseLine(): Int {
         var count: Int = 0
         while(true){
             if(isEOF()) break
             when(currentChar) {
-                '\r' -> { count++; if(moveForward() == '\n') { count++; moveForward() }; break}
+                '\r' -> { count++; if(moveForward() == '\n') { count++; moveForward()}; break }
                 '\n' -> { count++; moveForward(); break }
                 else -> { count++; continue }
             }
@@ -38,31 +39,44 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
         return count;
     }
 
+    @Throws(LexerException::class)
     override fun processText(lexer: BisLexer) {
-        val startPosition = lexer.bufferPtr
-        lexer.resetPosition()
+        //lexer.replaceAll("\r\n", "\n")
+        run {
+            lexer.replaceAll("\\\n", "")
+            lexer.replaceAll("\\\r\n", "")
+            processMacros(lexer)
+        }
 
+        lexer.resetPosition()
         while (!lexer.isEOF()) {
-            val currentPtr = lexer.bufferPtr
-            when(lexer.currentChar) {
-                '/' -> {
-                    if(lexer.moveForward() == '/') {
-                        lexer.removeRange(currentPtr..lexer.traverseLine())
-                        lexer.jumpTo(currentPtr);
+            val instructionStart = lexer.bufferPtr + lexer.traverseWhitespace()
+            if(lexer.currentChar == '/') {//------Comments------
+                when(lexer.moveForward()) {
+                    '/' -> { //------Line Comment------
+                        lexer.removeRange(instructionStart..lexer.traverseLine())
+                        lexer.jumpTo(instructionStart);
                     }
-                    continue
-                }
-                '\\' -> {
-                    lexer.moveForward()
-                    if(lexer.currentChar == '\n') lexer.removeRange(currentPtr..lexer.bufferPtr)
-                    else if(lexer.currentChar == '\r') {
-                        if(lexer.peekForward() == '\n') lexer.moveForward()
-                        lexer.removeRange(currentPtr..lexer.bufferPtr)
+                    '*' -> { //------Block Comment------
+                        while (!lexer.isEOF() && !(lexer.previousChar=='*' && lexer.currentChar=='/'))
+                            lexer.moveForward()
+                        lexer.removeRange(instructionStart..lexer.traverseLine())
+                        lexer.jumpTo(instructionStart);
                     }
-                    continue
                 }
             }
         }
+    }
+
+
+    @Throws(LexerException::class)
+    private fun processMacros(lexer: BisLexer) {
+
+    }
+
+    @Throws(LexerException::class)
+    fun processDirective(slimName: String?, lexer: BisLexer) {
+
     }
 
 }

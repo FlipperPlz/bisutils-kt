@@ -48,5 +48,6 @@ open class BisLexer(private var string: String) {
     fun peekAt(pos: Int): Char? = string.getOrNull(pos)
 
     fun regionMatches(text: String): Boolean = string.regionMatches(bufferPtr, text, 0, text.length)
+    fun replaceAll(from: String, to: String) { string = string.replace(from, to) }
 
 }

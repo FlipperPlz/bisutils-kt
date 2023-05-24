@@ -20,33 +20,28 @@ object ParamParser {
     fun parse(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile = mutableParamFile(name).apply {
         preProcessor?.processText(lexer)
         val contextStack = Stack<ParamMutableStatementHolder>().also { it.add(this) }
+        fun tryEnd(): Boolean {
+            if(contextStack.count() != 1) throw lexer.eofException()
+            return true
+        }
+
         while (contextStack.isNotEmpty() ) {
             val currentContext = contextStack.peek()
-            println("Loop started on context ${(currentContext as ParamNamedElement).slimName}")
             lexer.moveForward()
             lexer.traverseWhitespace(true)
-            fun tryEnd(): Boolean {
-                println("EOF ON LOOP START (${currentContext.getParamElementType()})")
-                if(contextStack.count() != 1) throw lexer.eofException()
-                return true
-            }
+
             when {
                 lexer.isEOF() -> if(tryEnd()) break
-                lexer.currentChar == '#' -> throw LexerException(lexer, LexicalError.PreprocessorError)
+                lexer.currentChar == '#' -> preProcessor?.processDirective(this.slimName, lexer) ?: throw lexer.unexpectedInputException()
                 lexer.currentChar == '}' -> {
-
                     lexer.moveForward(); lexer.traverseWhitespace(false)
                     if(lexer.currentChar != ';') throw lexer.unexpectedInputException()
-                    print("Found '};' Popping context. ${(contextStack.pop() as ParamNamedElement).slimName} ->")
-
-                    println((contextStack.peek() as ParamNamedElement).slimName)
                     continue
                 }
             }
 
             var keyword: String = lexer.readIdentifier(true)
             if(keyword.isBlank() && tryEnd()) break
-            println("Loop KEYWORD IS '$keyword'")
             when(keyword) {
                 "delete" -> {
                     if(lexer.traverseWhitespace() <= 0) throw lexer.unexpectedInputException()
@@ -72,7 +67,6 @@ object ParamParser {
                         else -> throw lexer.unexpectedInputException()
                     }
                     if(lexer.currentChar != '{') throw lexer.unexpectedInputException()
-                    println("Found class $keyword, adding to context after ${(currentContext as ParamNamedElement).slimName}")
                     with(ParamMutableClassImpl(currentContext, this, keyword, baseClass, mutableListOf())) {
                         currentContext += this
                         contextStack.push(this)
@@ -108,7 +102,8 @@ object ParamParser {
                         if(lexer.currentChar == '(') i--
                         builder.append(lexer.currentChar)
                     }
-                    //skip while whitespace or ;
+                    lexer.traverseWhitespace()
+                    if(lexer.currentChar != ';') throw lexer.unexpectedInputException()
                     continue
                 }
                 else -> {
@@ -117,7 +112,6 @@ object ParamParser {
                         if (lexer.currentChar != ']') { throw lexer.unexpectedInputException() };
                         lexer.moveForward(); lexer.traverseWhitespace()
                         val operator: ParamOperatorTypes = lexer.readOperator(); lexer.moveForward(); lexer.traverseWhitespace()
-                        println("Enter variable $keyword[]")
                         currentContext.slimCommands.add(ParamMutableVariableStatementImpl(currentContext, this, keyword).also {
                             it.slimValue = lexer.readArray(this, this)
                             it.slimOperator = operator

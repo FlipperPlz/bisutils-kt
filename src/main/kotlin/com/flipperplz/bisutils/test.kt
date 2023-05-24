@@ -1,7 +1,9 @@
 package com.flipperplz.bisutils
 
+import com.flipperplz.bisutils.param.ast.node.ParamNamedElement
 import com.flipperplz.bisutils.param.lexer.ParamLexer
 import com.flipperplz.bisutils.param.utils.extensions.parseParamFile
+import com.flipperplz.bisutils.param.utils.extensions.rem
 import com.flipperplz.bisutils.parsing.BisLexer
 
 fun main() {
@@ -49,7 +51,7 @@ class CfgMods
     """.trimIndent()
     )
 
-    parseParamFile(lexer, "config", null)
-    println()
+    val param = parseParamFile(lexer, "config", null)
+    println(param.toParam())
 }
 
