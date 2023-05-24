@@ -125,6 +125,7 @@ object ParamParser {
                         continue
                     } else if (finalLexer.currentChar == '=') {
                         println("Enter variable $keyword")
+                        finalLexer.moveForward(); finalLexer.traverseWhitespace()
                         currentContext.slimCommands.add(ParamMutableVariableStatementImpl(currentContext, this, keyword).also {
                             it.slimValue = finalLexer.readLiteral(this, this, ';')
                         })

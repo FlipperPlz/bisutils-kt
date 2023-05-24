@@ -4,7 +4,7 @@ import com.flipperplz.bisutils.param.ast.node.ParamLiteral
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
 
-interface ParamString : ParamLiteral<String> {
+interface ParamString : ParamLiteral<String>, CharSequence {
     companion object;
 
     val slimStringType: ParamStringType

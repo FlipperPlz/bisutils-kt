@@ -6,6 +6,7 @@ import com.flipperplz.bisutils.param.ast.node.ParamElement
 import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
+import com.flipperplz.bisutils.param.utils.extensions.isBlank
 import com.flipperplz.bisutils.param.utils.extensions.plusAssign
 import com.flipperplz.bisutils.param.utils.mutability.*
 import com.flipperplz.bisutils.parsing.BisLexer
@@ -13,6 +14,7 @@ import com.flipperplz.bisutils.parsing.LexerException
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.floor
+
 
 class ParamLexer(paramText: String) : BisLexer(paramText) {
     companion object {
@@ -140,9 +142,9 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
         var count: Int = 0
         while(true){
             if(isEOF()) {
-
                 if(allowEOF) break
-                else throw eofException() }
+                else throw eofException()
+            }
             when(currentChar) {
                 '\r' -> { line++; count++; if(moveForward() != '\n') continue  }
                 '\n' -> { line++; count++; moveForward() }

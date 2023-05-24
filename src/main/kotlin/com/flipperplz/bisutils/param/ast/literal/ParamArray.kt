@@ -4,7 +4,7 @@ import com.flipperplz.bisutils.param.ast.node.ParamLiteral
 import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
-interface ParamArray : ParamLiteral<List<ParamLiteralBase>> {
+interface ParamArray : ParamLiteral<List<ParamLiteralBase>>, List<ParamLiteralBase> {
     companion object;
     override fun isBinarizable(): Boolean =
         slimValue?.all { it.isBinarizable() } ?: true

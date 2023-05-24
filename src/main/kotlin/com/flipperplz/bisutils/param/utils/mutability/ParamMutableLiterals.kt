@@ -18,7 +18,7 @@ class ParamMutableStringImpl(
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimStringType: ParamStringType = ParamStringType.QUOTED,
     override var slimValue: String? = null
-): ParamMutableString
+): ParamMutableString, CharSequence by  slimValue ?: ""
 
 interface ParamMutableString : ParamMutableLiteral, ParamString {
     override var slimParent: ParamElement?
@@ -55,9 +55,9 @@ class ParamMutableArrayImpl(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
     override var slimValue: MutableList<ParamLiteralBase>? = mutableListOf(),
-): ParamMutableArray
+): ParamMutableArray, MutableList<ParamLiteralBase> by slimValue ?: mutableListOf<ParamLiteralBase>()
 
-interface ParamMutableArray : ParamMutableLiteral, ParamArray {
+interface ParamMutableArray : ParamMutableLiteral, ParamArray, MutableList<ParamLiteralBase> {
     override var slimParent: ParamElement?
     override var containingParamFile: ParamFile?
     override var slimValue: MutableList<ParamLiteralBase>?

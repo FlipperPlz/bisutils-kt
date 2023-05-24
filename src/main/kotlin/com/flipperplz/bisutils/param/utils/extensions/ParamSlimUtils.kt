@@ -162,6 +162,9 @@ import java.nio.ByteOrder
         override val slimValue: String = value
         override val slimParent: ParamElement? = parent
         override val containingParamFile: ParamFile? = parent?.containingParamFile
+        override val length: Int = slimValue.length
+        override fun get(index: Int): Char = slimValue[index]
+        override fun subSequence(startIndex: Int, endIndex: Int): CharSequence = slimValue.subSequence(startIndex, endIndex)
     }
 
     operator fun ParamClass.Companion.invoke(
@@ -230,6 +233,19 @@ import java.nio.ByteOrder
         override val slimValue: List<ParamLiteralBase> = value
         override val slimParent: ParamElement? = parent
         override val containingParamFile: ParamFile? = parent?.containingParamFile
+        override val size: Int
+            get() = slimValue.size
+
+        override fun contains(element: ParamLiteralBase): Boolean = slimValue.contains(element)
+        override fun containsAll(elements: Collection<ParamLiteralBase>): Boolean = slimValue.containsAll(elements)
+        override fun get(index: Int): ParamLiteralBase = slimValue[index]
+        override fun indexOf(element: ParamLiteralBase): Int = slimValue.indexOf(element)
+        override fun isEmpty(): Boolean = slimValue.isEmpty()
+        override fun iterator(): Iterator<ParamLiteralBase> = slimValue.iterator()
+        override fun lastIndexOf(element: ParamLiteralBase): Int = slimValue.lastIndexOf(element)
+        override fun listIterator(): ListIterator<ParamLiteralBase> = slimValue.listIterator()
+        override fun listIterator(index: Int): ListIterator<ParamLiteralBase> = slimValue.listIterator(index)
+        override fun subList(fromIndex: Int, toIndex: Int): List<ParamLiteralBase> = slimValue.subList(fromIndex, toIndex)
     }
 
     operator fun ParamArray.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamArray = ParamArray(
@@ -287,6 +303,13 @@ import java.nio.ByteOrder
         buffer.position(enumOffset) //TODO: ENUMS
 
         return file
+    }
+
+
+    fun ParamLiteralBase.isBlank(): Boolean = when(this) {
+        is ParamString -> slimValue.isNullOrBlank()
+        is ParamArray -> isEmpty()
+        else -> false
     }
 
     operator fun ParamStatement.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamStatement? = when(buffer.get()) {
