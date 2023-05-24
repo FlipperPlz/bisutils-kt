@@ -1,10 +1,12 @@
 package com.flipperplz.bisutils
 
+import com.flipperplz.bisutils.param.lexer.ParamLexer
+import com.flipperplz.bisutils.param.utils.extensions.parseParamFile
 import com.flipperplz.bisutils.parsing.BisLexer
 
 fun main() {
 
-    val v = BisLexer(
+    val lexer = ParamLexer(
         """
 class CfgPatches 
 {
@@ -46,6 +48,8 @@ class CfgMods
 };
     """.trimIndent()
     )
+
+    parseParamFile(lexer, "config", null)
     println()
 }
 

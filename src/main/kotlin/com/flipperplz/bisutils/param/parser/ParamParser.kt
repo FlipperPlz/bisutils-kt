@@ -1,7 +1,9 @@
 package com.flipperplz.bisutils.param.parser
 
 import com.flipperplz.bisutils.param.ParamFile
+import com.flipperplz.bisutils.param.ast.node.ParamNamedElement
 import com.flipperplz.bisutils.param.ast.node.ParamNumerical
+import com.flipperplz.bisutils.param.ast.statement.ParamClass
 import com.flipperplz.bisutils.param.lexer.ParamLexer
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.extensions.*
@@ -19,21 +21,28 @@ object ParamParser {
         val contextStack = Stack<ParamMutableStatementHolder>().also { it.add(this) }
         while (contextStack.isNotEmpty()) {
             val currentContext = contextStack.peek()
+            println("Loop started on context ${(currentContext as ParamNamedElement).slimName}")
             finalLexer.moveForward()
             finalLexer.traverseWhitespace(true)
             when {
                 finalLexer.isEOF() -> {
+                    println("EOF ON LOOP START (${currentContext.getParamElementType()})")
                     if(contextStack.count() != 1) throw finalLexer.eofException()
                     break
                 }
                 finalLexer.currentChar == '#' -> throw LexerException(finalLexer, LexicalError.PreprocessorError)
                 finalLexer.currentChar == '}' -> {
+
                     finalLexer.moveForward(); finalLexer.traverseWhitespace(false)
                     if(finalLexer.currentChar != ';') throw finalLexer.unexpectedInputException()
-                    contextStack.pop(); continue
+                    print("Found '};' Popping context. ${(contextStack.pop() as ParamNamedElement).slimName} ->")
+
+                    println((contextStack.peek() as ParamNamedElement).slimName)
+                    continue
                 }
             }
             var keyword: String = finalLexer.readIdentifier()
+            println("Loop KEYWORD IS '$keyword'")
             when(keyword) {
                 "delete" -> {
                     if(finalLexer.traverseWhitespace() <= 0) throw finalLexer.unexpectedInputException()
@@ -59,6 +68,7 @@ object ParamParser {
                         else -> throw finalLexer.unexpectedInputException()
                     }
                     if(finalLexer.currentChar != '{') throw finalLexer.unexpectedInputException()
+                    println("Found class $keyword, adding to context after ${(currentContext as ParamNamedElement).slimName}")
                     with(ParamMutableClassImpl(currentContext, this, keyword, baseClass, mutableListOf())) {
                         currentContext += this
                         contextStack.push(this)
@@ -98,9 +108,12 @@ object ParamParser {
                     continue
                 }
                 else -> {
+                    finalLexer.traverseWhitespace()
                     if (finalLexer.currentChar == '[') { finalLexer.moveForward(); finalLexer.traverseWhitespace()
-                        if (finalLexer.currentChar != ']') { throw finalLexer.unexpectedInputException() }; finalLexer.traverseWhitespace()
+                        if (finalLexer.currentChar != ']') { throw finalLexer.unexpectedInputException() };
+                        finalLexer.moveForward(); finalLexer.traverseWhitespace()
                         val operator: ParamOperatorTypes = finalLexer.readOperator(); finalLexer.moveForward(); finalLexer.traverseWhitespace()
+                        println("Enter variable $keyword[]")
                         currentContext.slimCommands.add(ParamMutableVariableStatementImpl(currentContext, this, keyword).also {
                             it.slimValue = finalLexer.readArray(this, this)
                             it.slimOperator = operator
@@ -108,15 +121,17 @@ object ParamParser {
                         while (finalLexer.currentChar == ';') finalLexer.moveForward()
                         continue
                     } else if (finalLexer.currentChar == '=') {
-                        currentContext.slimCommands.add(
-                            ParamMutableVariableStatementImpl(currentContext, this, keyword).also {
-                                it.slimValue = finalLexer.readLiteral(this, this, ';')
-                            }
-                        )
+                        println("Enter variable $keyword")
+                        currentContext.slimCommands.add(ParamMutableVariableStatementImpl(currentContext, this, keyword).also {
+                            it.slimValue = finalLexer.readLiteral(this, this, ';')
+                        })
                         finalLexer.traverseWhitespace()
                         if (finalLexer.currentChar != ';') throw finalLexer.unexpectedInputException()
+                        finalLexer.moveForward()
                         continue
                     }
+                    println("Unknown $keyword")
+
                     throw finalLexer.unexpectedInputException()
                 }
             }

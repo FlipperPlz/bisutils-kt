@@ -6,7 +6,5 @@ import com.flipperplz.bisutils.parsing.LexerException
 
 class ParamPreProcessor : BisPreProcessor<ParamLexer> {
     @Throws(LexerException::class)
-    override fun processText(lexer: ParamLexer): ParamLexer {
-        TODO("Not yet implemented")
-    }
+    override fun processText(lexer: ParamLexer): ParamLexer = lexer
 }

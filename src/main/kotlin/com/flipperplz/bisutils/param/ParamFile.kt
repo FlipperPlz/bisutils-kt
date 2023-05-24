@@ -1,13 +1,12 @@
 package com.flipperplz.bisutils.param
 
 import com.flipperplz.bisutils.param.ast.node.ParamElement
+import com.flipperplz.bisutils.param.ast.node.ParamNamedElement
 import com.flipperplz.bisutils.param.ast.node.ParamStatementHolder
 import com.flipperplz.bisutils.param.utils.ParamElementTypes
 
-interface ParamFile : ParamStatementHolder {
-    companion object
-    val fileName: String
-
+interface ParamFile : ParamStatementHolder, ParamNamedElement {
+    companion object;
     override val slimParent: ParamElement?
         get() = null
 

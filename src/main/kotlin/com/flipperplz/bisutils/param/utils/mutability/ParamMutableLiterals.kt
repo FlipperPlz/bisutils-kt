@@ -54,7 +54,7 @@ interface ParamMutableFloat : ParamMutableLiteral, ParamFloat {
 class ParamMutableArrayImpl(
     override var slimParent: ParamElement? = null,
     override var containingParamFile: ParamFile? = slimParent?.containingParamFile,
-    override var slimValue: MutableList<ParamLiteralBase>? = null,
+    override var slimValue: MutableList<ParamLiteralBase>? = mutableListOf(),
 ): ParamMutableArray
 
 interface ParamMutableArray : ParamMutableLiteral, ParamArray {

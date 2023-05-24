@@ -113,15 +113,25 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
                 '{' -> {
                     moveBackward().also { currentContext += contextStack.push(readArray(array, file)) }
                     traverseWhitespace()
-
-                    if(currentChar == ',' || currentChar == '}' ) { moveBackward(); continue }
-                    throw unexpectedInputException()
+                    when(currentChar) {
+                        '}' -> contextStack.pop()
+                        ',' -> continue
+                        else -> throw unexpectedInputException()
+                    }
                 }
                 ',' -> continue
-                '}' -> contextStack.pop()
-                else -> currentContext += readLiteral(currentContext, file, ';', '}')
+                else -> {
+                    currentContext += readLiteral(currentContext, file, ';', '}')
+                    traverseWhitespace()
+                    when(currentChar) {
+                        '}' -> contextStack.pop()
+                        ',' -> continue
+                        else -> throw unexpectedInputException()
+                    }
+                }
             }
         }
+        moveForward()
         return array
     }
 
@@ -129,11 +139,14 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
     fun traverseWhitespace(allowEOF: Boolean = false): Int {
         var count: Int = 0
         while(true){
-            if(isEOF()) { if(allowEOF) break else throw eofException() }
+            if(isEOF()) {
+
+                if(allowEOF) break
+                else throw eofException() }
             when(currentChar) {
                 '\r' -> { line++; count++; if(moveForward() != '\n') continue  }
                 '\n' -> { line++; count++; moveForward() }
-                else -> { if(!whitespaces.contains(currentChar)) break else count++; }
+                else -> { if(!whitespaces.contains(currentChar)) break else moveForward().also { count++ }; }
             }
         }
         return count;

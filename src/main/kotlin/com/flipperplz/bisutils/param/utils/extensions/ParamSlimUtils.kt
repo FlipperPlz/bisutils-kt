@@ -27,7 +27,7 @@ import java.nio.ByteOrder
         override val containingParamFile: ParamFile? = slimParent?.containingParamFile
     }
 
-    internal class RapFileImpl(override val fileName: String) : ParamFile {
+    internal class RapFileImpl(override val slimName: String?) : ParamFile {
         override lateinit var slimCommands: List<ParamStatement>
     }
 
@@ -354,6 +354,6 @@ import java.nio.ByteOrder
         ParamMutableDeleteStatementImpl(slimParent, slimParent?.containingParamFile, slimName)
 
     fun ParamFile.toMutableFile(): ParamMutableFile =
-        ParamMutableFileImpl(fileName, slimCommands.toMutableList())
+        ParamMutableFileImpl(slimName, slimCommands.toMutableList())
 //}
 
