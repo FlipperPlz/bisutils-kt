@@ -19,17 +19,18 @@ object ParamParser {
     fun parse(lexer: ParamLexer, name: String, preProcessor: ParamPreProcessor? = null): ParamFile = mutableParamFile(name).apply {
         val finalLexer = preProcessor?.processText(lexer) ?: lexer
         val contextStack = Stack<ParamMutableStatementHolder>().also { it.add(this) }
-        while (contextStack.isNotEmpty()) {
+        while (contextStack.isNotEmpty() ) {
             val currentContext = contextStack.peek()
             println("Loop started on context ${(currentContext as ParamNamedElement).slimName}")
             finalLexer.moveForward()
             finalLexer.traverseWhitespace(true)
+            fun tryEnd(): Boolean {
+                println("EOF ON LOOP START (${currentContext.getParamElementType()})")
+                if(contextStack.count() != 1) throw finalLexer.eofException()
+                return true
+            }
             when {
-                finalLexer.isEOF() -> {
-                    println("EOF ON LOOP START (${currentContext.getParamElementType()})")
-                    if(contextStack.count() != 1) throw finalLexer.eofException()
-                    break
-                }
+                finalLexer.isEOF() -> if(tryEnd()) break
                 finalLexer.currentChar == '#' -> throw LexerException(finalLexer, LexicalError.PreprocessorError)
                 finalLexer.currentChar == '}' -> {
 
@@ -41,7 +42,9 @@ object ParamParser {
                     continue
                 }
             }
-            var keyword: String = finalLexer.readIdentifier()
+
+            var keyword: String = finalLexer.readIdentifier(true)
+            if(keyword.isBlank() && tryEnd()) break
             println("Loop KEYWORD IS '$keyword'")
             when(keyword) {
                 "delete" -> {

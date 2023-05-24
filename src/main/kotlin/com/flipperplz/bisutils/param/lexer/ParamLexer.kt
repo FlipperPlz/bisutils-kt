@@ -23,11 +23,11 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
 
 
     @Throws(LexerException::class)
-    fun readIdentifier(): String {
+    fun readIdentifier(allowEOF: Boolean = false): String {
         traverseWhitespace()
-        if(currentChar == null) throw eofException()
+        if(currentChar == null && !allowEOF) throw eofException()
         val builder = StringBuilder()
-        while (with(currentChar!!) { isLetterOrDigit() || this == '_'  }) {
+        while (with(currentChar) { this != null && (isLetterOrDigit() || this == '_')  }) {
             builder.append(currentChar)
             moveForward()
             if(currentChar == null) throw eofException()
