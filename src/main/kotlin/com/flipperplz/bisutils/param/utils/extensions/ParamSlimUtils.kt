@@ -111,10 +111,10 @@ import java.nio.ByteOrder
         }
 
     operator fun ParamStatementHolder.rem(name: String): ParamClass =
-        slimCommands.filterIsInstance<ParamClass>().first {
+        childrenOfType<ParamClass>().first {
+            if(name == "*") return it
             it.slimName.equals(name, true)
         }
-
     //TODO(RYANN): order should be made, first deletes then classes then variables then preprocessor shit
     infix fun ParamStatementHolder.contains(name: String): Boolean =
         get(name) == null

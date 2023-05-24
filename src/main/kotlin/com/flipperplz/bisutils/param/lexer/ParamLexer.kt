@@ -122,6 +122,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
                     }
                 }
                 ',' -> continue
+                '}' -> contextStack.pop()
                 else -> {
                     currentContext += readLiteral(currentContext, file, ';', '}')
                     traverseWhitespace()
