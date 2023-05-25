@@ -1,5 +1,7 @@
 package com.flipperplz.bisutils.preprocesser.boost.utils
 
+import com.flipperplz.bisutils.parsing.BisLexer
+
 
 typealias DirectiveType = BoostDirectiveType
 interface BoostDirective {
@@ -13,4 +15,6 @@ interface BoostDirective {
         if(includeNewLine) builder.append("\n")
         return builder.toString()
     }
+
+    fun parseDirective(lexer: BisLexer)
 }

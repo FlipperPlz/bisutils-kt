@@ -3,28 +3,44 @@ package com.flipperplz.bisutils.preprocesser.boost
 import com.flipperplz.bisutils.BisPreProcessor
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.parsing.LexerException
+import com.flipperplz.bisutils.parsing.LexicalError
+import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirective
+import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirectiveType
 
 class BoostPreprocessor : BisPreProcessor<BisLexer> {
     companion object {
         val whitespaces: List<Char> = mutableListOf(' ', '\t', '\u000B', '\u000C')
-    }
+        fun preprocessorException(lexer: BisLexer) = LexerException(lexer, LexicalError.PreprocessorError)
+        @Throws(LexerException::class)
+        fun traverseWhitespace(lexer: BisLexer, allowEOF: Boolean = false): Int {
+            with(lexer) {
+                var count: Int = 0
+                while (true) {
+                    if (isEOF()) {
+                        if (allowEOF) break
+                        else throw eofException()
+                    }
+                    when (currentChar) {
+                        '\r' -> {
+                            count++; if (moveForward() != '\n') continue
+                        }
 
-    @Throws(LexerException::class)
-    private fun BisLexer.traverseWhitespace(allowEOF: Boolean = false): Int {
-        var count: Int = 0
-        while(true){
-            if(isEOF()) {
-                if(allowEOF) break
-                else throw eofException()
-            }
-            when(currentChar) {
-                '\r' -> { count++; if(moveForward() != '\n') continue  }
-                '\n' -> { count++; moveForward() }
-                else -> { if(!whitespaces.contains(currentChar)) break else moveForward().also { count++ } }
+                        '\n' -> {
+                            count++; moveForward()
+                        }
+
+                        else -> {
+                            if (!whitespaces.contains(currentChar)) break else moveForward().also { count++ }
+                        }
+                    }
+                }
+                return count;
             }
         }
-        return count;
+
     }
+
+
 
     private fun BisLexer.traverseLine(): Int {
         var count: Int = 0
@@ -50,7 +66,7 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
 
         lexer.resetPosition()
         while (!lexer.isEOF()) {
-            val instructionStart = lexer.bufferPtr + lexer.traverseWhitespace()
+            val instructionStart = lexer.bufferPtr + traverseWhitespace(lexer)
             when(lexer.currentChar) {
                 '/' -> /*------Comments------*/ {
                     when(lexer.moveForward()) {
@@ -96,6 +112,11 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
     private fun processMacros(lexer: BisLexer) {}
 
     @Throws(LexerException::class)
-    fun processDirective(slimName: String?, lexer: BisLexer) {}
+    fun processDirective(slimName: String?, lexer: BisLexer): BoostDirective {
+        val keyword = lexer.getWhile { it.isWhitespace() }
+        val type = BoostDirectiveType.directiveForKeyword(keyword) ?: throw preprocessorException(lexer)
+        return type.parse(lexer)
+    }
+
 
 }

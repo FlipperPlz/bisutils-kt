@@ -1,5 +1,7 @@
 package com.flipperplz.bisutils.parsing
 
+import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
+
 open class BisLexer(private var string: String) {
     var bufferPtr: Int = -1
         private set
@@ -10,6 +12,8 @@ open class BisLexer(private var string: String) {
     fun hasNext(): Boolean = peekForward() != null
 
     fun isEOF(): Boolean =  currentChar == null && bufferPtr > string.length
+
+    fun isWhitespace(): Boolean = BoostPreprocessor.whitespaces.contains(currentChar)
 
     fun moveForward(count: Int = 1): Char? = jumpTo(bufferPtr + count)
     fun moveBackward(count: Int = 1) : Char? = jumpTo(bufferPtr - count)
@@ -48,6 +52,10 @@ open class BisLexer(private var string: String) {
         while (i != count) { i++;builder.append(moveForward()) }
         return builder.toString()
     }
+
+    fun getWhile(condition: (BisLexer) -> Boolean) = StringBuilder().apply {
+        while (condition(this@BisLexer)) append(currentChar)
+    }.toString()
 
     fun peekForward(): Char? = string.getOrNull(bufferPtr + 1)
 
