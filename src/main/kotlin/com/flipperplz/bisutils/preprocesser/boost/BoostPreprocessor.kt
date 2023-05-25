@@ -6,11 +6,14 @@ import com.flipperplz.bisutils.parsing.LexerException
 import com.flipperplz.bisutils.parsing.LexicalError
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirective
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirectiveType
+import java.lang.StringBuilder
 
 class BoostPreprocessor : BisPreProcessor<BisLexer> {
     companion object {
         val whitespaces: List<Char> = mutableListOf(' ', '\t', '\u000B', '\u000C')
+
         fun preprocessorException(lexer: BisLexer) = LexerException(lexer, LexicalError.PreprocessorError)
+
         @Throws(LexerException::class)
         fun traverseWhitespace(lexer: BisLexer, allowEOF: Boolean = false): Int {
             with(lexer) {
@@ -21,16 +24,15 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
                         else throw eofException()
                     }
                     when (currentChar) {
-                        '\r' -> {
-                            count++; if (moveForward() != '\n') continue
-                        }
-
-                        '\n' -> {
-                            count++; moveForward()
-                        }
-
+                        '\r' -> { count++; if (moveForward() != '\n') continue }
+                        '\n' -> { count++; moveForward() }
                         else -> {
-                            if (!whitespaces.contains(currentChar)) break else moveForward().also { count++ }
+                            if (!whitespaces.contains(currentChar)) break else {
+                                moveForward().also { count++ }
+                                val extra = traverseComments(lexer)
+                                if(extra == 0) break
+                                count += extra
+                            }
                         }
                     }
                 }
@@ -38,73 +40,54 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
             }
         }
 
-    }
-
-
-
-    private fun BisLexer.traverseLine(): Int {
-        var count: Int = 0
-        while(true){
-            if(isEOF()) break
-            when(currentChar) {
-                '\r' -> { count++; if(moveForward() == '\n') { count++; moveForward()}; break }
-                '\n' -> { count++; moveForward(); break }
-                else -> { count++; continue }
+        fun traverseComments(lexer: BisLexer): Int {
+            val instructionStart = lexer.bufferPtr
+            if(lexer.currentChar == '/') when(lexer.moveForward()) {
+                '/' -> { //------Line Comment------
+                    val lineEnd = lexer.traverseLine() + instructionStart
+                    lexer.removeRange(instructionStart..lineEnd)
+                    lexer.jumpTo(instructionStart);
+                    return lineEnd - instructionStart
+                }
+                '*' -> { //------Block Comment------
+                    var length = 2
+                    while (!lexer.isEOF() && !(lexer.previousChar=='*' && lexer.currentChar=='/'))
+                        lexer.moveForward().also { length++ }
+                    lexer.removeRange(instructionStart..length)
+                    lexer.jumpTo(instructionStart);
+                    return length
+                }
             }
+            return 0
         }
-        return count;
+        private fun BisLexer.traverseLine(): Int {
+            var count: Int = 0
+            while(true){
+                if(isEOF()) break
+                when(currentChar) {
+                    '\r' -> { count++; if(moveForward() == '\n') { count++; moveForward()}; break }
+                    '\n' -> { count++; moveForward(); break }
+                    else -> { moveForward(); count++; continue }
+                }
+            }
+            return count;
+        }
+
     }
+
+
+
+
 
     @Throws(LexerException::class)
-    override fun processText(lexer: BisLexer) {
+    override fun processUntil(lexer: BisLexer) {
         //lexer.replaceAll("\r\n", "\n")
-        run {
-            lexer.replaceAll("\\\n", "")
-            lexer.replaceAll("\\\r\n", "")
-            processMacros(lexer)
-        }
-
+        lexer.replaceInLine(Regex("""//.*(\n|\r\n)"""), "")
+        lexer.replaceInLine(Regex("""/\\*/"""), "")
+        lexer.replaceInLine(Regex("""/\\*.*\\*/"""), "")
+        lexer.replaceInLine("__LINE__", "-1")
+        lexer.replaceInLine("__FILE__", "config.cpp")
         lexer.resetPosition()
-        while (!lexer.isEOF()) {
-            val instructionStart = lexer.bufferPtr + traverseWhitespace(lexer)
-            when(lexer.currentChar) {
-                '/' -> /*------Comments------*/ {
-                    when(lexer.moveForward()) {
-                        '/' -> { //------Line Comment------
-                            lexer.removeRange(instructionStart..lexer.traverseLine())
-                            lexer.jumpTo(instructionStart);
-                        }
-                        '*' -> { //------Block Comment------
-                            while (!lexer.isEOF() && !(lexer.previousChar=='*' && lexer.currentChar=='/'))
-                                lexer.moveForward()
-                            lexer.removeRange(instructionStart..lexer.traverseLine())
-                            lexer.jumpTo(instructionStart);
-                        }
-                    }
-                }
-                '_' -> /*------Macros------*/ {
-                    if(lexer.moveForward() != '_') continue
-                    val keyword = lexer.readChars(4)
-
-                    if(lexer.moveForward() != '_' || lexer.moveForward() != '_' ) continue
-
-                    when(keyword) {
-                        "LINE" -> {
-                            lexer.removeRange(instructionStart..lexer.traverseLine())
-                            lexer.jumpTo(instructionStart); lexer.shoveText("\"-1\"")
-                            continue
-                        }
-                        "FILE" -> {
-                            lexer.removeRange(instructionStart..lexer.traverseLine())
-                            lexer.jumpTo(instructionStart); lexer.shoveText("\"testFileName\"")
-                            continue
-                        }
-                        else -> { lexer.moveBackward(5); continue }
-                    }
-                }
-            }
-
-        }
     }
 
 
@@ -113,9 +96,13 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
 
     @Throws(LexerException::class)
     fun processDirective(slimName: String?, lexer: BisLexer): BoostDirective {
-        val keyword = lexer.getWhile { it.isWhitespace() }
-        val type = BoostDirectiveType.directiveForKeyword(keyword) ?: throw preprocessorException(lexer)
-        return type.parse(lexer)
+        val start = lexer.bufferPtr - 1
+        val keyword = StringBuilder().apply {
+            while(lexer.moveForward()?.isWhitespace() != true) append(lexer.currentChar)
+        }.toString()
+        return (BoostDirectiveType.directiveForKeyword(keyword) ?: throw preprocessorException(lexer)).parse(lexer).apply {
+            lexer.replaceRange(start..lexer.bufferPtr+1, process())
+        }
     }
 
 

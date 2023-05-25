@@ -1,5 +1,6 @@
 package com.flipperplz.bisutils.param.lexer
 
+import com.flipperplz.bisutils.BisPreProcessor
 import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.ast.literal.ParamString
 import com.flipperplz.bisutils.param.ast.node.ParamElement
@@ -139,16 +140,21 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
 
     @Throws(LexerException::class)
     fun traverseWhitespace(allowEOF: Boolean = false): Int {
-        var count: Int = 0
+        var count: Int = BoostPreprocessor.traverseComments(this)
         while(true){
             if(isEOF()) {
                 if(allowEOF) break
                 else throw eofException()
             }
             when(currentChar) {
-                '\r' -> { line++; count++; if(moveForward() != '\n') continue  }
+                '\r' -> { line++; count++; if(moveForward() != '\n') { count++ }; continue  }
                 '\n' -> { line++; count++; moveForward() }
-                else -> { if(!BoostPreprocessor.whitespaces.contains(currentChar)) break else moveForward().also { count++ }; }
+                else -> { if(!BoostPreprocessor.whitespaces.contains(currentChar)) break else {
+                    val extra = BoostPreprocessor.traverseComments(this)
+                    if(extra != 0) count += extra
+                    moveForward().also { count++ }
+                };
+                }
             }
         }
         return count;

@@ -21,13 +21,25 @@ enum class BoostDirectiveType(val debugName: String, val text: String) {
     B_ENDIF("boost::endif", "endif");
 
     fun parse(lexer: BisLexer): BoostDirective = when(this) {
-        B_ENDIF -> object : BoostEndIfDirective{}
-        B_ELSE -> object : BoostElseDirective{}
+        B_ENDIF -> object : BoostEndIfDirective{
+            override fun process(arg: Any?): String {
+                return super.process(arg)
+            }
+        }
+        B_ELSE -> object : BoostElseDirective{
+            override fun process(arg: Any?): String {
+                return super.process(arg)
+            }
+        }
         B_INCLUDE -> object : BoostIncludeDirective {
             override lateinit var stringType: BoostIncludeDirective.StringType
             override lateinit var path: String
             init {
                 parseDirective(lexer)
+            }
+
+            override fun process(arg: Any?): String {
+                return super.process(arg)
             }
 
             override fun parseDirective(lexer: BisLexer) {
@@ -39,6 +51,10 @@ enum class BoostDirectiveType(val debugName: String, val text: String) {
         B_UNDEFINE -> object : BoostUndefineDirective {
             override lateinit var macroName: String
             init { parseDirective(lexer) }
+
+            override fun process(arg: Any?): String {
+                return super.process(arg)
+            }
 
             override fun parseDirective(lexer: BisLexer) {
                 BoostPreprocessor.traverseWhitespace(lexer)

@@ -5,29 +5,43 @@ import com.flipperplz.bisutils.param.lexer.ParamLexer
 import com.flipperplz.bisutils.param.utils.extensions.parseParamFile
 import com.flipperplz.bisutils.param.utils.extensions.rem
 import com.flipperplz.bisutils.parsing.BisLexer
+import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 
 fun main() {
 
+//    val lexer = BisLexer(
+//            """
+//                /*ryann*/
+//                class myclass {
+//                //this is a comment remove it
+//                }; /*/
+//            """.trimIndent()
+//    )
+//    val preprocessor = BoostPreprocessor()
+//    preprocessor.processText(lexer)
+//    println(lexer.toString())
+
     val lexer = ParamLexer(
         """
-class CfgPatches 
+class CfgPatches
 {
     class TestMod
     {
         requiredAddons[]=
         {
-            "DZ_Data", 
+            "DZ_Data",
         };
     };
 };
-
-class CfgMods   
+//this is a comment
+class CfgMods
 {
+#include <test.hpp>
     class TestMod
     {
         type = "mod";
         inputs = "mods\testmod\inputs\my_new_inputs.xml";
-        dependencies[]={"Game"}; 
+        dependencies[]={"Game"};
 
         class defs
         {
@@ -43,7 +57,7 @@ class CfgMods
             class engineScriptModule
             {
                 value="";
-                files[]={"mods/testmod/scripts/1_Core"}; 
+                files[]={"mods/testmod/scripts/1_Core"};
             };
         };
     };
@@ -51,7 +65,7 @@ class CfgMods
     """.trimIndent()
     )
 
-    val param = parseParamFile(lexer, "config", null)
+    val param = parseParamFile(lexer, "config", BoostPreprocessor())
     println(param.toParam())
 }
 

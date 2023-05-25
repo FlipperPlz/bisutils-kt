@@ -18,7 +18,6 @@ object ParamParser {
 
     @Throws(LexerException::class)
     fun parse(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile = mutableParamFile(name).apply {
-        preProcessor?.processText(lexer)
         val contextStack = Stack<ParamMutableStatementHolder>().also { it.add(this) }
         fun tryEnd(): Boolean {
             if(contextStack.count() != 1)
@@ -33,7 +32,11 @@ object ParamParser {
 
             when {
                 lexer.isEOF() -> if(tryEnd()) break
-                lexer.currentChar == '#' -> preProcessor?.processDirective(this.slimName, lexer) ?: throw lexer.unexpectedInputException()
+                lexer.currentChar == '#' -> {
+                    val position = lexer.bufferPtr - 1
+                    preProcessor?.processDirective(this.slimName, lexer) ?: throw lexer.unexpectedInputException()
+                    lexer.jumpTo(position)
+                }
                 lexer.currentChar == '}' -> {
                     lexer.moveForward(); lexer.traverseWhitespace(false)
                     if(lexer.currentChar != ';') throw lexer.unexpectedInputException()

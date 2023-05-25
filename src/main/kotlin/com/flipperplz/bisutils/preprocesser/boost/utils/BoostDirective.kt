@@ -16,5 +16,7 @@ interface BoostDirective {
         return builder.toString()
     }
 
+    fun process(arg: Any? = null): String = ""
+
     fun parseDirective(lexer: BisLexer)
 }
