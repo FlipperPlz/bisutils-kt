@@ -33,13 +33,21 @@ open class BisLexer(private var string: String) {
             currentChar = it
         }
     }
+
     fun removeRange(from: Int, to: Int) {
         string = string.removeRange(from, to)
     }
+
     fun removeRange(range: IntRange) {
         string = string.removeRange(range)
     }
 
+    fun readChars(count: Int, includeFirst: Boolean = false): String {
+        var i = 0; val builder = StringBuilder()
+        if(includeFirst && count >= 1) { i++; builder.append(currentChar) }
+        while (i != count) { i++;builder.append(moveForward()) }
+        return builder.toString()
+    }
 
     fun peekForward(): Char? = string.getOrNull(bufferPtr + 1)
 
@@ -48,6 +56,10 @@ open class BisLexer(private var string: String) {
     fun peekAt(pos: Int): Char? = string.getOrNull(pos)
 
     fun regionMatches(text: String): Boolean = string.regionMatches(bufferPtr, text, 0, text.length)
+
     fun replaceAll(from: String, to: String) { string = string.replace(from, to) }
 
+    fun shoveText(text: String): Int = "${string.substring(0, bufferPtr)}$text${string.substring(bufferPtr)}".let {
+        bufferPtr + it.length
+    }
 }

@@ -21,7 +21,8 @@ object ParamParser {
         preProcessor?.processText(lexer)
         val contextStack = Stack<ParamMutableStatementHolder>().also { it.add(this) }
         fun tryEnd(): Boolean {
-            if(contextStack.count() != 1) throw lexer.eofException()
+            if(contextStack.count() != 1)
+                throw lexer.eofException()
             return true
         }
 
@@ -36,12 +37,14 @@ object ParamParser {
                 lexer.currentChar == '}' -> {
                     lexer.moveForward(); lexer.traverseWhitespace(false)
                     if(lexer.currentChar != ';') throw lexer.unexpectedInputException()
+                    contextStack.pop()
                     continue
                 }
             }
 
             var keyword: String = lexer.readIdentifier(true)
-            if(keyword.isBlank() && tryEnd()) break
+            if(keyword.isBlank() && tryEnd())
+                break
             when(keyword) {
                 "delete" -> {
                     if(lexer.traverseWhitespace() <= 0) throw lexer.unexpectedInputException()
