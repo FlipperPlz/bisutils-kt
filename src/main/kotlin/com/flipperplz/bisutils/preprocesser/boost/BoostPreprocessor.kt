@@ -12,7 +12,7 @@ import java.lang.StringBuilder
 typealias DefineDirective = BoostDefineDirective
 class BoostPreprocessor(
        private val _defines: MutableList<DefineDirective>  = mutableListOf(),
-       val locateFile: (String) -> String? = { "class MyMod {};" }
+       val locateFile: (String) -> String? = { "class RandomDirective {};" }
 ) : BisPreProcessor<BisLexer> {
     companion object {
         val whitespaces: List<Char> = mutableListOf(' ', '\t', '\u000B', '\u000C')
@@ -37,8 +37,7 @@ class BoostPreprocessor(
                 var count: Int = 0
                 while (true) {
                     if (isEOF()) {
-                        if (allowEOF) break
-                        else throw eofException()
+                        if (allowEOF) break else throw eofException()
                     }
                     when (currentChar) {
                         '\\' -> {
@@ -120,16 +119,21 @@ class BoostPreprocessor(
 
     @Throws(LexerException::class)
     override fun processLine(lexer: BisLexer) {
-        //lexer.replaceAll("\r\n", "\n")
-        lexer.replaceInLine(Regex("""/\\*/"""), "")
-        lexer.replaceInLine(Regex("""/\\*.*\\*/"""), "")
-        lexer.replaceInLine("__LINE__", "-1")
-        lexer.replaceInLine("__FILE__", "config.cpp")
-        lexer.resetPosition()
+        var quoted = false
+
+        while (!lexer.isEOF()) {
+            val start = lexer.bufferPtr
+            if(lexer.currentChar == '"') quoted = !quoted
+            if(quoted) { lexer.moveForward(); continue; }
+            if(lexer.currentChar == '/' && traverseComments(lexer) == 0) continue
+            if(lexer.currentChar == '#') processDirective(lexer)
+            if(with(lexer.currentChar) { this != null && (this.isLetter() || this == '_') }) processMacro(lexer)
+            lexer.jumpTo(start + 1)
+        }
     }
 
     @Throws(LexerException::class)
-    private fun processMacros(lexer: BisLexer) {}
+    private fun processMacro(lexer: BisLexer) {}
 
     @Throws(LexerException::class)
     fun processDirective(lexer: BisLexer): BoostDirective {
