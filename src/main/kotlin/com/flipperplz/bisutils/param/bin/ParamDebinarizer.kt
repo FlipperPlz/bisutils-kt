@@ -23,33 +23,26 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 object ParamDebinarizer {
-    operator fun ParamString.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamString =
+    fun readString(parent: ParamElement?, buffer: ByteBuffer): ParamString =
             ParamString(parent, buffer.getAsciiZ())
 
-    operator fun ParamFloat.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamFloat =
+    fun readFloat(parent: ParamElement?, buffer: ByteBuffer): ParamFloat =
             ParamFloat(parent, buffer.getFloat(ByteOrder.LITTLE_ENDIAN))
 
-    operator fun ParamInt.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamInt =
+    fun readInt(parent: ParamElement?, buffer: ByteBuffer): ParamInt =
             ParamInt(parent, buffer.getInt(ByteOrder.LITTLE_ENDIAN))
 
-    operator fun ParamExternalClass.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamExternalClass =
+    fun readExternalClass(parent: ParamElement?, buffer: ByteBuffer): ParamExternalClass =
             ParamExternalClass(parent, buffer.getAsciiZ())
 
-    operator fun ParamDeleteStatement.Companion.invoke(
-            parent: ParamElement?,
-            buffer: ByteBuffer,
-            locateTarget: ((ParamDeleteStatement) -> ParamExternalClass)? = null
-    ): ParamDeleteStatement = ParamDeleteStatement(parent, buffer.getAsciiZ(), locateTarget)
+    fun readDeleteStatement(parent: ParamElement?, buffer: ByteBuffer, locateTarget: ((ParamDeleteStatement) -> ParamExternalClass)? = null): ParamDeleteStatement =
+            ParamDeleteStatement(parent, buffer.getAsciiZ(), locateTarget)
 
-    operator fun ParamArray.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamArray = ParamArray(
-            parent,
-            mutableListOf<ParamLiteralBase>().apply {
-                repeat(buffer.getCompactInt()) {
-                    add(ParamLiteralBase(parent, buffer) ?: throw Exception())
-                }
-            }
-    )
-
+    fun readArray(parent: ParamElement?, buffer: ByteBuffer): ParamArray = ParamArray(parent, mutableListOf<ParamLiteralBase>().apply {
+        repeat(buffer.getCompactInt()) {
+            add(readLiteral(parent, buffer))
+        }
+    })
 
     fun readParamFile(name: String, buffer: ByteBuffer): ParamFile {
 
@@ -59,8 +52,7 @@ object ParamDebinarizer {
                 buffer.position(child.binaryOffset)
                 child.slimSuperClass = buffer.getAsciiZ()
 
-                for (i in 0 until buffer.getCompactInt())
-                    add(ParamStatement(child, buffer) ?: return false)
+                repeat(buffer.getCompactInt()) { add(readStatement(child, buffer)) }
 
                 child.slimCommands = this
             }
@@ -76,7 +68,7 @@ object ParamDebinarizer {
         with(mutableListOf<ParamStatement>()) {
             buffer.getAsciiZ()
             for (i in 0 until buffer.getCompactInt())
-                add(ParamStatement(file, buffer) ?: throw Exception())
+                add(readStatement(file, buffer) ?: throw Exception())
 
             file.slimCommands = this
         }
@@ -91,32 +83,34 @@ object ParamDebinarizer {
 
 
 
-    operator fun ParamStatement.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamStatement? = when(buffer.get()) {
+    fun readStatement(parent: ParamElement?, buffer: ByteBuffer): ParamStatement = when(buffer.get()) {
         0.toByte() -> RapClassImpl(parent, buffer.getAsciiZ(), buffer.getInt(ByteOrder.LITTLE_ENDIAN))
-        1.toByte() -> with(buffer.get().toInt()) {
-            RapVariableImpl(parent, ParamOperatorTypes.ASSIGN, buffer.getAsciiZ()).apply {
-                slimValue = ParamLiteralBase.readStatement(this@apply, this@with, buffer) ?: throw Exception()
-            }
+
+        1.toByte() -> RapVariableImpl(parent, ParamOperatorTypes.ASSIGN, buffer.getAsciiZ()).apply {
+            slimValue = readLiteral(id = buffer.get().toInt(), parent = this@apply, buffer = buffer)
         }
+
         2.toByte() -> RapVariableImpl(parent, ParamOperatorTypes.ASSIGN, buffer.getAsciiZ()).apply {
-            slimValue = ParamArray(this, buffer)
+            slimValue = readLiteral(this, buffer)
         }
-        3.toByte() -> ParamExternalClass(parent, buffer)
-        4.toByte() -> ParamDeleteStatement(parent, buffer)
+
+        3.toByte() -> readExternalClass(parent, buffer)
+
+        4.toByte() -> readDeleteStatement(parent, buffer)
+
         5.toByte() -> RapVariableImpl(parent, ParamOperatorTypes.forFlag(buffer.get()), buffer.getAsciiZ()).apply {
-            slimValue = ParamArray(this, buffer)
+            slimValue = readArray(parent, buffer)
         }
-        else -> null
+        else -> throw Exception()
     }
 
-    operator fun ParamLiteralBase.Companion.invoke(parent: ParamElement?, buffer: ByteBuffer): ParamLiteralBase? =
-            ParamLiteralBase.readStatement(parent, buffer.getInt(), buffer)
-
-    fun ParamLiteralBase.Companion.readStatement(parent: ParamElement?, id: Int, buffer: ByteBuffer): ParamLiteralBase? = when (id) {
-        0 -> ParamString(parent, buffer)
-        1 -> ParamFloat(parent, buffer)
-        2 -> ParamInt(parent, buffer)
-        3 -> ParamArray(parent, buffer)
-        else -> null
+    fun readLiteral(parent: ParamElement?, id: Int, buffer: ByteBuffer): ParamLiteralBase = when (id) {
+        0 -> readString(parent, buffer)
+        1 -> readFloat(parent, buffer)
+        2 -> readInt(parent, buffer)
+        3 -> readArray(parent, buffer)
+        else -> throw Exception()
     }
+
+    fun readLiteral(parent: ParamElement?, buffer: ByteBuffer): ParamLiteralBase = readLiteral(parent, buffer.getInt(), buffer)
 }

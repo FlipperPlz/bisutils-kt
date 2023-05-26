@@ -1,5 +1,6 @@
 package com.flipperplz.bisutils.utils
 
+import com.flipperplz.bisutils.param.ast.literal.ParamString
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
@@ -40,6 +41,8 @@ fun ByteBuffer.putCompactInt(value: Int) {
     } while (data > 0x7F)
     if(data != 0) put(data.toByte())
 }
+
+fun ByteBuffer.putAsciiZ(string: String, charset: Charset = Charsets.UTF_8) = put(string.toByteArray(charset) + 0x0)
 
 fun ByteBuffer.getCompactInt(): Int {
     var value: Int = 0
