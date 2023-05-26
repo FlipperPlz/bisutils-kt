@@ -1,10 +1,12 @@
 package com.flipperplz.bisutils.preprocesser.boost.utils
 
 import com.flipperplz.bisutils.parsing.BisLexer
+import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 
 
 typealias DirectiveType = BoostDirectiveType
 interface BoostDirective {
+    val processor: BoostPreprocessor
     fun getType(): DirectiveType
     fun getDirectiveText(): String?
     fun toBoost(includeSharp: Boolean, includeNewLine: Boolean): String {
@@ -16,7 +18,7 @@ interface BoostDirective {
         return builder.toString()
     }
 
-    fun process(arg: Any? = null): String = ""
+    fun process(arg: Any? = null): String
 
     fun parseDirective(lexer: BisLexer)
 }

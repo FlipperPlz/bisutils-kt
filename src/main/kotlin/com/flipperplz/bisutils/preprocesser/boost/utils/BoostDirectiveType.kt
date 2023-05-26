@@ -20,26 +20,22 @@ enum class BoostDirectiveType(val debugName: String, val text: String) {
     B_ELSE("boost::else", "else"),
     B_ENDIF("boost::endif", "endif");
 
-    fun parse(lexer: BisLexer): BoostDirective = when(this) {
+    fun parse(lexer: BisLexer, processor: BoostPreprocessor): BoostDirective = when(this) {
         B_ENDIF -> object : BoostEndIfDirective{
-            override fun process(arg: Any?): String {
-                return super.process(arg)
-            }
+            override val processor: BoostPreprocessor = processor
+            override fun process(arg: Any?): String = "//endif"
         }
         B_ELSE -> object : BoostElseDirective{
-            override fun process(arg: Any?): String {
-                return super.process(arg)
-            }
+            override val processor: BoostPreprocessor = processor
+            override fun process(arg: Any?): String = "//else"
         }
         B_INCLUDE -> object : BoostIncludeDirective {
+            override val processor: BoostPreprocessor = processor
+
             override lateinit var stringType: BoostIncludeDirective.StringType
             override lateinit var path: String
             init {
                 parseDirective(lexer)
-            }
-
-            override fun process(arg: Any?): String {
-                return super.process(arg)
             }
 
             override fun parseDirective(lexer: BisLexer) {
@@ -50,11 +46,10 @@ enum class BoostDirectiveType(val debugName: String, val text: String) {
         }
         B_UNDEFINE -> object : BoostUndefineDirective {
             override lateinit var macroName: String
+            override val processor: BoostPreprocessor = processor
+            override fun process(arg: Any?): String = "//undefine"
             init { parseDirective(lexer) }
 
-            override fun process(arg: Any?): String {
-                return super.process(arg)
-            }
 
             override fun parseDirective(lexer: BisLexer) {
                 BoostPreprocessor.traverseWhitespace(lexer)
@@ -64,8 +59,6 @@ enum class BoostDirectiveType(val debugName: String, val text: String) {
         }
         else -> throw preprocessorException(lexer)
     }
-
-
 
 
     companion object {

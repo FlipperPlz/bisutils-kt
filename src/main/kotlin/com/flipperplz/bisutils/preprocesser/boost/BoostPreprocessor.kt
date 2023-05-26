@@ -8,7 +8,9 @@ import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirective
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirectiveType
 import java.lang.StringBuilder
 
-class BoostPreprocessor : BisPreProcessor<BisLexer> {
+class BoostPreprocessor(
+       val locateFile: (String) -> String? = { "class MyMod {};" }
+) : BisPreProcessor<BisLexer> {
     companion object {
         val whitespaces: List<Char> = mutableListOf(' ', '\t', '\u000B', '\u000C')
 
@@ -75,10 +77,6 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
 
     }
 
-
-
-
-
     @Throws(LexerException::class)
     override fun processUntil(lexer: BisLexer) {
         //lexer.replaceAll("\r\n", "\n")
@@ -89,8 +87,6 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
         lexer.replaceInLine("__FILE__", "config.cpp")
         lexer.resetPosition()
     }
-
-
     @Throws(LexerException::class)
     private fun processMacros(lexer: BisLexer) {}
 
@@ -100,7 +96,7 @@ class BoostPreprocessor : BisPreProcessor<BisLexer> {
         val keyword = StringBuilder().apply {
             while(lexer.moveForward()?.isWhitespace() != true) append(lexer.currentChar)
         }.toString()
-        return (BoostDirectiveType.directiveForKeyword(keyword) ?: throw preprocessorException(lexer)).parse(lexer).apply {
+        return (BoostDirectiveType.directiveForKeyword(keyword) ?: throw preprocessorException(lexer)).parse(lexer, this).apply {
             lexer.replaceRange(start..lexer.bufferPtr+1, process())
         }
     }
