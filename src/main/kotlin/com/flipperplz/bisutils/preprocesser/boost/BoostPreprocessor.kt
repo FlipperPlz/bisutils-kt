@@ -118,7 +118,7 @@ class BoostPreprocessor(
     fun locateMacro(name: String): DefineDirective? = _defines.firstOrNull { it.macroName == name }
 
     @Throws(LexerException::class)
-    override fun processLine(lexer: BisLexer) {
+    override fun processLexer(lexer: BisLexer) {
         var quoted = false
 
         while (!lexer.isEOF()) {
