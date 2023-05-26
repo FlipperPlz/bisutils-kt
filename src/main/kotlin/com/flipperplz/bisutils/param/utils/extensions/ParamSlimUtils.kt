@@ -125,8 +125,8 @@ import java.nio.ByteOrder
         slimCommands.filterIsInstance<T>()
 
 
-    fun ParamStatementHolder.childClasses(): List<ParamClass> =
-        childrenOfType()
+    val ParamStatementHolder.childClasses: List<ParamClass>
+        get() = childrenOfType()
 
     operator fun ParamStatementHolder.iterator(): Iterator<ParamStatement> =
         slimCommands.iterator()

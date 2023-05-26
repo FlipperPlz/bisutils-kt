@@ -32,12 +32,7 @@ object ParamParser {
 
             when {
                 lexer.isEOF() -> if(tryEnd()) break
-                lexer.currentChar == '#' -> {
-                    val position = lexer.bufferPtr - 1
-                    println("Directive was found... processing")
-                    preProcessor?.processDirective(lexer) ?: throw lexer.unexpectedInputException()
-                    lexer.jumpTo(position)
-                }
+                lexer.currentChar == '#' -> throw lexer.unexpectedInputException()
                 lexer.currentChar == '}' -> {
                     lexer.moveForward(); lexer.traverseWhitespace(false)
                     if(lexer.currentChar != ';') throw lexer.unexpectedInputException()

@@ -149,12 +149,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
             when(currentChar) {
                 '\r' -> { line++; count++; if(moveForward() != '\n') { count++ }; continue  }
                 '\n' -> { line++; count++; moveForward() }
-                else -> { if(!BoostPreprocessor.whitespaces.contains(currentChar)) break else {
-                    val extra = BoostPreprocessor.traverseComments(this)
-                    if(extra != 0) count += extra
-                    moveForward().also { count++ }
-                };
-                }
+                else -> { if(!BoostPreprocessor.whitespaces.contains(currentChar)) break else moveForward().also { count++ } }
             }
         }
         return count;
