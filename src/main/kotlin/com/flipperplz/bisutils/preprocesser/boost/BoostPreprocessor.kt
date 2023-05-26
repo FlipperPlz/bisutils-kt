@@ -19,6 +19,18 @@ class BoostPreprocessor(
 
         fun preprocessorException(lexer: BisLexer) = LexerException(lexer, LexicalError.PreprocessorError)
 
+        fun readMacroID(lexer: BisLexer, throwOnNone: Boolean = false): String {
+            if(with(lexer.currentChar) {this != null && isLetter() || this == '_' }) {
+                return StringBuilder().apply {
+                    append(lexer.currentChar)
+                    while (with(lexer.moveForward()) { this != null && (this == '_' || this.isLetterOrDigit()) })
+                        append(lexer.currentChar)
+                }.toString()
+            }
+            if(throwOnNone) throw preprocessorException(lexer)
+            return ""
+        }
+
         @Throws(LexerException::class)
         fun traverseWhitespace(lexer: BisLexer, allowEOF: Boolean = false, allowEOL: Boolean = true, allowDirectiveEOL: Boolean = true): Int {
             with(lexer) {
