@@ -6,8 +6,9 @@ import java.lang.StringBuilder
 
 interface BoostDefineDirective : BoostDirective {
     val macroName: String
-    val macroArguments: List<String>
     val macroValue: String
+    val macroArguments: List<String>
+    override fun process(arg: Any?): String = "".also { processor.define(this) }
 
     override fun getType(): DirectiveType = DirectiveType.B_DEFINE
 
@@ -15,4 +16,5 @@ interface BoostDefineDirective : BoostDirective {
         if(macroArguments.isNotEmpty()) append(macroArguments.joinToString(prefix = "(", postfix = ")") { it })
         if(macroValue.isNotBlank()) append(macroValue)
     }.toString()
+
 }

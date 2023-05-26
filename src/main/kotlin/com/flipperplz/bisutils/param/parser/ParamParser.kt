@@ -34,7 +34,8 @@ object ParamParser {
                 lexer.isEOF() -> if(tryEnd()) break
                 lexer.currentChar == '#' -> {
                     val position = lexer.bufferPtr - 1
-                    preProcessor?.processDirective(this.slimName, lexer) ?: throw lexer.unexpectedInputException()
+                    println("Directive was found... processing")
+                    preProcessor?.processDirective(lexer) ?: throw lexer.unexpectedInputException()
                     lexer.jumpTo(position)
                 }
                 lexer.currentChar == '}' -> {
@@ -125,7 +126,6 @@ object ParamParser {
                         while (lexer.currentChar == ';') lexer.moveForward()
                         continue
                     } else if (lexer.currentChar == '=') {
-                        println("Enter variable $keyword")
                         lexer.moveForward(); lexer.traverseWhitespace()
                         currentContext.slimCommands.add(ParamMutableVariableStatementImpl(currentContext, this, keyword).also {
                             it.slimValue = lexer.readLiteral(this, this, ';')
@@ -135,7 +135,6 @@ object ParamParser {
                         lexer.moveForward()
                         continue
                     }
-                    println("Unknown $keyword")
 
                     throw lexer.unexpectedInputException()
                 }

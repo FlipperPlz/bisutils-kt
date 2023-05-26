@@ -5,5 +5,5 @@ import com.flipperplz.bisutils.parsing.LexerException
 
 interface BisPreProcessor<T: BisLexer> {
     @Throws(LexerException::class)
-    fun processUntil(lexer: T)
+    fun processLine(lexer: T)
 }

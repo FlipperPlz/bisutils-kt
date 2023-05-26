@@ -4,11 +4,14 @@ import com.flipperplz.bisutils.BisPreProcessor
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.parsing.LexerException
 import com.flipperplz.bisutils.parsing.LexicalError
+import com.flipperplz.bisutils.preprocesser.boost.directive.BoostDefineDirective
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirective
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirectiveType
 import java.lang.StringBuilder
 
+typealias DefineDirective = BoostDefineDirective
 class BoostPreprocessor(
+       private val _defines: MutableList<DefineDirective>  = mutableListOf(),
        val locateFile: (String) -> String? = { "class MyMod {};" }
 ) : BisPreProcessor<BisLexer> {
     companion object {
@@ -17,7 +20,7 @@ class BoostPreprocessor(
         fun preprocessorException(lexer: BisLexer) = LexerException(lexer, LexicalError.PreprocessorError)
 
         @Throws(LexerException::class)
-        fun traverseWhitespace(lexer: BisLexer, allowEOF: Boolean = false): Int {
+        fun traverseWhitespace(lexer: BisLexer, allowEOF: Boolean = false, allowEOL: Boolean = true, allowDirectiveEOL: Boolean = true): Int {
             with(lexer) {
                 var count: Int = 0
                 while (true) {
@@ -26,8 +29,22 @@ class BoostPreprocessor(
                         else throw eofException()
                     }
                     when (currentChar) {
-                        '\r' -> { count++; if (moveForward() != '\n') continue }
-                        '\n' -> { count++; moveForward() }
+                        '\\' -> {
+                            if(!allowDirectiveEOL) break
+                            val next =peekForward()
+                            if(next != '\r' && next != '\n') break
+                            count++
+                        }
+                        '\r' -> {
+                            if(!allowEOL) throw lexer.eolException();
+                            count++;
+                            if (moveForward() != '\n') continue
+                            count++;
+                        }
+                        '\n' -> {
+                            if(!allowEOL) throw lexer.eolException();
+                            count++; moveForward()
+                        }
                         else -> {
                             if (!whitespaces.contains(currentChar)) break else {
                                 moveForward().also { count++ }
@@ -76,22 +93,34 @@ class BoostPreprocessor(
         }
 
     }
+    val defines: List<DefineDirective>
+        get() = _defines
+
+
+    fun undefine(macroName: String) = _defines.removeIf { it.macroName == macroName }
+
+    fun define(macro: DefineDirective) =
+        if(_defines.firstOrNull { it.macroName == macro.macroName } != null)
+            throw Exception("A macro with name '${macro.macroName}' already exists.")
+        else _defines.add(macro)
+
+    fun locateMacro(name: String): DefineDirective? = _defines.firstOrNull { it.macroName == name }
 
     @Throws(LexerException::class)
-    override fun processUntil(lexer: BisLexer) {
+    override fun processLine(lexer: BisLexer) {
         //lexer.replaceAll("\r\n", "\n")
-        lexer.replaceInLine(Regex("""//.*(\n|\r\n)"""), "")
         lexer.replaceInLine(Regex("""/\\*/"""), "")
         lexer.replaceInLine(Regex("""/\\*.*\\*/"""), "")
         lexer.replaceInLine("__LINE__", "-1")
         lexer.replaceInLine("__FILE__", "config.cpp")
         lexer.resetPosition()
     }
+
     @Throws(LexerException::class)
     private fun processMacros(lexer: BisLexer) {}
 
     @Throws(LexerException::class)
-    fun processDirective(slimName: String?, lexer: BisLexer): BoostDirective {
+    fun processDirective(lexer: BisLexer): BoostDirective {
         val start = lexer.bufferPtr - 1
         val keyword = StringBuilder().apply {
             while(lexer.moveForward()?.isWhitespace() != true) append(lexer.currentChar)
