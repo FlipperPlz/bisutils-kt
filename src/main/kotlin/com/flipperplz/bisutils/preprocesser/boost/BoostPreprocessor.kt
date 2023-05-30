@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.preprocesser.boost
 
-import com.flipperplz.bisutils.BisPreProcessor
+import com.flipperplz.bisutils.preprocesser.BisPreprocessor
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.parsing.LexerException
 import com.flipperplz.bisutils.parsing.LexicalError
@@ -11,9 +11,9 @@ import java.lang.StringBuilder
 
 typealias DefineDirective = BoostDefineDirective
 class BoostPreprocessor(
-       private val _defines: MutableList<DefineDirective>  = mutableListOf(),
+       private val _defines: MutableList<DefineDirective> = mutableListOf(),
        val locateFile: (String) -> String? = { "class RandomDirective {};" }
-) : BisPreProcessor<BisLexer> {
+) : BisPreprocessor<BisLexer> {
     companion object {
         val whitespaces: List<Char> = mutableListOf(' ', '\t', '\u000B', '\u000C')
 
@@ -104,9 +104,12 @@ class BoostPreprocessor(
         }
 
     }
-    val defines: List<DefineDirective>
+    var defines: List<DefineDirective>
         get() = _defines
-
+        set(value) {
+            _defines.clear()
+            _defines.addAll(value)
+        }
 
     fun undefine(macroName: String) = _defines.removeIf { it.macroName == macroName }
 
@@ -126,25 +129,24 @@ class BoostPreprocessor(
             if(lexer.currentChar == '"') quoted = !quoted
             if(quoted) { lexer.moveForward(); continue; }
             if(lexer.currentChar == '/' && traverseComments(lexer) == 0) continue
-            if(lexer.currentChar == '#') processDirective(lexer)
+            if(lexer.currentChar == '#') {
+                val keyword = StringBuilder().apply {
+                    while(lexer.moveForward()?.isWhitespace() != true) append(lexer.currentChar)
+                }.toString()
+                val directive = (BoostDirectiveType.directiveForKeyword(keyword) ?: throw preprocessorException(lexer)).parse(lexer, this)
+                lexer.replaceRange(start..lexer.bufferPtr+1, processDirective(directive))
+                return
+            }
             if(with(lexer.currentChar) { this != null && (this.isLetter() || this == '_') }) processMacro(lexer)
             lexer.jumpTo(start + 1)
         }
     }
 
     @Throws(LexerException::class)
-    private fun processMacro(lexer: BisLexer) {}
+    private fun processMacro(lexer: BisLexer): String = ""
+
 
     @Throws(LexerException::class)
-    fun processDirective(lexer: BisLexer): BoostDirective {
-        val start = lexer.bufferPtr - 1
-        val keyword = StringBuilder().apply {
-            while(lexer.moveForward()?.isWhitespace() != true) append(lexer.currentChar)
-        }.toString()
-        return (BoostDirectiveType.directiveForKeyword(keyword) ?: throw preprocessorException(lexer)).parse(lexer, this).apply {
-            lexer.replaceRange(start..lexer.bufferPtr+1, process())
-        }
-    }
-
+    fun processDirective(directive: BoostDirective): String = ""
 
 }

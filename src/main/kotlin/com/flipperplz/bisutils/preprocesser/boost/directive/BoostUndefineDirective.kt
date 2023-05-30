@@ -7,5 +7,4 @@ interface BoostUndefineDirective : BoostDirective {
     val macroName: String
     override fun getType(): DirectiveType = DirectiveType.B_UNDEFINE
     override fun getDirectiveText(): String? = macroName
-    override fun process(arg: Any?): String = "".also { processor.undefine(macroName) }
 }

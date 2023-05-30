@@ -10,6 +10,4 @@ class BoostEndIfDirectiveImpl(
     constructor(lexer: BisLexer, processor: BoostPreprocessor): this(processor) {
         parseDirective(lexer)
     }
-
-    override fun process(arg: Any?): String = "//endif"
 }

@@ -12,5 +12,4 @@ class BoostElseDirectiveImpl(
         parseDirective(lexer)
     }
 
-    override fun process(arg: Any?): String = "//else"
 }

@@ -8,7 +8,6 @@ interface BoostDefineDirective : BoostDirective {
     val macroName: String
     val macroValue: String
     val macroArguments: List<String>
-    override fun process(arg: Any?): String = "".also { processor.define(this) }
 
     override fun getType(): DirectiveType = DirectiveType.B_DEFINE
 
