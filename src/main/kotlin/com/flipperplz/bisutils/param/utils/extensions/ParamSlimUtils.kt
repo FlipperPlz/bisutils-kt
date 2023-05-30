@@ -95,9 +95,11 @@ import java.nio.ByteOrder
 
     operator fun ParamMutableArray.plusAssign(push: ParamLiteralBase?) { push?.let { slimValue?.add(it) } }
 
-    operator fun ParamFile.Companion.invoke(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile = ParamParser.parse(lexer, name, preProcessor)
+    operator fun ParamFile.Companion.invoke(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile =
+        ParamParser.parse(lexer, name, preProcessor)
 
-    fun parseParamFile(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile = ParamParser.parse(lexer, name, preProcessor)
+    fun parseParamFile(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile =
+        ParamParser.parse(lexer, name, preProcessor)
 
     inline operator fun <reified T : ParamNamedElement> ParamStatementHolder.get(name: String): T? =
         slimCommands.filterIsInstance<T>().firstOrNull {

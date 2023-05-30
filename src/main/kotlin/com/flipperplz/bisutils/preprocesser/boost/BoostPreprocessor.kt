@@ -4,16 +4,75 @@ import com.flipperplz.bisutils.preprocesser.BisPreprocessor
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.parsing.LexerException
 import com.flipperplz.bisutils.parsing.LexicalError
-import com.flipperplz.bisutils.preprocesser.boost.directive.BoostDefineDirective
+import com.flipperplz.bisutils.preprocesser.boost.directive.*
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirective
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirectiveType
+import com.flipperplz.bisutils.preprocesser.boost.utils.BoostIncludeNotFoundException
 import java.lang.StringBuilder
 
 typealias DefineDirective = BoostDefineDirective
 class BoostPreprocessor(
        private val _defines: MutableList<DefineDirective> = mutableListOf(),
        val locateFile: (String) -> String? = { "class RandomDirective {};" }
-) : BisPreprocessor<BisLexer> {
+) : BisPreprocessor {
+    var defines: List<DefineDirective>
+        get() = _defines
+        set(value) {
+            _defines.clear()
+            _defines.addAll(value)
+        }
+
+    fun undefine(macroName: String) = _defines.removeIf { it.macroName == macroName }
+
+
+    fun locateMacro(name: String): DefineDirective? = _defines.firstOrNull { it.macroName == name }
+
+    @Throws(LexerException::class)
+    override fun processLexer(lexer: BisLexer) {
+        var quoted = false
+
+        while (!lexer.isEOF()) {
+            val start = lexer.bufferPtr
+            if(lexer.currentChar == '"') quoted = !quoted
+            if(quoted) { lexer.moveForward(); continue; }
+            if(lexer.currentChar == '/' && traverseComments(lexer) == 0) continue
+            if(lexer.currentChar == '#') {
+                val directive = BoostDirectiveType.parse(lexer, this) ?: throw preprocessorException(lexer)
+                lexer.replaceRange(start..lexer.bufferPtr, processDirective(directive))
+                lexer.jumpTo(start+1)
+                continue
+            }
+            val macro = readMacroID(lexer)
+            when {
+                macro.isEmpty() -> { lexer.moveForward(); continue }
+                macro == "__LINE__" -> lexer.replaceRange(start..lexer.bufferPtr, "111")//TODO: LINE COUNT
+                macro == "__FILE__" -> lexer.replaceRange(start..lexer.bufferPtr, "filename")//TODO: LINE COUNT
+                macro == "__EXEC" -> throw Exception()//unsupported; read to closing ')' and fuck off
+                macro == "__EVAL" -> throw Exception()
+                else -> locateMacro(macro)?.let {
+                    lexer.replaceRange(start..lexer.bufferPtr,  processMacro(it))
+                }
+            }
+        }
+    }
+
+    @Throws(LexerException::class)
+    private fun processMacro(macro: BoostDefineDirective): String = ""
+
+
+    @Throws(LexerException::class, BoostIncludeNotFoundException::class)
+    fun processDirective(directive: BoostDirective): String = when(directive) {
+        is BoostDefineDirective -> "".also { _defines.add(directive) }
+        is BoostIfNDefinedDirective -> directive.evaluate()
+        is BoostIfDefinedDirective -> directive.evaluate()
+        is BoostIncludeDirective -> processInclude(directive)
+        is BoostUndefineDirective -> "".also { undefine(directive.macroName) }
+        else -> "Error Processing Directive (${directive.getType()})"
+    }
+
+    @Throws(BoostIncludeNotFoundException::class)
+    fun processInclude(include: BoostIncludeDirective): String = ""
+
     companion object {
         val whitespaces: List<Char> = mutableListOf(' ', '\t', '\u000B', '\u000C')
 
@@ -90,6 +149,7 @@ class BoostPreprocessor(
             }
             return 0
         }
+
         private fun BisLexer.traverseLine(): Int {
             var count: Int = 0
             while(true){
@@ -104,49 +164,6 @@ class BoostPreprocessor(
         }
 
     }
-    var defines: List<DefineDirective>
-        get() = _defines
-        set(value) {
-            _defines.clear()
-            _defines.addAll(value)
-        }
 
-    fun undefine(macroName: String) = _defines.removeIf { it.macroName == macroName }
-
-    fun define(macro: DefineDirective) =
-        if(_defines.firstOrNull { it.macroName == macro.macroName } != null)
-            throw Exception("A macro with name '${macro.macroName}' already exists.")
-        else _defines.add(macro)
-
-    fun locateMacro(name: String): DefineDirective? = _defines.firstOrNull { it.macroName == name }
-
-    @Throws(LexerException::class)
-    override fun processLexer(lexer: BisLexer) {
-        var quoted = false
-
-        while (!lexer.isEOF()) {
-            val start = lexer.bufferPtr
-            if(lexer.currentChar == '"') quoted = !quoted
-            if(quoted) { lexer.moveForward(); continue; }
-            if(lexer.currentChar == '/' && traverseComments(lexer) == 0) continue
-            if(lexer.currentChar == '#') {
-                val keyword = StringBuilder().apply {
-                    while(lexer.moveForward()?.isWhitespace() != true) append(lexer.currentChar)
-                }.toString()
-                val directive = (BoostDirectiveType.directiveForKeyword(keyword) ?: throw preprocessorException(lexer)).parse(lexer, this)
-                lexer.replaceRange(start..lexer.bufferPtr+1, processDirective(directive))
-                return
-            }
-            if(with(lexer.currentChar) { this != null && (this.isLetter() || this == '_') }) processMacro(lexer)
-            lexer.jumpTo(start + 1)
-        }
-    }
-
-    @Throws(LexerException::class)
-    private fun processMacro(lexer: BisLexer): String = ""
-
-
-    @Throws(LexerException::class)
-    fun processDirective(directive: BoostDirective): String = ""
 
 }

@@ -11,13 +11,15 @@ import com.flipperplz.bisutils.param.utils.mutability.*
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
 import com.flipperplz.bisutils.parsing.LexerException
 import com.flipperplz.bisutils.parsing.LexicalError
+import com.flipperplz.bisutils.preprocesser.BisPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import java.util.Stack
 
 object ParamParser {
 
     @Throws(LexerException::class)
-    fun parse(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile = mutableParamFile(name).apply {
+    fun parse(lexer: ParamLexer, name: String, preProcessor: BisPreprocessor? = null): ParamFile = mutableParamFile(name).apply {
+        preProcessor?.processLexer(lexer)
         val contextStack = Stack<ParamMutableStatementHolder>().also { it.add(this) }
         fun tryEnd(): Boolean {
             if(contextStack.count() != 1)

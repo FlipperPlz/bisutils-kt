@@ -10,31 +10,33 @@ import com.flipperplz.bisutils.preprocesser.boost.directive.*
 import com.flipperplz.bisutils.preprocesser.boost.impl.*
 
 enum class BoostDirectiveType(val debugName: String, val text: String) {
-    B_INCLUDE("boost::include", "include"),
-    B_DEFINE("boost::define", "define"),
-    B_UNDEFINE("boost::undefine", "undef"),
-    B_IF("boost::if", "if"),
-    B_IFDEF("boost::if.defined", "ifdef"),
-    B_IFNDEF("boost::if.not-defined", "ifndef"),
-    B_ELSE("boost::else", "else"),
-    B_ENDIF("boost::endif", "endif");
+    B_INCLUDE("boost::include", "include") {
+        override fun parse(lexer: BisLexer, processor: BoostPreprocessor): BoostIncludeDirective =
+            BoostIncludeDirectiveImpl(lexer, processor)
+    }, B_DEFINE("boost::define", "define") {
+        override fun parse(lexer: BisLexer, processor: BoostPreprocessor): BoostDefineDirective =
+            BoostDefineDirectiveImpl(lexer, processor)
+    }, B_UNDEFINE("boost::undefine", "undef") {
+        override fun parse(lexer: BisLexer, processor: BoostPreprocessor): BoostUndefineDirective =
+            BoostUndefineDirectiveImpl(lexer, processor)
+    }, B_IFDEF("boost::if.defined", "ifdef") {
+        override fun parse(lexer: BisLexer, processor: BoostPreprocessor): BoostIfDefinedDirective =
+            BoostIfDefinedDirectiveImpl(lexer, processor)
+    }, B_IFNDEF("boost::if.not-defined", "ifndef") {
+        override fun parse(lexer: BisLexer, processor: BoostPreprocessor): BoostIfNDefinedDirective =
+            BoostIfNDefinedDirectiveImpl(lexer, processor)
+    };
 
-    fun parse(lexer: BisLexer, processor: BoostPreprocessor): BoostDirective = when(this) {
-        B_ENDIF -> BoostEndIfDirectiveImpl(lexer, processor)
-        B_ELSE -> BoostElseDirectiveImpl(lexer, processor)
-        B_INCLUDE -> BoostIncludeDirectiveImpl(lexer, processor)
-        B_UNDEFINE -> BoostUndefineDirectiveImpl(lexer, processor)
-        B_DEFINE -> BoostDefineDirectiveImpl(lexer, processor)
-        else -> throw preprocessorException(lexer)
-    }
-
-
-
-
+    open fun parse(lexer: BisLexer, processor: BoostPreprocessor): BoostDirective? = null
 
     companion object {
+        private fun directiveForKeyword(keyword: String): BoostDirectiveType? = values().firstOrNull { it.text == keyword }
+        private fun directiveFromLexer(lexer: BisLexer): BoostDirectiveType? = BoostDirectiveType.directiveForKeyword(StringBuilder().apply {
+            while(lexer.moveForward()?.isWhitespace() != true) append(lexer.currentChar)
+        }.toString())
 
-
-        fun directiveForKeyword(keyword: String): BoostDirectiveType? = values().firstOrNull { it.text == keyword }
+        fun parse(lexer: BisLexer, processor: BoostPreprocessor): BoostDirective? = directiveForKeyword(StringBuilder().apply {
+            while(lexer.moveForward()?.isWhitespace() != true) append(lexer.currentChar)
+        }.toString())?.parse(lexer, processor)
     }
 }

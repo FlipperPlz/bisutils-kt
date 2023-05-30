@@ -1,0 +1,3 @@
+package com.flipperplz.bisutils.preprocesser.boost.directive
+
+interface BoostIfNDefinedDirective : BoostIfDefinedDirective

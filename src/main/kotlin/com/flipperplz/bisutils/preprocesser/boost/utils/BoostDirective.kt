@@ -17,6 +17,4 @@ interface BoostDirective {
         if(includeNewLine) builder.append("\n")
         return builder.toString()
     }
-
-    fun parseDirective(lexer: BisLexer)
 }
