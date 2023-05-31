@@ -8,8 +8,10 @@ import com.flipperplz.bisutils.preprocesser.BisPreprocessor
 import com.flipperplz.bisutils.stringtable.ast.StringTableFile
 
 object StringTableCSVParser {
-    fun parse(lexer: BisLexer, name: String, preProcessor: BisPreprocessor? = null): StringTableFile =
-        mutableStringTable().apply {
-
+    fun parse(lexer: BisLexer, name: String, preProcessor: BisPreprocessor? = null): StringTableFile = mutableStringTable().apply {
+        preProcessor?.processAndReset(lexer)
+        while(!lexer.isEOF()) {
+            TODO()
         }
+    }
 }
