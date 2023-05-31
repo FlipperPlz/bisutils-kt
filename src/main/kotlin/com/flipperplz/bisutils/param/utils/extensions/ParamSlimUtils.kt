@@ -5,6 +5,7 @@ import com.flipperplz.bisutils.utils.*
 import com.flipperplz.bisutils.param.ast.literal.*
 import com.flipperplz.bisutils.param.ast.node.*
 import com.flipperplz.bisutils.param.ast.statement.*
+import com.flipperplz.bisutils.param.bin.ParamDebinarizer
 import com.flipperplz.bisutils.param.lexer.ParamLexer
 import com.flipperplz.bisutils.param.parser.ParamParser
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
@@ -14,6 +15,8 @@ import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatement
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.stringtable.ast.mutable.StringTableMutableFile
 import com.flipperplz.bisutils.stringtable.astImpl.mutable.StringTableMutableFileImpl
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 //object ParamSlimUtils {
     internal class RapVariableImpl(
@@ -102,6 +105,14 @@ import com.flipperplz.bisutils.stringtable.astImpl.mutable.StringTableMutableFil
 
     fun parseParamFile(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile =
         ParamParser.parse(lexer, name, preProcessor)
+
+    fun paramLexerOf(buffer: ByteBuffer, charset: Charset = Charsets.UTF_8): ParamLexer =
+        ParamLexer(buffer.array().toString(charset))
+
+    fun openParamFile(buffer: ByteBuffer, name: String, preProcessor: BoostPreprocessor? = null): ParamFile =
+        if(buffer[0] == 0.toByte() && buffer[1] == 114.toByte() && buffer[2] == 97.toByte() && buffer[3] == 80.toByte())
+            ParamDebinarizer.readParamFile(name, buffer)
+        else parseParamFile(paramLexerOf(buffer), name, preProcessor)
 
     inline operator fun <reified T : ParamNamedElement> ParamStatementHolder.get(name: String): T? =
         slimCommands.filterIsInstance<T>().firstOrNull {

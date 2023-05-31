@@ -5,6 +5,8 @@ import com.flipperplz.bisutils.bank.PboFile
 import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.utils.extensions.mutableParamFile
 import com.flipperplz.bisutils.param.utils.extensions.mutableStringTable
+import com.flipperplz.bisutils.param.utils.extensions.openParamFile
+import com.flipperplz.bisutils.param.utils.extensions.parseParamFile
 import com.flipperplz.bisutils.param.utils.mutability.ParamMutableFile
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDefineDirective
@@ -34,8 +36,29 @@ class BankProcessor(
 TODO()
     }
 
+
+
     private fun indexBank(bank: PboFile) {
-        //TODO populate configs
+
+        for (dataEntry in bank.pboEntries.filterIsInstance<PboDataEntry>()) {
+            fun processConfig(file: ParamFile) = configFiles.putIfAbsent(dataEntry, file)
+            var fileName = dataEntry.segmentedPath.last()
+            val extension = fileName.split('.').last()
+            fileName = fileName.removeRange(fileName.length-extension.length-1.. fileName.length)
+            when(fileName) {
+                "config" -> {
+                    when(extension) {
+                        "bin" -> { TODO("try to locate a cpp file in same directory, skip if found")
+                        }
+                        "cpp" -> {}
+                        else -> continue
+                    }
+                    processConfig(openParamFile(dataEntry.entryData, dataEntry.fileName, _boostPreprocessor))
+
+                }
+            }
+
+        }
     }
 
     private fun associateLocalPath(path: String): String {
