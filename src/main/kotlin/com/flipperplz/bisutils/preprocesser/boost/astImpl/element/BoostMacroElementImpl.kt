@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.preprocesser.boost.ast.impl.element
+package com.flipperplz.bisutils.preprocesser.boost.astImpl.element
 
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor

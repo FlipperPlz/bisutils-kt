@@ -1,9 +1,9 @@
-package com.flipperplz.bisutils.preprocesser.boost.ast.impl.directive
+package com.flipperplz.bisutils.preprocesser.boost.astImpl.directive
 
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDefineDirective
-import com.flipperplz.bisutils.preprocesser.boost.ast.impl.element.BoostMacroElementImpl
+import com.flipperplz.bisutils.preprocesser.boost.astImpl.element.BoostMacroElementImpl
 
 class BoostDefineDirectiveImpl(
     lexer: BisLexer, override val processor: BoostPreprocessor

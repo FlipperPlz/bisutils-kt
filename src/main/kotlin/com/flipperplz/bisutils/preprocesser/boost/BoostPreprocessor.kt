@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.parsing.LexerException
 import com.flipperplz.bisutils.parsing.LexicalError
 import com.flipperplz.bisutils.preprocesser.boost.ast.*
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.*
-import com.flipperplz.bisutils.preprocesser.boost.ast.impl.element.BoostMacroElementImpl
+import com.flipperplz.bisutils.preprocesser.boost.astImpl.element.BoostMacroElementImpl
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirectiveType
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostIncludeNotFoundException
 
@@ -68,7 +68,7 @@ class BoostPreprocessor(
     }
 
     @Throws(BoostIncludeNotFoundException::class)
-    fun processInclude(include: BoostIncludeDirective): String = ""
+    fun processInclude(include: BoostIncludeDirective): String = "#include <notdoneyet>"
 
     companion object {
         val whitespaces: List<Char> = mutableListOf(' ', '\t', '\u000B', '\u000C')

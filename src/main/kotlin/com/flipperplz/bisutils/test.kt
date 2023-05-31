@@ -27,13 +27,19 @@ fun main() {
         """
         #define Ryann TM_
         class CfgPatches {
+        #ifdef Ryann    
             class Ryann##Patches {
-                dependencies[] = { Ryann, "Ryann", Ryann };
+                dependencies[] = { Ryann##dependency1, "the Ryann mod", Ryann##dependency3 };
             };
+        #else
+            this is a error; error; error; error; error;
+        #endif
         };
         """.trimIndent()
     )
-
+    println("original--------------------------------------------------------")
+    println(lexer.toString())
+    println("preprocessed--------------------------------------------------------")
     val param = parseParamFile(lexer, "config", BoostPreprocessor())
     println(param.toParam())
     println("Param file ${if (param.isBinarizable()) "is" else "is not"} binarizable")

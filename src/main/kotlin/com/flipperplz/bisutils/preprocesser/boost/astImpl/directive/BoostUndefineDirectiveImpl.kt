@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.preprocesser.boost.ast.impl.directive
+package com.flipperplz.bisutils.preprocesser.boost.astImpl.directive
 
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor

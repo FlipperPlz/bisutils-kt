@@ -4,7 +4,7 @@ import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDirective
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.*
-import com.flipperplz.bisutils.preprocesser.boost.ast.impl.directive.*
+import com.flipperplz.bisutils.preprocesser.boost.astImpl.directive.*
 
 enum class BoostDirectiveType(val debugName: String, val text: String) {
     B_INCLUDE("boost::include", "include") {
