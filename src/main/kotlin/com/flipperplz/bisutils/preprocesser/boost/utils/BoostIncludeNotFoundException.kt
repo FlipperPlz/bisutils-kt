@@ -1,3 +1,5 @@
 package com.flipperplz.bisutils.preprocesser.boost.utils
 
-data class BoostIncludeNotFoundException(val path: String): Exception("[Boost] Include path <$path> could not be resolved! ")
+import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostIncludeDirective
+
+data class BoostIncludeNotFoundException(val include: BoostIncludeDirective): Exception("[Boost] Include path <${include.path}> could not be resolved! ")

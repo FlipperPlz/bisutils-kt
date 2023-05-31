@@ -9,12 +9,13 @@ import com.flipperplz.bisutils.preprocesser.boost.ast.directive.*
 import com.flipperplz.bisutils.preprocesser.boost.astImpl.element.BoostMacroElementImpl
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirectiveType
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostIncludeNotFoundException
+import com.flipperplz.bisutils.utils.BisFlushable
 
 typealias DefineDirective = BoostDefineDirective
 class BoostPreprocessor(
        private val _defines: MutableList<DefineDirective> = mutableListOf(),
        val locateFile: (String) -> String? = { "class RandomDirective {};" }
-) : BisPreprocessor {
+) : BisPreprocessor, BisFlushable {
     var defines: List<DefineDirective>
         get() = _defines
         set(value) {
@@ -26,6 +27,8 @@ class BoostPreprocessor(
 
 
     fun locateMacro(name: String): DefineDirective? = _defines.firstOrNull { it.macroName == name }
+
+
 
     @Throws(LexerException::class)
     override fun processLexer(lexer: BisLexer) {
@@ -68,7 +71,11 @@ class BoostPreprocessor(
     }
 
     @Throws(BoostIncludeNotFoundException::class)
-    fun processInclude(include: BoostIncludeDirective): String = "#include <notdoneyet>"
+    fun processInclude(include: BoostIncludeDirective): String = locateFile(include.path) ?: throw BoostIncludeNotFoundException(include)
+
+    override fun flush() {
+        _defines.clear()
+    }
 
     companion object {
         val whitespaces: List<Char> = mutableListOf(' ', '\t', '\u000B', '\u000C')
