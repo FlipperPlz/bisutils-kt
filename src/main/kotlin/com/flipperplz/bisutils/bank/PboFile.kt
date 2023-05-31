@@ -64,7 +64,7 @@ class PboFile internal constructor(prefix: String) : AutoCloseable {
     }
 
     fun getAbsoluteEntryPath(entry: PboDataEntry): String =
-        StringBuilder(pboPrefix).append('\\').append(entry.path).toString()
+        StringBuilder(pboPrefix).append('\\').append(normalizePath(entry.path)?.trimStart('\\')).toString()
 
     fun createEntryTree(): PboPseudoDirectory {
         val root = PboPseudoDirectory(pboPrefix, null)

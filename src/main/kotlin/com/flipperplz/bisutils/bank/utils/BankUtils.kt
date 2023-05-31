@@ -9,10 +9,14 @@ import com.flipperplz.bisutils.param.utils.extensions.openParamFile
 import com.flipperplz.bisutils.param.utils.mutability.ParamMutableFile
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDefineDirective
+import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostIncludeDirective
+import com.flipperplz.bisutils.preprocesser.boost.utils.BoostIncludeNotFoundException
 import com.flipperplz.bisutils.stringtable.ast.StringTableFile
 import com.flipperplz.bisutils.stringtable.ast.mutable.StringTableMutableFile
 import com.flipperplz.bisutils.stringtable.util.StringTableFormat
 import com.flipperplz.bisutils.stringtable.util.openStringtable
+import java.nio.charset.Charset
+import java.nio.file.Path
 
 class BankProcessor(
     private val _banks: MutableList<PboFile>,
@@ -40,11 +44,10 @@ class BankProcessor(
         return banks
     }
 
-
     private fun indexBank(bank: PboFile) {
         for (dataEntry in bank.pboEntries.filterIsInstance<PboDataEntry>()) {
             currentEntry = dataEntry
-            var fileName = dataEntry.segmentedPath.last()
+            var fileName = PboFile.normalizePath(dataEntry.fileName)?.split('\\')?.last() ?: continue
             val extension = fileName.split('.').last()
             fileName = fileName.removeRange(fileName.length-extension.length-1.. fileName.length)
 
@@ -75,18 +78,28 @@ class BankProcessor(
         currentEntry = null
     }
 
+    private fun associateLocalPath(path: String): String = currentEntry?.let {
+        return it.initialOwner?.getAbsoluteEntryPath(it)?.split('\\')?.toMutableList()?.let { currentDirPath ->
+            currentDirPath.removeLast()
+            PboFile.normalizePath(path)?.split('\\')?.forEach {segment ->
+                when(segment) {
+                    ".." -> currentDirPath.removeLast()
+                    else -> currentDirPath.add(segment)
+                }
+            }
+            currentDirPath.joinToString(separator = "\\")
+        } ?: throw Exception("Failed to conjoin paths")
+    }  ?: throw Exception("Cannot associate with current path as no current path is set")
+
+    private fun locateBoostFile(include: BoostIncludeDirective, encoding: Charset = Charsets.UTF_8): String =
+        locateVFSEntry(associateLocalPath(include.path))?.entryData?.array()?.toString(encoding) ?: throw BoostIncludeNotFoundException(include)
+
     private fun flush() {
         _boostPreprocessor.flush(); _banks.clear()
         stringTables.clear(); globalStringTable.flush()
         configFiles.clear(); globalConfig.flush()
     }
 
-    private fun associateLocalPath(path: String): String {
-        TODO("get full path of currentEntry relavise from there")
-    }
-    private fun locateBoostFile(path: String): String {
-        return ""
-    }
     private fun locateVFSEntry(path: String): PboDataEntry? {
         TODO("Locate entry in vfs")
     }

@@ -14,7 +14,7 @@ import com.flipperplz.bisutils.utils.BisFlushable
 typealias DefineDirective = BoostDefineDirective
 class BoostPreprocessor(
        private val _defines: MutableList<DefineDirective> = mutableListOf(),
-       val locateFile: (String) -> String? = { "class RandomDirective {};" }
+       val locateFile: (BoostIncludeDirective) -> String? = { "" }
 ) : BisPreprocessor, BisFlushable {
     var defines: List<DefineDirective>
         get() = _defines
@@ -25,10 +25,7 @@ class BoostPreprocessor(
 
     fun undefine(macroName: String) = _defines.removeIf { it.macroName == macroName }
 
-
     fun locateMacro(name: String): DefineDirective? = _defines.firstOrNull { it.macroName == name }
-
-
 
     @Throws(LexerException::class)
     override fun processLexer(lexer: BisLexer) {
@@ -71,7 +68,7 @@ class BoostPreprocessor(
     }
 
     @Throws(BoostIncludeNotFoundException::class)
-    fun processInclude(include: BoostIncludeDirective): String = locateFile(include.path) ?: throw BoostIncludeNotFoundException(include)
+    fun processInclude(include: BoostIncludeDirective): String = locateFile(include) ?: throw BoostIncludeNotFoundException(include)
 
     override fun flush() {
         _defines.clear()
