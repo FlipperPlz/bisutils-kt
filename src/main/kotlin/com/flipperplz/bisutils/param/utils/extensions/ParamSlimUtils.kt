@@ -12,8 +12,8 @@ import com.flipperplz.bisutils.param.utils.ParamStringType
 import com.flipperplz.bisutils.param.utils.mutability.*
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
+import com.flipperplz.bisutils.stringtable.ast.mutable.StringTableMutableFile
+import com.flipperplz.bisutils.stringtable.astImpl.mutable.StringTableMutableFileImpl
 
 //object ParamSlimUtils {
     internal class RapVariableImpl(
@@ -68,6 +68,8 @@ import java.nio.ByteOrder
         ParamInt(parent, value())
 
     fun mutableParamFile(name: String): ParamMutableFile = ParamMutableFileImpl(name)
+
+    fun mutableStringTable(): StringTableMutableFile = StringTableMutableFileImpl()
 
     inline fun ParamElement?.floatOf(crossinline value: () -> Float): ParamFloat =
         ParamFloat(this, value())

@@ -1,10 +1,15 @@
-package com.flipperplz.bisutils.bank
+package com.flipperplz.bisutils.bank.utils
 
+import com.flipperplz.bisutils.bank.BisPboDataEntry
+import com.flipperplz.bisutils.bank.BisPboFile
 import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.pbo.BisPboDataEntry
-import com.flipperplz.bisutils.pbo.BisPboFile
+import com.flipperplz.bisutils.param.utils.extensions.mutableParamFile
+import com.flipperplz.bisutils.param.utils.extensions.mutableStringTable
+import com.flipperplz.bisutils.param.utils.mutability.ParamMutableFile
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDefineDirective
+import com.flipperplz.bisutils.stringtable.ast.StringTableFile
+import com.flipperplz.bisutils.stringtable.ast.mutable.StringTableMutableFile
 
 class BankProcessor(
     private val _banks: MutableList<BisPboFile>,
@@ -13,7 +18,10 @@ class BankProcessor(
     private val _boostPreprocessor: BoostPreprocessor = BoostPreprocessor(boostDefines, ::locateBoostFile)
     private var currentEntry: BisPboDataEntry? = null //current entry being preprocessed
     private val configFiles: MutableMap<BisPboDataEntry, ParamFile> = mutableMapOf()
-    private val stringTables: MutableMap<BisPboDataEntry, String> = mutableMapOf() //TODO: stringtables implementation
+    private val stringTables: MutableMap<BisPboDataEntry, StringTableFile> = mutableMapOf() //TODO: stringtables implementation
+
+    private val globalConfig: ParamMutableFile = mutableParamFile("config")
+    private val globalStringTable: StringTableMutableFile = mutableStringTable()
 
     val banks: List<BisPboFile> = _banks
 

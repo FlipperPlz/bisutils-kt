@@ -1,9 +1,9 @@
-package com.flipperplz.bisutils.pbo
+package com.flipperplz.bisutils.bank
 
 import com.flipperplz.bisutils.BisPboManager
-import com.flipperplz.bisutils.pbo.io.BisPboReader
-import com.flipperplz.bisutils.pbo.misc.BisPboProperty
-import com.flipperplz.bisutils.pbo.misc.EntryMimeType
+import com.flipperplz.bisutils.bank.io.BisPboReader
+import com.flipperplz.bisutils.bank.utils.BisPboProperty
+import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.utils.BisRandomAccessFile
 import com.flipperplz.bisutils.utils.decompress
 import com.google.common.cache.CacheBuilder

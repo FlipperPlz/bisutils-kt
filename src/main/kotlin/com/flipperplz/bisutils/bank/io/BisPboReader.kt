@@ -1,10 +1,10 @@
-package com.flipperplz.bisutils.pbo.io
+package com.flipperplz.bisutils.bank.io
 
 import com.flipperplz.bisutils.BisPboManager
-import com.flipperplz.bisutils.pbo.*
-import com.flipperplz.bisutils.pbo.misc.BisPboProperty
-import com.flipperplz.bisutils.pbo.misc.EntryMimeType
-import com.flipperplz.bisutils.pbo.misc.StagedPboDataEntry
+import com.flipperplz.bisutils.bank.*
+import com.flipperplz.bisutils.bank.utils.BisPboProperty
+import com.flipperplz.bisutils.bank.utils.EntryMimeType
+import com.flipperplz.bisutils.bank.utils.StagedPboDataEntry
 import com.flipperplz.bisutils.utils.*
 import java.io.File
 import java.nio.ByteBuffer

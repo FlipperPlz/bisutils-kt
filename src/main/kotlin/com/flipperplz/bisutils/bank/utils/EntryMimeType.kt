@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.pbo.misc
+package com.flipperplz.bisutils.bank.utils
 
 enum class EntryMimeType(
     val mime: Int

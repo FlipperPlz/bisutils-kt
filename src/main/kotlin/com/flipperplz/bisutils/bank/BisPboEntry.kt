@@ -1,9 +1,9 @@
-package com.flipperplz.bisutils.pbo
+package com.flipperplz.bisutils.bank
 
-import com.flipperplz.bisutils.pbo.misc.BisPboProperty
-import com.flipperplz.bisutils.pbo.misc.EntryMimeType
-import com.flipperplz.bisutils.pbo.misc.StagedPboDataEntry
-import com.flipperplz.bisutils.pbo.misc.StagedPboEntry
+import com.flipperplz.bisutils.bank.utils.BisPboProperty
+import com.flipperplz.bisutils.bank.utils.EntryMimeType
+import com.flipperplz.bisutils.bank.utils.StagedPboDataEntry
+import com.flipperplz.bisutils.bank.utils.StagedPboEntry
 import com.flipperplz.bisutils.utils.readBytes
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer

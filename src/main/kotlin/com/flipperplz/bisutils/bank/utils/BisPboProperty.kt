@@ -1,6 +1,6 @@
-package com.flipperplz.bisutils.pbo.misc
+package com.flipperplz.bisutils.bank.utils
 
-import com.flipperplz.bisutils.pbo.BisPboVersionEntry
+import com.flipperplz.bisutils.bank.BisPboVersionEntry
 
 data class BisPboProperty(
     val propertyName: String,
