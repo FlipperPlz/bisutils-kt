@@ -11,18 +11,23 @@ import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDefineDirective
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostIncludeDirective
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostIncludeNotFoundException
+import com.flipperplz.bisutils.preprocesser.enforce.EnforcePreprocessor
+import com.flipperplz.bisutils.preprocesser.enforce.ast.directive.EnforceDefineDirective
+import com.flipperplz.bisutils.preprocesser.enforce.ast.directive.EnforceIncludeDirective
+import com.flipperplz.bisutils.preprocesser.enforce.utils.EnforceIncludeNotFoundException
 import com.flipperplz.bisutils.stringtable.ast.StringTableFile
 import com.flipperplz.bisutils.stringtable.ast.mutable.StringTableMutableFile
 import com.flipperplz.bisutils.stringtable.util.StringTableFormat
 import com.flipperplz.bisutils.stringtable.util.openStringtable
 import java.nio.charset.Charset
-import java.nio.file.Path
 
 class BankProcessor(
     private val _banks: MutableList<PboFile>,
-    private val startingDefines: MutableList<BoostDefineDirective> = mutableListOf(),
+    private val startingBoostDefines: MutableList<BoostDefineDirective> = mutableListOf(),
+    private val startingEnforceDefines: MutableList<EnforceDefineDirective> = mutableListOf()
 ) {
-    private val _boostPreprocessor: BoostPreprocessor = BoostPreprocessor(startingDefines, ::locateBoostFile)
+    private val _enforcePreprocessor: EnforcePreprocessor = EnforcePreprocessor(startingEnforceDefines, ::locateEnforceFile)
+    private val _boostPreprocessor: BoostPreprocessor = BoostPreprocessor(startingBoostDefines, ::locateBoostFile)
     private var currentEntry: PboDataEntry? = null //current entry being preprocessed
     private val configFiles: MutableMap<PboDataEntry, ParamFile> = mutableMapOf()
     private val stringTables: MutableMap<PboDataEntry, StringTableFile> = mutableMapOf() //TODO: stringtables implementation
@@ -93,6 +98,9 @@ class BankProcessor(
 
     private fun locateBoostFile(include: BoostIncludeDirective, encoding: Charset = Charsets.UTF_8): String =
         locateVFSEntry(associateLocalPath(include.path))?.entryData?.array()?.toString(encoding) ?: throw BoostIncludeNotFoundException(include)
+
+    private fun locateEnforceFile(include: EnforceIncludeDirective, encoding: Charset = Charsets.UTF_8): String =
+        locateVFSEntry(PboFile.normalizePath(include.path) ?: throw Exception("Error normalizing PBO path"))?.entryData?.array()?.toString(encoding) ?: throw EnforceIncludeNotFoundException(include)
 
     private fun flush() {
         _boostPreprocessor.flush(); _banks.clear()

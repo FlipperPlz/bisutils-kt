@@ -35,22 +35,25 @@ class BoostPreprocessor(
             val start = lexer.bufferPtr
             if(lexer.currentChar == '"') quoted = !quoted
             if(quoted) { lexer.moveForward(); continue; }
-            if(lexer.currentChar == '/' && traverseComments(lexer) == 0) continue
-            if(lexer.currentChar == '#') {
-                val directive = BoostDirectiveType.parse(lexer, this) ?: throw preprocessorException(lexer)
-                lexer.replaceRange(start..lexer.bufferPtr, processDirective(directive))
-                lexer.jumpTo(start+1)
-                continue
-            }
-
-            val macro = BoostMacroElementImpl(lexer, this)
-            macro.process(this)?.let {
-                if(BoostPreprocessor.whitespaces.contains(lexer.currentChar) ||
-                    lexer.currentChar == ';' ||
-                    lexer.currentChar == ',' ||
-                    (lexer.currentChar == '#' && lexer.peekForward() == '#').also { e -> if (e) lexer.moveForward(2) }) {
-                    lexer.replaceRange(start..lexer.bufferPtr, it)
-                    lexer.jumpTo(lexer.bufferPtr)
+            when(lexer.currentChar) {
+                '/' -> if(traverseComments(lexer) != 0) continue
+                '#' -> {
+                    val directive = BoostDirectiveType.parse(lexer, this) ?: throw preprocessorException(lexer)
+                    lexer.replaceRange(start..lexer.bufferPtr, processDirective(directive))
+                    lexer.jumpTo(start+1)
+                    continue
+                }
+                else -> {
+                    val macro = BoostMacroElementImpl(lexer, this)
+                    macro.process(this)?.let {
+                        if(BoostPreprocessor.whitespaces.contains(lexer.currentChar) ||
+                            lexer.currentChar == ';' ||
+                            lexer.currentChar == ',' ||
+                            (lexer.currentChar == '#' && lexer.peekForward() == '#').also { e -> if (e) lexer.moveForward(2) }) {
+                            lexer.replaceRange(start..lexer.bufferPtr, it)
+                            lexer.jumpTo(lexer.bufferPtr)
+                        }
+                    }
                 }
             }
             if(lexer.bufferPtr == start) lexer.moveForward()
