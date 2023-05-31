@@ -9,7 +9,7 @@ import com.flipperplz.bisutils.stringtable.ast.StringTableFile
 import com.flipperplz.bisutils.stringtable.ast.StringTableLanguage
 
 object StringTableCSVParser {
-    fun parse(lexer: StringTableLexer, name: String, preProcessor: BisPreprocessor? = null): StringTableFile = mutableStringTable().apply {
+    fun parse(lexer: StringTableLexer, preProcessor: BisPreprocessor? = null): StringTableFile = mutableStringTable().apply {
         preProcessor?.processAndReset(lexer)
         var ln = 0
 

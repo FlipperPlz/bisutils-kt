@@ -1,8 +1,11 @@
 package com.flipperplz.bisutils.parsing
 
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 open class BisLexer(private var string: String) {
+
     var bufferPtr: Int = -1
         private set
     var currentChar: Char? = null

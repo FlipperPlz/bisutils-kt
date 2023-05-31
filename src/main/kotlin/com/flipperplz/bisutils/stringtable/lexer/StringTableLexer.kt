@@ -2,9 +2,12 @@ package com.flipperplz.bisutils.stringtable.lexer
 
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 class StringTableLexer(text: String) : BisLexer(text) {
 
+    constructor(buffer: ByteBuffer, charset: Charset = Charsets.UTF_8) : this(buffer.array().toString(charset))
 
     fun readCSVColumn(): String {
         if(bufferPtr == -1) moveForward()

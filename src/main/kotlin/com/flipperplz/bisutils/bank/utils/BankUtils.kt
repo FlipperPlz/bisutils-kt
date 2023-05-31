@@ -6,12 +6,13 @@ import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.utils.extensions.mutableParamFile
 import com.flipperplz.bisutils.param.utils.extensions.mutableStringTable
 import com.flipperplz.bisutils.param.utils.extensions.openParamFile
-import com.flipperplz.bisutils.param.utils.extensions.parseParamFile
 import com.flipperplz.bisutils.param.utils.mutability.ParamMutableFile
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDefineDirective
 import com.flipperplz.bisutils.stringtable.ast.StringTableFile
 import com.flipperplz.bisutils.stringtable.ast.mutable.StringTableMutableFile
+import com.flipperplz.bisutils.stringtable.util.StringTableFormat
+import com.flipperplz.bisutils.stringtable.util.openStringtable
 
 class BankProcessor(
     private val _banks: MutableList<PboFile>,
@@ -41,20 +42,31 @@ TODO()
     private fun indexBank(bank: PboFile) {
 
         for (dataEntry in bank.pboEntries.filterIsInstance<PboDataEntry>()) {
-            fun processConfig(file: ParamFile) = configFiles.putIfAbsent(dataEntry, file)
             var fileName = dataEntry.segmentedPath.last()
             val extension = fileName.split('.').last()
             fileName = fileName.removeRange(fileName.length-extension.length-1.. fileName.length)
+
+            fun processConfig(file: ParamFile) = configFiles.putIfAbsent(dataEntry, file)
+
+            fun processStringtable(table: StringTableFile) {
+                stringTables.putIfAbsent(dataEntry, table)
+                globalStringTable.append(table)
+            }
+
             when(fileName) {
                 "config" -> {
                     when(extension) {
-                        "bin" -> { TODO("try to locate a cpp file in same directory, skip if found")
-                        }
+                        "bin" -> { TODO("try to locate a cpp file in same directory, skip if found") }
                         "cpp" -> {}
                         else -> continue
                     }
-                    processConfig(openParamFile(dataEntry.entryData, dataEntry.fileName, _boostPreprocessor))
-
+                    val param = openParamFile(dataEntry.entryData, dataEntry.fileName, _boostPreprocessor)
+                    processConfig(param)
+                }
+                "stringtable" -> {
+                    val format = StringTableFormat.forExtension(extension) ?: continue
+                    val stringtable = openStringtable(dataEntry.entryData, format, _boostPreprocessor)
+                    processStringtable(stringtable)
                 }
             }
 
