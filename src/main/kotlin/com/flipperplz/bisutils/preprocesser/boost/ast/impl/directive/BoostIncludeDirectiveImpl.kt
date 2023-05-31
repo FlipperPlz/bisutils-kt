@@ -1,8 +1,8 @@
-package com.flipperplz.bisutils.preprocesser.boost.impl
+package com.flipperplz.bisutils.preprocesser.boost.ast.impl.directive
 
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
-import com.flipperplz.bisutils.preprocesser.boost.directive.BoostIncludeDirective
+import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostIncludeDirective
 
 class BoostIncludeDirectiveImpl(lexer: BisLexer, override val processor: BoostPreprocessor) : BoostIncludeDirective {
     override lateinit var stringType: BoostIncludeDirective.StringType

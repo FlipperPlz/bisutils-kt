@@ -20,7 +20,7 @@ interface ParamClass : ParamElement, ParamExternalClass, ParamStatementHolder {
         locateSuperClass() != null
 
     override fun toParam(): String {
-        val builder = StringBuilder(super<ParamExternalClass>.toParam().trimEnd(';'))
+        val builder = StringBuilder(super.toParam().trimEnd(';'))
         if (!slimSuperClass.isNullOrBlank()) builder.append(" : ").append(slimSuperClass)
         builder.append(" { \n")
         builder.append(writeSlimCommands())

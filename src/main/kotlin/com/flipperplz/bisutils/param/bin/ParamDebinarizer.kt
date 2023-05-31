@@ -68,7 +68,7 @@ object ParamDebinarizer {
         with(mutableListOf<ParamStatement>()) {
             buffer.getAsciiZ()
             for (i in 0 until buffer.getCompactInt())
-                add(readStatement(file, buffer) ?: throw Exception())
+                add(readStatement(file, buffer))
 
             file.slimCommands = this
         }

@@ -1,8 +1,9 @@
-package com.flipperplz.bisutils.preprocesser.boost.impl
+package com.flipperplz.bisutils.preprocesser.boost.ast.impl.directive
 
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
-import com.flipperplz.bisutils.preprocesser.boost.directive.BoostDefineDirective
+import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDefineDirective
+import com.flipperplz.bisutils.preprocesser.boost.ast.impl.element.BoostMacroElementImpl
 
 class BoostDefineDirectiveImpl(
     lexer: BisLexer, override val processor: BoostPreprocessor
@@ -15,7 +16,7 @@ class BoostDefineDirectiveImpl(
         private set
     init {
         BoostPreprocessor.traverseWhitespace(lexer)
-        macroName = BoostPreprocessor.readMacroID(lexer, true)
+        macroName = BoostMacroElementImpl.readMacroID(lexer, true)
         BoostPreprocessor.traverseWhitespace(lexer, true)
         when(lexer.currentChar) {
             null -> {}
@@ -24,7 +25,7 @@ class BoostDefineDirectiveImpl(
                 val args = mutableListOf<String>()
                 while (lexer.currentChar != ')') {
                     BoostPreprocessor.traverseWhitespace(lexer, false, allowEOL = true, allowDirectiveEOL = true)
-                    args.add(BoostPreprocessor.readMacroID(lexer))
+                    args.add(BoostMacroElementImpl.readMacroID(lexer))
                     BoostPreprocessor.traverseWhitespace(lexer, false, allowEOL = true, allowDirectiveEOL = true)
                     if(with(lexer.currentChar) { this != ')' && this !=',' }) throw BoostPreprocessor.preprocessorException(lexer)
                     if(lexer.currentChar == ',')  lexer.moveForward()

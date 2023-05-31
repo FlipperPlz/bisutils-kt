@@ -56,8 +56,8 @@ fun ParamArray.write(buffer: ByteBuffer): Boolean { return if(!isCurrentlyValid(
 fun ParamFile.write(buffer: ByteBuffer): Boolean { return if(!isCurrentlyValid()) false else with(buffer) {
         put(0); put(114); put(97); put(80); putInt(0); putInt(8)
         val offsets = mutableListOf(ParamOffset(position(), 0xDADA))
-        var i = 0;
-        putInt(0xDADA); put(0); putCompactInt(slimCommands.count())
+        var i = 0
+    putInt(0xDADA); put(0); putCompactInt(slimCommands.count())
 
 
         slimCommands.forEach { it.write(buffer, offsets) }
@@ -77,12 +77,12 @@ fun ParamClass.save(buffer: ByteBuffer, offsets: MutableList<ParamOffset>? = nul
     var ii = i
     slimCommands.forEach { it.write(buffer, offsets) }
     childClasses.forEach { ii = it.save(buffer, offsets, ii++) }
-    return ii++;
+    return ii++
 }
 
 fun ParamClass.write(buffer: ByteBuffer, offsets: MutableList<ParamOffset>? = null): Boolean {
     buffer.putAsciiZ(slimName ?: return false)
-    offsets?.add(ParamOffset(buffer.position(),0xDADA)); buffer.putInt(0xDADA);
+    offsets?.add(ParamOffset(buffer.position(),0xDADA)); buffer.putInt(0xDADA)
     return true
 }
 

@@ -1,10 +1,12 @@
-package com.flipperplz.bisutils.preprocesser.boost.impl
+package com.flipperplz.bisutils.preprocesser.boost.ast.impl.directive
 
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
-import com.flipperplz.bisutils.preprocesser.boost.directive.BoostIfDefinedDirective
+import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostIfDefinedDirective
+import com.flipperplz.bisutils.preprocesser.boost.ast.impl.element.BoostMacroElementImpl
 
-class BoostIfDefinedDirectiveImpl(lexer: BisLexer, override val processor: BoostPreprocessor) : BoostIfDefinedDirective {
+class BoostIfDefinedDirectiveImpl(lexer: BisLexer, override val processor: BoostPreprocessor) :
+    BoostIfDefinedDirective {
     override lateinit var macroName: String
         private set
     override lateinit var ifBody: String
@@ -13,7 +15,7 @@ class BoostIfDefinedDirectiveImpl(lexer: BisLexer, override val processor: Boost
         private set
     init {
         BoostPreprocessor.traverseWhitespace(lexer)
-        macroName = BoostPreprocessor.readMacroID(lexer, true)
+        macroName = BoostMacroElementImpl.readMacroID(lexer, true)
         BoostPreprocessor.traverseWhitespace(lexer, allowEOF = false, allowEOL = false, allowDirectiveEOL = true)
 
         val builder = StringBuilder()
@@ -23,7 +25,8 @@ class BoostIfDefinedDirectiveImpl(lexer: BisLexer, override val processor: Boost
             if(lexer.isEOF()) throw lexer.eofException()
             if(lexer.currentChar == '#') {
                 val start = lexer.bufferPtr
-                when(BoostPreprocessor.readMacroID(lexer)) {
+                lexer.moveForward()
+                when(BoostMacroElementImpl.readMacroID(lexer, true)) {
                     "else" -> {
                         elseEncountered = true
                         ifBody = builder.toString()

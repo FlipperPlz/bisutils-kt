@@ -63,7 +63,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
             if(currentChar == '"' && quoted) {
                 if(moveForward() != '"') {
                     traverseWhitespace()
-                    if(currentChar != '\\') return "\"${builder.toString()}\""
+                    if(currentChar != '\\') return "\"$builder\""
                     if(moveForward() != 'n') throw unexpectedInputException()
                     traverseWhitespace()
                     if(currentChar != '"') throw unexpectedInputException()
@@ -76,7 +76,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
             moveForward()
         }
 
-        return if(quoted) "\"${builder.toString()}\"" else builder.toString()
+        return if(quoted) "\"$builder\"" else builder.toString()
     }
 
     @Throws(LexerException::class)
@@ -150,7 +150,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
                 else -> { if(!BoostPreprocessor.whitespaces.contains(currentChar)) break else moveForward().also { count++ } }
             }
         }
-        return count;
+        return count
     }
 
 }

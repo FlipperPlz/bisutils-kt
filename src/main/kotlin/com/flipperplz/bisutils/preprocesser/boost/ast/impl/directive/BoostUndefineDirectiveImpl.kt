@@ -1,8 +1,8 @@
-package com.flipperplz.bisutils.preprocesser.boost.impl
+package com.flipperplz.bisutils.preprocesser.boost.ast.impl.directive
 
 import com.flipperplz.bisutils.parsing.BisLexer
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
-import com.flipperplz.bisutils.preprocesser.boost.directive.BoostUndefineDirective
+import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostUndefineDirective
 
 class BoostUndefineDirectiveImpl(lexer: BisLexer, override val processor: BoostPreprocessor) : BoostUndefineDirective {
     override lateinit var macroName: String

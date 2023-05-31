@@ -1,6 +1,5 @@
-package com.flipperplz.bisutils.preprocesser.boost.directive
+package com.flipperplz.bisutils.preprocesser.boost.ast.directive
 
-import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirective
 import com.flipperplz.bisutils.preprocesser.boost.utils.DirectiveType
 import java.lang.StringBuilder
 
@@ -16,4 +15,8 @@ interface BoostDefineDirective : BoostDirective {
         if(macroValue.isNotBlank()) append(macroValue)
     }.toString()
 
+    fun evaluate(arguments: List<String>): String? = macroValue.replace(Regex("\\b(${macroArguments.joinToString("|")})\\b")) { matchResult ->
+        val argumentIndex = macroArguments.indexOf(matchResult.value)
+        arguments.getOrNull(argumentIndex) ?: ""
+    }
 }

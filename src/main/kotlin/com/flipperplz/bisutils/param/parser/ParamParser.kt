@@ -61,7 +61,7 @@ object ParamParser {
                     when(lexer.currentChar) {
                         ';' -> {
                             currentContext += ParamMutableExternalClassImpl(currentContext, this, keyword)
-                            continue;
+                            continue
                         }
                         ':' -> {
                             lexer.moveForward(); lexer.traverseWhitespace(); baseClass = lexer.readIdentifier()
@@ -113,7 +113,7 @@ object ParamParser {
                 else -> {
                     lexer.traverseWhitespace()
                     if (lexer.currentChar == '[') { lexer.moveForward(); lexer.traverseWhitespace()
-                        if (lexer.currentChar != ']') { throw lexer.unexpectedInputException() };
+                        if (lexer.currentChar != ']') { throw lexer.unexpectedInputException() }
                         lexer.moveForward(); lexer.traverseWhitespace()
                         val operator: ParamOperatorTypes = lexer.readOperator(); lexer.moveForward(); lexer.traverseWhitespace()
                         currentContext.slimCommands.add(ParamMutableVariableStatementImpl(currentContext, this, keyword).also {

@@ -5,7 +5,7 @@ import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
 
 interface ParamString : ParamLiteral<String>, CharSequence {
-    companion object;
+    companion object
 
     val slimStringType: ParamStringType
 

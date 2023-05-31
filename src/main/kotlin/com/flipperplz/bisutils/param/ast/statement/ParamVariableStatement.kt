@@ -8,7 +8,8 @@ import com.flipperplz.bisutils.param.utils.ParamElementTypes
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 
 interface ParamVariableStatement : ParamStatement, ParamNamedElement {
-    companion object;
+    companion object
+
     val slimValue: ParamLiteralBase?
     val slimOperator: ParamOperatorTypes?
 

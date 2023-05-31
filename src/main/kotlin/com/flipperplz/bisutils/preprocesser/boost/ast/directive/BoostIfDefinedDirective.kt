@@ -1,6 +1,5 @@
-package com.flipperplz.bisutils.preprocesser.boost.directive
+package com.flipperplz.bisutils.preprocesser.boost.ast.directive
 
-import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirective
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirectiveType
 import com.flipperplz.bisutils.preprocesser.boost.utils.DirectiveType
 

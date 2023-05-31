@@ -1,7 +1,6 @@
-package com.flipperplz.bisutils.preprocesser.boost.directive
+package com.flipperplz.bisutils.preprocesser.boost.ast.directive
 
 import com.flipperplz.bisutils.parsing.BisLexer
-import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirective
 import com.flipperplz.bisutils.preprocesser.boost.utils.DirectiveType
 
 interface BoostIncludeDirective: BoostDirective {
@@ -18,7 +17,7 @@ interface BoostIncludeDirective: BoostDirective {
         fun stringify(string: String): String = "$prefix$string$suffix"
         fun readRaw(lexer: BisLexer): String = StringBuilder().apply {
             while (length < MAX_STRING_LENGTH && !lexer.isEOF() && lexer.moveForward() != suffix)
-                append(lexer.currentChar);
+                append(lexer.currentChar)
         }.toString()
 
         companion object {

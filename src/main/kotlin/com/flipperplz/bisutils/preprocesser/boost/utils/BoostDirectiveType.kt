@@ -1,13 +1,10 @@
 package com.flipperplz.bisutils.preprocesser.boost.utils
 
 import com.flipperplz.bisutils.parsing.BisLexer
-import com.flipperplz.bisutils.parsing.LexerException
-import com.flipperplz.bisutils.parsing.LexicalError
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
-import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor.Companion.preprocessorException
-import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor.Companion.traverseWhitespace
-import com.flipperplz.bisutils.preprocesser.boost.directive.*
-import com.flipperplz.bisutils.preprocesser.boost.impl.*
+import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDirective
+import com.flipperplz.bisutils.preprocesser.boost.ast.directive.*
+import com.flipperplz.bisutils.preprocesser.boost.ast.impl.directive.*
 
 enum class BoostDirectiveType(val debugName: String, val text: String) {
     B_INCLUDE("boost::include", "include") {
