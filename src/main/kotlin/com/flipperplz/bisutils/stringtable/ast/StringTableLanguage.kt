@@ -4,13 +4,16 @@ package com.flipperplz.bisutils.stringtable.ast
 sealed interface StringTableLanguage {
     companion object {
         private val languages: MutableMap<String, StringTableLanguage> = mutableMapOf<String, StringTableLanguage>().apply {
-            put("English", English)
-            put("Original", Original)
+            put("english", English)
+            put("original", Original)
         }
+
+        fun forName(name: String, ignoreCase: Boolean = true): StringTableLanguage =
+            languages[if(ignoreCase) name.lowercase() else name] ?: Custom(name.lowercase())
+
     }
     val languageName: String
 
-    fun custom(name: String): StringTableLanguage = languages[name] ?: Custom(name)
 
     object Original : StringTableLanguage {
         override val languageName: String = "Original"
