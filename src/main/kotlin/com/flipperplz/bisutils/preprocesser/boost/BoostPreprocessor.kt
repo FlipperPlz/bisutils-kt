@@ -42,10 +42,18 @@ class BoostPreprocessor(
                 lexer.jumpTo(start+1)
                 continue
             }
-            BoostMacroElementImpl(lexer, this).process(this)?.let {
-                lexer.replaceRange(start..lexer.bufferPtr, it)
+
+            val macro = BoostMacroElementImpl(lexer, this)
+            macro.process(this)?.let {
+                if(BoostPreprocessor.whitespaces.contains(lexer.currentChar) ||
+                    lexer.currentChar == ';' ||
+                    lexer.currentChar == ',' ||
+                    (lexer.currentChar == '#' && lexer.peekForward() == '#').also { e -> if (e) lexer.moveForward(2) }) {
+                    lexer.replaceRange(start..lexer.bufferPtr, it)
+                    lexer.jumpTo(lexer.bufferPtr)
+                }
             }
-            lexer.moveForward()
+            if(lexer.bufferPtr == start) lexer.moveForward()
         }
     }
 

@@ -19,7 +19,7 @@ object ParamParser {
 
     @Throws(LexerException::class)
     fun parse(lexer: ParamLexer, name: String, preProcessor: BisPreprocessor? = null): ParamFile = mutableParamFile(name).apply {
-        preProcessor?.processLexer(lexer)
+        preProcessor?.processAndReset(lexer)
         val contextStack = Stack<ParamMutableStatementHolder>().also { it.add(this) }
         fun tryEnd(): Boolean {
             if(contextStack.count() != 1)

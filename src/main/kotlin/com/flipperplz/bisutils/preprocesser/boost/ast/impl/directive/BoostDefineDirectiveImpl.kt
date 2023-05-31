@@ -18,8 +18,7 @@ class BoostDefineDirectiveImpl(
         BoostPreprocessor.traverseWhitespace(lexer)
         macroName = BoostMacroElementImpl.readMacroID(lexer, true)
         BoostPreprocessor.traverseWhitespace(lexer, true)
-        when(lexer.currentChar) {
-            null -> {}
+        macroArguments = when(lexer.currentChar) {
             '(' -> {
                 lexer.moveForward(); BoostPreprocessor.traverseWhitespace(lexer, false)
                 val args = mutableListOf<String>()
@@ -31,10 +30,10 @@ class BoostDefineDirectiveImpl(
                     if(lexer.currentChar == ',')  lexer.moveForward()
                 }
                 BoostPreprocessor.traverseWhitespace(lexer, false, allowEOL = false, allowDirectiveEOL = true)
-                macroArguments = args
+                args
             }
+            else -> emptyList()
         }
-        lexer.moveForward()
         BoostPreprocessor.traverseWhitespace(lexer, false, allowEOL = true, allowDirectiveEOL = true)
 
         val definition = StringBuilder()
