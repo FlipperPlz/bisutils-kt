@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.bank
 
-import com.flipperplz.bisutils.bank.utils.BisPboProperty
+import com.flipperplz.bisutils.bank.utils.PboProperty
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.bank.utils.StagedPboDataEntry
 import com.flipperplz.bisutils.bank.utils.StagedPboEntry
@@ -9,8 +9,8 @@ import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import kotlin.properties.Delegates
 
-sealed interface BisPboEntry {
-    val initialOwner: BisPboFile?
+sealed interface PboEntry {
+    val initialOwner: PboFile?
 
     var mimeType: EntryMimeType
     var fileName: String
@@ -22,30 +22,30 @@ sealed interface BisPboEntry {
     fun calculateMetadataLength(): Long = 21L + fileName.length
 }
 
-abstract class BisPboDummyEntry : BisPboEntry {
+abstract class PboDummyEntry : PboEntry {
     override var fileName: String = ""
     override var mimeType: EntryMimeType = EntryMimeType.DUMMY
     override var size: Long = 0
     override var offset: Long = 0
     override var originalSize: Long = 0
     override var timeStamp: Long = 0
-    override val initialOwner: BisPboFile? = null
+    override val initialOwner: PboFile? = null
     override fun calculateMetadataLength(): Long = 21
 
-    object CACHED : BisPboDummyEntry()
+    object CACHED : PboDummyEntry()
     class INFILE internal constructor(
-        override val initialOwner: BisPboFile,
+        override val initialOwner: PboFile,
         override val stageBuffer: RandomAccessFile,
         offset: Long
-    ) : BisPboDummyEntry(), StagedPboEntry {
+    ) : PboDummyEntry(), StagedPboEntry {
         override var synced: Boolean = true
         override var metadataOffset: Long = offset
     }
 }
 
-abstract class BisPboVersionEntry : BisPboEntry {
+abstract class PboVersionEntry : PboEntry {
 
-    abstract var properties: List<BisPboProperty>
+    abstract var properties: List<PboProperty>
     override var fileName: String = ""
     override var mimeType: EntryMimeType = EntryMimeType.DUMMY
     override var size: Long = 0
@@ -56,42 +56,42 @@ abstract class BisPboVersionEntry : BisPboEntry {
     override fun calculateMetadataLength(): Long = 21 + properties.sumOf { it.calculateLength() } + 1
 
     class CACHED internal constructor(
-        override val initialOwner: BisPboFile?,
-        override var properties: List<BisPboProperty>
-    ) : BisPboVersionEntry() {
+        override val initialOwner: PboFile?,
+        override var properties: List<PboProperty>
+    ) : PboVersionEntry() {
         companion object {
-            fun withPrefix(prefix: String, owner: BisPboFile? = null): CACHED =
-                CACHED(owner, mutableListOf(BisPboProperty("prefix", prefix.lowercase())))
+            fun withPrefix(prefix: String, owner: PboFile? = null): CACHED =
+                CACHED(owner, mutableListOf(PboProperty("prefix", prefix.lowercase())))
         }
     }
 
     class INFILE internal constructor(
-        override val initialOwner: BisPboFile,
+        override val initialOwner: PboFile,
         override val stageBuffer: RandomAccessFile,
         offset: Long,
-        properties: List<BisPboProperty>
-    ) : BisPboVersionEntry(), StagedPboEntry {
+        properties: List<PboProperty>
+    ) : PboVersionEntry(), StagedPboEntry {
         override var synced: Boolean = true
         override var metadataOffset: Long = offset
 
-        override var properties: List<BisPboProperty> by Delegates.observable(properties) { _, _, _ ->
+        override var properties: List<PboProperty> by Delegates.observable(properties) { _, _, _ ->
             onEditsMade()
         }
     }
 }
 
-abstract class BisPboDataEntry(
+abstract class PboDataEntry(
     fileName: String,
     override var offset: Long,
     override var timeStamp: Long,
     override var mimeType: EntryMimeType,
     override var originalSize: Long,
     override var size: Long,
-) : BisPboEntry {
+) : PboEntry {
     internal abstract val entryData: ByteBuffer
 
 
-    var path: String = BisPboFile.normalizePath(fileName) ?: "BUx0001: \"$fileName\""
+    var path: String = PboFile.normalizePath(fileName) ?: "BUx0001: \"$fileName\""
         private set
     var segmentedPath: List<String> = path.split("\\")
         private set
@@ -101,11 +101,11 @@ abstract class BisPboDataEntry(
 
     protected open fun nameChanged(oldName: String, newName: String) {
         if (oldName == newName) return
-        path = BisPboFile.normalizePath(newName) ?: "BUx0001: \"$newName\""
+        path = PboFile.normalizePath(newName) ?: "BUx0001: \"$newName\""
     }
 
     class CACHED internal constructor(
-        override val initialOwner: BisPboFile?,
+        override val initialOwner: PboFile?,
         fileName: String,
         offset: Long,
         timeStamp: Long,
@@ -113,7 +113,7 @@ abstract class BisPboDataEntry(
         originalSize: Long,
         size: Long,
         override val entryData: ByteBuffer
-    ) : BisPboDataEntry(
+    ) : PboDataEntry(
         fileName,
         offset,
         timeStamp,
@@ -123,7 +123,7 @@ abstract class BisPboDataEntry(
     )
 
     class INFILE internal constructor(
-        override val initialOwner: BisPboFile,
+        override val initialOwner: PboFile,
         override val stageBuffer: RandomAccessFile,
         override var metadataOffset: Long,
         fileName: String,
@@ -132,7 +132,7 @@ abstract class BisPboDataEntry(
         mimeType: EntryMimeType,
         originalSize: Long,
         size: Long,
-    ) : BisPboDataEntry(
+    ) : PboDataEntry(
         fileName,
         offset,
         timeStamp,
