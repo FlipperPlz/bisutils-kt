@@ -99,8 +99,26 @@ class BankProcessor(
     private fun locateEnforceFile(include: EnforceIncludeDirective, encoding: Charset = Charsets.UTF_8): String =
         locateVFSEntry(PboFile.normalizePath(include.path) ?: throw Exception("Error normalizing PBO path"))?.entryData?.array()?.toString(encoding) ?: throw EnforceIncludeNotFoundException(include)
 
-    private fun locateVFSEntry(path: String): PboDataEntry? {
-        TODO("Locate entry in vfs")
+    private fun locateVFSEntry(path: String): PboDataEntry?{
+        return with(pboForPath(path) ?: return null) {
+            entries.filterIsInstance<PboDataEntry>().firstOrNull {
+                getAbsoluteEntryPath(it).equals(path, ignoreCase = true)
+            }
+        }
+    }
+
+    private fun pboForPath(absolutePath: String): PboFile? {
+        var target: PboFile? = null
+        var longestMatch = 0
+        val path = absolutePath.trimStart('\\')
+        banks.forEach {
+            val prefixLn = it.pboPrefix.length
+            if(path.startsWith(it.pboPrefix) && prefixLn >= longestMatch) {
+               target = it
+               longestMatch = prefixLn
+            }
+        }
+        return target
     }
 
     private fun flush() {
