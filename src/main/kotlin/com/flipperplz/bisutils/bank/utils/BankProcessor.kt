@@ -19,8 +19,8 @@ import com.flipperplz.bisutils.stringtable.ast.StringTableFile
 import com.flipperplz.bisutils.stringtable.ast.mutable.StringTableMutableFile
 import com.flipperplz.bisutils.stringtable.util.StringTableFormat
 import com.flipperplz.bisutils.stringtable.util.openStringtable
-import com.flipperplz.bisutils.utils.DayZScriptContext
-import com.flipperplz.bisutils.utils.DayZScriptModule
+import com.flipperplz.bisutils.dayz.DayZScriptContext
+import com.flipperplz.bisutils.dayz.DayZScriptModule
 import java.nio.charset.Charset
 
 class BankProcessor(

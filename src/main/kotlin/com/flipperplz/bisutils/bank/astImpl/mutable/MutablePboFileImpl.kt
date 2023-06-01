@@ -4,15 +4,14 @@ package com.flipperplz.bisutils.bank.astImpl.mutable
 
 import com.flipperplz.bisutils.bank.ast.mutable.MutablePboFile
 import com.flipperplz.bisutils.bank.ast.PboEntry
-import com.flipperplz.bisutils.bank.ast.misc.mutable.MutablePboElement
 import com.flipperplz.bisutils.bank.astImpl.PboFileImpl
-import com.flipperplz.bisutils.utils.BisFamily
+import com.flipperplz.bisutils.family.interfaces.FamilyNode
 
 class MutablePboFileImpl(
     override var defaultPrefix: String,
-    override val entries: MutableList<PboEntry>,
-    override var parent: BisFamily? = null
+    override var entries: MutableList<PboEntry>,
+    override var parent: FamilyNode?
 ):  PboFileImpl(defaultPrefix, entries, parent),
-    MutablePboElement, MutablePboFile, MutableList<PboEntry> by entries {
+    MutablePboFile {
     override lateinit var signature: ByteArray
 }

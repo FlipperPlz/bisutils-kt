@@ -5,7 +5,6 @@ import com.flipperplz.bisutils.param.ast.literal.ParamArray
 import com.flipperplz.bisutils.param.ast.literal.ParamFloat
 import com.flipperplz.bisutils.param.ast.literal.ParamInt
 import com.flipperplz.bisutils.param.ast.literal.ParamString
-import com.flipperplz.bisutils.param.ast.node.ParamElement
 import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
 import com.flipperplz.bisutils.param.ast.node.ParamStatement
 import com.flipperplz.bisutils.param.ast.statement.ParamClass
@@ -14,15 +13,9 @@ import com.flipperplz.bisutils.param.ast.statement.ParamExternalClass
 import com.flipperplz.bisutils.param.ast.statement.ParamVariableStatement
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.extensions.childClasses
-import com.flipperplz.bisutils.param.utils.extensions.get
-import com.flipperplz.bisutils.param.utils.mutability.ParamMutableArray
-import com.flipperplz.bisutils.param.utils.mutability.ParamMutableArrayImpl
-import com.flipperplz.bisutils.utils.getAsciiZ
-import com.flipperplz.bisutils.utils.getCompactInt
-import com.flipperplz.bisutils.utils.putAsciiZ
-import com.flipperplz.bisutils.utils.putCompactInt
+import com.flipperplz.bisutils.io.putAsciiZ
+import com.flipperplz.bisutils.io.putCompactInt
 import java.nio.ByteBuffer
-import java.util.Dictionary
 
 //object ParamBinarizer {
 

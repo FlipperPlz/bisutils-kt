@@ -1,24 +1,25 @@
 package com.flipperplz.bisutils.bank.astImpl.entry.mutable
 
 import com.flipperplz.bisutils.bank.ast.PboFile
-import com.flipperplz.bisutils.bank.ast.entry.PboVersionEntry
 import com.flipperplz.bisutils.bank.ast.entry.mutable.MutablePboVersionEntry
-import com.flipperplz.bisutils.bank.ast.mutable.MutablePboEntry
-import com.flipperplz.bisutils.bank.astImpl.misc.PboPropertyMap
-import com.flipperplz.bisutils.bank.astImpl.misc.mutable.MutablePboPropertyMap
+import com.flipperplz.bisutils.bank.ast.misc.mutable.MutablePboProperty
 import com.flipperplz.bisutils.bank.astImpl.mutable.MutablePboEntryImpl
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.utils.BisFamily
+import com.flipperplz.bisutils.family.interfaces.FamilyNode
 
 class MutablePboVersionEntryImpl(
     lowestBranch: PboFile?,
-    parent: BisFamily?,
+    parent: FamilyNode?,
     entryName: String,
     entryMime: EntryMimeType,
     entryDecompressedSize: Long,
     entryOffset: Long,
     entryTimestamp: Long,
     entrySize: Long,
-    override val propertiesMap: MutablePboPropertyMap
+    override var properties: MutableList<MutablePboProperty>,
 ) : MutablePboEntryImpl(lowestBranch, parent, entryName, entryMime, entryDecompressedSize, entryOffset, entryTimestamp, entrySize),
-    MutablePboVersionEntry
+    MutablePboVersionEntry {
+
+    override val binaryLength: Long
+        get() = super<MutablePboVersionEntry>.binaryLength
+    }

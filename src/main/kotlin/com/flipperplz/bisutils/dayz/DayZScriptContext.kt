@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.utils
+package com.flipperplz.bisutils.dayz
 
 class DayZScriptContext<T> {
     private val context: MutableMap<DayZScriptModule, MutableList<T>> = mutableMapOf()

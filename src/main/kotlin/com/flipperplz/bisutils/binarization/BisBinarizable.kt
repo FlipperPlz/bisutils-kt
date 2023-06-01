@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.utils
+package com.flipperplz.bisutils.binarization
 
 import java.nio.ByteBuffer
 import java.nio.charset.Charset

@@ -1,5 +1,6 @@
-package com.flipperplz.bisutils.utils
+package com.flipperplz.bisutils.binarization
 
+import com.flipperplz.bisutils.utils.BisValidatable
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 

@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.utils
+package com.flipperplz.bisutils.io
 
 import java.io.IOException
 import java.io.RandomAccessFile

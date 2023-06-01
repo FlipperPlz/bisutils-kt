@@ -1,4 +1,4 @@
-package com.flipperplz.bisutils.utils
+package com.flipperplz.bisutils.dayz
 
 enum class DayZScriptModule(val id: Int, val defsTitle: String) {
     ENGINE(1, "engineScriptModule"),

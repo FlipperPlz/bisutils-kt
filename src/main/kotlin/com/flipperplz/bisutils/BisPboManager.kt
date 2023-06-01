@@ -1,7 +1,7 @@
 package com.flipperplz.bisutils
 
 import com.flipperplz.bisutils.bank.io.BisPboReader
-import com.flipperplz.bisutils.utils.BisRandomAccessFile
+import com.flipperplz.bisutils.io.BisRandomAccessFile
 import java.nio.channels.FileChannel
 
 object BisPboManager {

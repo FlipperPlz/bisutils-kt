@@ -15,10 +15,10 @@ import com.flipperplz.bisutils.param.utils.extensions.*
 import com.flipperplz.bisutils.param.utils.extensions.RapClassImpl
 import com.flipperplz.bisutils.param.utils.extensions.RapFileImpl
 import com.flipperplz.bisutils.param.utils.extensions.RapVariableImpl
-import com.flipperplz.bisutils.utils.getAsciiZ
-import com.flipperplz.bisutils.utils.getCompactInt
-import com.flipperplz.bisutils.utils.getFloat
-import com.flipperplz.bisutils.utils.getInt
+import com.flipperplz.bisutils.io.getAsciiZ
+import com.flipperplz.bisutils.io.getCompactInt
+import com.flipperplz.bisutils.io.getFloat
+import com.flipperplz.bisutils.io.getInt
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 

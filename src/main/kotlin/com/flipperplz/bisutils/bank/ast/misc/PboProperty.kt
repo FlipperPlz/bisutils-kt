@@ -1,17 +1,14 @@
 package com.flipperplz.bisutils.bank.ast.misc
 
-import com.flipperplz.bisutils.utils.BisFamily
-import com.flipperplz.bisutils.utils.BisStrictBinarizable
-import com.flipperplz.bisutils.utils.putAsciiZ
+import com.flipperplz.bisutils.family.interfaces.FamilyChild
+import com.flipperplz.bisutils.binarization.BisStrictBinarizable
+import com.flipperplz.bisutils.io.putAsciiZ
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface PboProperty : BisStrictBinarizable, PboElement {
+interface PboProperty : BisStrictBinarizable, FamilyChild {
     val name: String
     val value: String
-
-    override val children: List<Any>
-        get() = listOf(name, value)
 
     override fun writeValidated(buffer: ByteBuffer, charset: Charset): Boolean {
         buffer.putAsciiZ(name, charset)

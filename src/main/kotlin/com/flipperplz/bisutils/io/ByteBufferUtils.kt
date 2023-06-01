@@ -1,10 +1,8 @@
-package com.flipperplz.bisutils.utils
+package com.flipperplz.bisutils.io
 
-import com.flipperplz.bisutils.param.ast.literal.ParamString
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
-import kotlin.experimental.or
 import kotlin.math.floor
 
 

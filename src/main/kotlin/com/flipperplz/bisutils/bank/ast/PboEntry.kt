@@ -1,13 +1,13 @@
 package com.flipperplz.bisutils.bank.ast
 
-import com.flipperplz.bisutils.bank.ast.misc.PboElement
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.utils.BisStrictBinarizable
-import com.flipperplz.bisutils.utils.putAsciiZ
+import com.flipperplz.bisutils.family.interfaces.FamilyChild
+import com.flipperplz.bisutils.binarization.BisStrictBinarizable
+import com.flipperplz.bisutils.io.putAsciiZ
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface PboEntry : BisStrictBinarizable, PboElement {
+interface PboEntry : BisStrictBinarizable, FamilyChild {
     val entryName: String
     val entryMime: EntryMimeType
     val entryTimestamp: Long
@@ -24,9 +24,6 @@ interface PboEntry : BisStrictBinarizable, PboElement {
         buffer.putLong(entrySize)
         return true
     }
-
-    override val children: List<Any>?
-        get() = listOf(entryName, entryMime, entryTimestamp, entryOffset, entryDecompressedSize, entrySize)
 
     override val binaryLength: Long
         get() = 21L + entryName.length

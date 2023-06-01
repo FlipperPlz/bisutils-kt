@@ -1,27 +1,22 @@
 package com.flipperplz.bisutils.bank.ast
 
-import com.flipperplz.bisutils.bank.ast.misc.PboElement
-import com.flipperplz.bisutils.utils.BisFamily
-import com.flipperplz.bisutils.utils.BisStrictBinarizable
+import com.flipperplz.bisutils.family.interfaces.FamilyMember
+import com.flipperplz.bisutils.family.interfaces.FamilyParent
+import com.flipperplz.bisutils.binarization.BisStrictBinarizable
 
-interface PboFile : List<PboEntry>, PboElement, BisStrictBinarizable {
+interface PboFile :  BisStrictBinarizable, FamilyParent {
     val defaultPrefix: String
-    override val parent: BisFamily?
-        get() = null
-    override val children: List<Any>?
-        get() = entries
-    override val size: Int
-        get() = entries.size
     val entries: List<PboEntry>
+    var signature: ByteArray //should always be 20 bytes **IIRC**
+
+    override val children: List<FamilyMember>?
+        get() = entries
     override val binaryLength: Long
         get() = TODO()//TODO: calculate length
 
     override fun isValid(): Boolean {
         if(!entries.all { it.isValid() }) return false
-        //TODO check signature
-        return true
+        TODO()
     }
-
-    var signature: ByteArray //should always be 20 bytes **IIRC**
 
 }

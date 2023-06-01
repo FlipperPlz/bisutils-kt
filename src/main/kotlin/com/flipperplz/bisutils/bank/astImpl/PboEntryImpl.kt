@@ -1,14 +1,13 @@
+package com.flipperplz.bisutils.bank.astImpl
+
 import com.flipperplz.bisutils.bank.ast.PboEntry
-import com.flipperplz.bisutils.bank.ast.PboFile
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.utils.BisFamily
-import com.flipperplz.bisutils.utils.BisStrictDebinarizable
-import java.nio.ByteBuffer
-import java.nio.charset.Charset
+import com.flipperplz.bisutils.family.interfaces.FamilyNode
+import com.flipperplz.bisutils.binarization.BisStrictDebinarizable
 
 abstract class PboEntryImpl(
-    override val lowestBranch: PboFile?,
-    override val parent: BisFamily?,
+    override val node: FamilyNode?,
+    override val parent: FamilyNode?,
     override val entryName: String,
     override val entryMime: EntryMimeType,
     override val entryDecompressedSize: Long,
@@ -17,7 +16,4 @@ abstract class PboEntryImpl(
     override val entrySize: Long
 ) : BisStrictDebinarizable(), PboEntry {
 
-    override fun read(buffer: ByteBuffer, charset: Charset) {
-        TODO("Not yet implemented")
-    }
 }

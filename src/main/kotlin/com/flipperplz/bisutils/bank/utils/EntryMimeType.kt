@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.bank.utils
 
-import com.flipperplz.bisutils.utils.BisBinarizable
+import com.flipperplz.bisutils.binarization.BisBinarizable
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 

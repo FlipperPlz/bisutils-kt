@@ -2,19 +2,21 @@ package com.flipperplz.bisutils.bank.astImpl
 
 import com.flipperplz.bisutils.bank.ast.PboEntry
 import com.flipperplz.bisutils.bank.ast.PboFile
-import com.flipperplz.bisutils.utils.BisFamily
-import com.flipperplz.bisutils.utils.BisStrictDebinarizable
-import com.flipperplz.bisutils.utils.getBytes
+import com.flipperplz.bisutils.family.interfaces.FamilyNode
+import com.flipperplz.bisutils.binarization.BisStrictDebinarizable
+import com.flipperplz.bisutils.io.getBytes
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 open class PboFileImpl(
     override val defaultPrefix: String,
     override val entries: List<PboEntry> = emptyList(),
-    override val parent: BisFamily? = null
+    override val parent: FamilyNode?
 ) : BisStrictDebinarizable(), PboFile, List<PboEntry> by entries {
-    override val lowestBranch: PboFile? = null
+    override val node: FamilyNode?
+        get() = parent?.node
     override lateinit var signature: ByteArray
+
 
     override fun read(buffer: ByteBuffer, charset: Charset) { //TODO: return boolean
         //TODO("Not yet implemented")

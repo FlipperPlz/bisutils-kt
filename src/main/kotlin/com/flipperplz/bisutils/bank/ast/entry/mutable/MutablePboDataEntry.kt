@@ -5,9 +5,7 @@ import com.flipperplz.bisutils.bank.ast.mutable.MutablePboEntry
 import java.nio.ByteBuffer
 
 interface MutablePboDataEntry : MutablePboEntry, PboDataEntry {
-    override val entryData: ByteBuffer
-    override val children: MutableList<Any>
-        get() = mutableListOf(entryData)
+    override var entryData: ByteBuffer
 
     override fun validateMutability(): Boolean = !super.validateMutability()
 
