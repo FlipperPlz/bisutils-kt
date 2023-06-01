@@ -1,7 +1,7 @@
 package com.flipperplz.bisutils.bank.utils
 
-import com.flipperplz.bisutils.bank.PboDataEntry
-import com.flipperplz.bisutils.bank.PboFile
+import com.flipperplz.bisutils.bank.ast.PboFile
+import com.flipperplz.bisutils.bank.ast.entry.PboDataEntry
 import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.ast.literal.ParamArray
 import com.flipperplz.bisutils.param.ast.statement.ParamVariableStatement
@@ -67,9 +67,10 @@ class BankProcessor(
     private var currentEntry: PboDataEntry? = null //current entry being preprocessed
 
     private fun indexBank(bank: PboFile) {
-        for (dataEntry in bank.pboEntries.filterIsInstance<PboDataEntry>()) {
+        for (dataEntry in bank.entries.filterIsInstance<PboDataEntry>()) {
             currentEntry = dataEntry
-            var fileName = PboFile.normalizePath(dataEntry.fileName)?.split('\\')?.last() ?: continue
+            //TODO: normalization of path
+            var fileName = /*PboFile.normalizePath(dataEntry.fileName)*/dataEntry.entryName.split('\\').last()
             val extension = fileName.split('.').last()
             fileName = fileName.removeRange(fileName.length-extension.length-1.. fileName.length)
 
@@ -87,7 +88,7 @@ class BankProcessor(
                         "cpp" -> {}
                         else -> continue
                     }
-                    val param = openParamFile(dataEntry.entryData, dataEntry.fileName, _boostPreprocessor)
+                    val param = openParamFile(dataEntry.entryData, dataEntry.entryName, _boostPreprocessor)
                     processConfig(param)
                 }
                 "stringtable" -> {
@@ -101,9 +102,11 @@ class BankProcessor(
     }
 
     private fun associateLocalPath(path: String): String = currentEntry?.let {
-        return it.initialOwner?.getAbsoluteEntryPath(it)?.split('\\')?.toMutableList()?.let { currentDirPath ->
+        //TODO: Create absolute path
+        return path/* it.lowestBranch?.getAbsoluteEntryPath(it)?*/.split('\\')?.toMutableList()?.let { currentDirPath ->
             currentDirPath.removeLast()
-            PboFile.normalizePath(path)?.split('\\')?.forEach {segment ->
+            //TODO: Normalize Path
+            /*PboFile.normalizePath(path)?*/path.split('\\')?.forEach {segment ->
                 when(segment) {
                     ".." -> currentDirPath.removeLast()
                     else -> currentDirPath.add(segment)
@@ -117,12 +120,14 @@ class BankProcessor(
         locateVFSEntry(associateLocalPath(include.path))?.entryData?.array()?.toString(encoding) ?: throw BoostIncludeNotFoundException(include)
 
     private fun locateEnforceFile(include: EnforceIncludeDirective, encoding: Charset = Charsets.UTF_8): String =
-        locateVFSEntry(PboFile.normalizePath(include.path) ?: throw Exception("Error normalizing PBO path"))?.entryData?.array()?.toString(encoding) ?: throw EnforceIncludeNotFoundException(include)
+        //TODO: Path normalization
+        locateVFSEntry(/*PboFile.normalizePath*/(include.path) ?: throw Exception("Error normalizing PBO path"))?.entryData?.array()?.toString(encoding) ?: throw EnforceIncludeNotFoundException(include)
 
     private fun locateVFSEntry(path: String): PboDataEntry?{
         return with(pboForPath(path) ?: return null) {
             entries.filterIsInstance<PboDataEntry>().firstOrNull {
-                getAbsoluteEntryPath(it).equals(path, ignoreCase = true)
+                //TODO:  Create absolute path
+                /*getAbsoluteEntryPath*/(it.entryName).equals(path, ignoreCase = true)
             }
         }
     }
@@ -132,8 +137,8 @@ class BankProcessor(
         var longestMatch = 0
         val path = absolutePath.trimStart('\\')
         banks.forEach {
-            val prefixLn = it.pboPrefix.length
-            if(path.startsWith(it.pboPrefix) && prefixLn >= longestMatch) {
+            val prefixLn = it.prefix.length
+            if(path.startsWith(it.prefix) && prefixLn >= longestMatch) {
                target = it
                longestMatch = prefixLn
             }

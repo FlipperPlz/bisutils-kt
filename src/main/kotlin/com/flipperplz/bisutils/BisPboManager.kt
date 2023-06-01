@@ -1,6 +1,5 @@
 package com.flipperplz.bisutils
 
-import com.flipperplz.bisutils.bank.PboFile
 import com.flipperplz.bisutils.bank.io.BisPboReader
 import com.flipperplz.bisutils.utils.BisRandomAccessFile
 import java.nio.channels.FileChannel

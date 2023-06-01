@@ -2,7 +2,6 @@ package com.flipperplz.bisutils.bank.io
 
 import com.flipperplz.bisutils.BisPboManager
 import com.flipperplz.bisutils.bank.*
-import com.flipperplz.bisutils.bank.utils.PboProperty
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.bank.utils.StagedPboDataEntry
 import com.flipperplz.bisutils.utils.*
