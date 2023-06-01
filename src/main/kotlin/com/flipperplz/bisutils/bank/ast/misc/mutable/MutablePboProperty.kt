@@ -1,4 +1,6 @@
-package com.flipperplz.bisutils.bank.ast.misc
+package com.flipperplz.bisutils.bank.ast.misc.mutable
+
+import com.flipperplz.bisutils.bank.ast.misc.PboProperty
 
 interface MutablePboProperty : PboProperty, MutablePboElement {
     override var name: String

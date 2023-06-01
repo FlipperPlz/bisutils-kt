@@ -2,6 +2,8 @@ package com.flipperplz.bisutils.bank.io
 
 import com.flipperplz.bisutils.BisPboManager
 import com.flipperplz.bisutils.bank.*
+import com.flipperplz.bisutils.bank.ast.PboFile
+import com.flipperplz.bisutils.bank.astImpl.PboFileImpl
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.bank.utils.StagedPboDataEntry
 import com.flipperplz.bisutils.utils.*
@@ -16,8 +18,8 @@ class BisPboReader(internal val buffer: BisRandomAccessFile) : AutoCloseable {
         get() = buffer.filePointer
     private var flagPtr: Long? = null
 
-    fun lightRead(): PboFile {
-        val result = PboFile(buffer.fileName)
+    fun lightRead(): PboFile {//TODO: BisRandomAccessFile should have never existed,,, open file as r/w buffer
+        val result = PboFileImpl(buffer.fileName)
         BisPboManager.managePbo(result, this)
 
         return initializeFile(result)

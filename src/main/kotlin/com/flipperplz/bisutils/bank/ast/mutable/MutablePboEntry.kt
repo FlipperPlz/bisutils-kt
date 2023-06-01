@@ -1,6 +1,7 @@
-package com.flipperplz.bisutils.bank.ast
+package com.flipperplz.bisutils.bank.ast.mutable
 
-import com.flipperplz.bisutils.bank.ast.misc.MutablePboElement
+import com.flipperplz.bisutils.bank.ast.PboEntry
+import com.flipperplz.bisutils.bank.ast.misc.mutable.MutablePboElement
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.utils.BisFlushable
 
@@ -12,6 +13,7 @@ interface MutablePboEntry : MutablePboElement, PboEntry, BisFlushable {
     override var entryMime: EntryMimeType
     override var entryTimestamp: Long
     override val children: MutableList<Any>?
+        get() = mutableListOf(entrySize, entryName, entryOffset, entryDecompressedSize, entryMime, entryTimestamp)
 
     override fun flush() {
         entryMime = EntryMimeType.DUMMY

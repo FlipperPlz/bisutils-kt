@@ -2,8 +2,8 @@ package com.flipperplz.bisutils.bank.utils
 
 import com.flipperplz.bisutils.bank.ast.PboEntry
 import com.flipperplz.bisutils.bank.ast.PboFile
-import com.flipperplz.bisutils.bank.ast.entry.MutablePboDataEntry
-import com.flipperplz.bisutils.bank.ast.entry.MutablePboVersionEntry
+import com.flipperplz.bisutils.bank.ast.entry.mutable.MutablePboDataEntry
+import com.flipperplz.bisutils.bank.ast.entry.mutable.MutablePboVersionEntry
 import com.flipperplz.bisutils.bank.ast.entry.PboDataEntry
 import com.flipperplz.bisutils.bank.ast.entry.PboVersionEntry
 import com.flipperplz.bisutils.bank.ast.misc.PboProperty

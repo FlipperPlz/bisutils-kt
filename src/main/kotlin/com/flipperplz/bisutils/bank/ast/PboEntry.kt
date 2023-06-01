@@ -25,6 +25,9 @@ interface PboEntry : BisStrictBinarizable, PboElement {
         return true
     }
 
+    override val children: List<Any>?
+        get() = listOf(entryName, entryMime, entryTimestamp, entryOffset, entryDecompressedSize, entrySize)
+
     override val binaryLength: Long
         get() = 21L + entryName.length
 }

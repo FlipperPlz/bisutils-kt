@@ -1,13 +1,14 @@
-package com.flipperplz.bisutils.bank.ast
+package com.flipperplz.bisutils.bank.ast.mutable
 
-import com.flipperplz.bisutils.bank.ast.misc.MutablePboElement
+import com.flipperplz.bisutils.bank.ast.PboEntry
+import com.flipperplz.bisutils.bank.ast.PboFile
+import com.flipperplz.bisutils.bank.ast.misc.mutable.MutablePboElement
 import com.flipperplz.bisutils.utils.BisFamily
 import com.flipperplz.bisutils.utils.BisFlushable
 
 interface MutablePboFile : MutablePboElement, PboFile, BisFlushable {
-    override val entries: MutableList<MutablePboEntry>
-    override var signature: MutableList<Byte>
-
+    override val entries: MutableList<PboEntry>
+    override var signature: ByteArray
 
     //TODO: wtf kotlin, you're killing me
     override var parent: BisFamily?
@@ -17,6 +18,6 @@ interface MutablePboFile : MutablePboElement, PboFile, BisFlushable {
 
     override fun flush() {
         entries.filterIsInstance<BisFlushable>().forEach { it.flush() }
-        signature.clear()
+        signature = byteArrayOf()
     }
 }
