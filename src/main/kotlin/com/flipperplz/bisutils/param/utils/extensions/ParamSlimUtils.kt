@@ -124,8 +124,8 @@ import java.nio.charset.Charset
             it is ParamNamedElement && it.slimName.equals(name, true)
         }
 
-    operator fun ParamStatementHolder.rem(name: String): ParamClass =
-        childrenOfType<ParamClass>().first {
+    operator fun ParamStatementHolder.rem(name: String): ParamClass? =
+        childrenOfType<ParamClass>().firstOrNull() {
             if(name == "*") return it
             it.slimName.equals(name, true)
         }

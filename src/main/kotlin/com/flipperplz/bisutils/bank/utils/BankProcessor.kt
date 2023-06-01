@@ -3,9 +3,9 @@ package com.flipperplz.bisutils.bank.utils
 import com.flipperplz.bisutils.bank.PboDataEntry
 import com.flipperplz.bisutils.bank.PboFile
 import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.utils.extensions.mutableParamFile
-import com.flipperplz.bisutils.param.utils.extensions.mutableStringTable
-import com.flipperplz.bisutils.param.utils.extensions.openParamFile
+import com.flipperplz.bisutils.param.ast.literal.ParamArray
+import com.flipperplz.bisutils.param.ast.statement.ParamVariableStatement
+import com.flipperplz.bisutils.param.utils.extensions.*
 import com.flipperplz.bisutils.param.utils.mutability.ParamMutableFile
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDefineDirective
@@ -19,6 +19,8 @@ import com.flipperplz.bisutils.stringtable.ast.StringTableFile
 import com.flipperplz.bisutils.stringtable.ast.mutable.StringTableMutableFile
 import com.flipperplz.bisutils.stringtable.util.StringTableFormat
 import com.flipperplz.bisutils.stringtable.util.openStringtable
+import com.flipperplz.bisutils.utils.DayZScriptContext
+import com.flipperplz.bisutils.utils.DayZScriptModule
 import java.nio.charset.Charset
 
 class BankProcessor(
@@ -28,7 +30,6 @@ class BankProcessor(
 ) {
     private val _enforcePreprocessor: EnforcePreprocessor = EnforcePreprocessor(startingEnforceDefines, ::locateEnforceFile)
     private val _boostPreprocessor: BoostPreprocessor = BoostPreprocessor(startingBoostDefines, ::locateBoostFile)
-    private var currentEntry: PboDataEntry? = null //current entry being preprocessed
     private val configFiles: MutableMap<PboDataEntry, ParamFile> = mutableMapOf()
     private val stringTables: MutableMap<PboDataEntry, StringTableFile> = mutableMapOf() //TODO: stringtables implementation
     private val globalConfig: ParamMutableFile = mutableParamFile("config")
@@ -39,12 +40,31 @@ class BankProcessor(
         _banks.add(bank)
         indexBank(bank)
     }
+
     fun process(flush: Boolean = true): List<PboFile> {
         val banks = mutableListOf<PboFile>()
-        //TODO: Process Banks
+        val context = DayZScriptContext<PboDataEntry>()
+        for ((pboFile, paramFile) in configFiles) {
+            (paramFile % "CfgMods")?.childClasses?.forEach { modClass ->
+                (modClass % "defs")?.childClasses?.forEach { defsClass ->
+                    for(module in DayZScriptModule.values()) {
+                        val scriptDefinitionClass = (defsClass % module.defsTitle) ?: continue
+                        (scriptDefinitionClass.childrenOfType<ParamVariableStatement>().firstOrNull {
+                            it.slimName == "files" && it.slimValue is ParamArray
+                        }?.slimValue as? ParamArray)?.slimValue?.forEach {
+                            //todo: parse each directory or filename and add to context
+                        }
+
+                    }
+                }
+            }
+        }
+
         if(flush) flush()
         return banks
     }
+
+    private var currentEntry: PboDataEntry? = null //current entry being preprocessed
 
     private fun indexBank(bank: PboFile) {
         for (dataEntry in bank.pboEntries.filterIsInstance<PboDataEntry>()) {
