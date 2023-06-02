@@ -25,20 +25,11 @@ fun List<IPboEntry>.dataEntries(): List<IPboDataEntry> =
 fun List<IPboEntry>.mutableDataEntries(): List<IMutablePboDataEntry> =
     filterIsInstance<IMutablePboDataEntry>()
 
-fun MutableList<IPboEntry>.dataEntries(): List<IMutablePboDataEntry> =
-    filterIsInstance<IMutablePboDataEntry>()
-
-fun List<IPboEntry>.immutableDataEntries(): List<IPboDataEntry> =
-    filterIsInstance<IPboDataEntry>()
-
 fun List<IPboEntry>.versionEntry(): IPboVersionEntry? =
     filterIsInstance<IPboVersionEntry>().firstOrNull()
 
 fun List<IPboEntry>.mutableVersionEntry(): IMutablePboVersionEntry? =
     filterIsInstance<IMutablePboVersionEntry>().firstOrNull()
 
-fun MutableList<IPboEntry>.versionEntry(): IMutablePboVersionEntry? =
-    filterIsInstance<IMutablePboVersionEntry>().firstOrNull()
-
-fun MutableList<IPboEntry>.immutableVersionEntry(): IPboVersionEntry? =
-    filterIsInstance<IPboVersionEntry>().firstOrNull()
+fun List<IPboEntry>.getProperty(name: String): IPboProperty? =
+    versionEntry()?.properties?.firstOrNull {it.name == name}
