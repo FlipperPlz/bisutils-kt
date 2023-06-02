@@ -1,9 +1,10 @@
 package com.flipperplz.bisutils.bank.astImpl
 
 import com.flipperplz.bisutils.bank.ast.IPboEntry
+import com.flipperplz.bisutils.bank.options.PboDebinarizationOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.family.interfaces.IFamilyNode
-import com.flipperplz.bisutils.binarization.BisStrictDebinarizable
+import com.flipperplz.bisutils.bank.utils.IPboBinaryObject
+import com.flipperplz.bisutils.family.IFamilyNode
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
@@ -16,6 +17,6 @@ abstract class PboEntry(
     override val entryOffset: Long,
     override val entryTimestamp: Long,
     override val entrySize: Long
-) : BisStrictDebinarizable(), IPboEntry {
-    override fun read(buffer: ByteBuffer, charset: Charset): Boolean = throw Exception("Not supported")
+) : IPboBinaryObject, IPboEntry {
+    override fun read(buffer: ByteBuffer, charset: Charset, options: PboDebinarizationOptions): Boolean = throw Exception("Not supported")
 }

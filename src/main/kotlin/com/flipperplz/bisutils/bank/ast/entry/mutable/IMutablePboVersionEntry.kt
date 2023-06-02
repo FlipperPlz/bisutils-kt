@@ -2,8 +2,8 @@ package com.flipperplz.bisutils.bank.ast.entry.mutable
 
 import com.flipperplz.bisutils.bank.ast.entry.IPboVersionEntry
 import com.flipperplz.bisutils.bank.ast.misc.mutable.IMutablePboProperty
-import com.flipperplz.bisutils.family.interfaces.IFamilyMember
-import com.flipperplz.bisutils.family.interfaces.mutable.IMutableFamilyParent
+import com.flipperplz.bisutils.family.IFamilyMember
+import com.flipperplz.bisutils.family.mutable.IMutableFamilyParent
 
 interface IMutablePboVersionEntry : IPboVersionEntry, IMutableFamilyParent {
     override var properties: MutableList<IMutablePboProperty>

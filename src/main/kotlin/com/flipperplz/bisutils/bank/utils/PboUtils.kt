@@ -7,8 +7,13 @@ import com.flipperplz.bisutils.bank.ast.entry.mutable.IMutablePboVersionEntry
 import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
 import com.flipperplz.bisutils.bank.ast.entry.IPboVersionEntry
 import com.flipperplz.bisutils.bank.ast.misc.IPboProperty
+import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboDebinarizationOptions
+import com.flipperplz.bisutils.binarization.interfaces.IStrictBinaryObject
 import com.flipperplz.bisutils.param.lexer.ParamLexer
 import java.nio.charset.Charset
+
+typealias IPboBinaryObject = IStrictBinaryObject<PboBinarizationOptions, PboDebinarizationOptions>
 
 fun lexerOf(entry: IPboDataEntry, encoding: Charset = Charsets.UTF_8): ParamLexer =
     ParamLexer(textOf(entry, encoding))

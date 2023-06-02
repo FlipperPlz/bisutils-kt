@@ -2,7 +2,7 @@ package com.flipperplz.bisutils.bank.ast.mutable
 
 import com.flipperplz.bisutils.bank.ast.IPboEntry
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.family.interfaces.mutable.IMutableFamilyChild
+import com.flipperplz.bisutils.family.mutable.IMutableFamilyChild
 import com.flipperplz.bisutils.utils.IFlushable
 
 interface IMutablePboEntry : IMutableFamilyChild, IPboEntry, IFlushable {
@@ -22,6 +22,4 @@ interface IMutablePboEntry : IMutableFamilyChild, IPboEntry, IFlushable {
         entryTimestamp = 0
     }
 
-    override val binaryLength: Long
-        get() = 21L + entryName.length
 }

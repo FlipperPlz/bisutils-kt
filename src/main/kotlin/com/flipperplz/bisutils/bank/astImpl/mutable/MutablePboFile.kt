@@ -3,7 +3,8 @@ package com.flipperplz.bisutils.bank.astImpl.mutable
 import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboFile
 import com.flipperplz.bisutils.bank.ast.IPboEntry
 import com.flipperplz.bisutils.bank.astImpl.PboFile
-import com.flipperplz.bisutils.family.interfaces.IFamilyNode
+import com.flipperplz.bisutils.bank.options.PboDebinarizationOptions
+import com.flipperplz.bisutils.family.IFamilyNode
 import com.flipperplz.bisutils.io.getBytes
 import com.flipperplz.bisutils.utils.IFlushable
 import java.io.Closeable
@@ -17,7 +18,7 @@ class MutablePboFile(
     override var signature: ByteArray,
 ): PboFile(defaultPrefix, parent, entries, signature), IMutablePboFile {
 
-    override fun read(buffer: ByteBuffer, charset: Charset): Boolean {
+    override fun read(buffer: ByteBuffer, charset: Charset, options: PboDebinarizationOptions): Boolean {
         flush()
         entries = mutableListOf() //TODO: Read PBO
         signature = buffer.getBytes(buffer.remaining())
@@ -30,4 +31,5 @@ class MutablePboFile(
         entries.filterIsInstance<Closeable>().forEach { it.close() }
         signature = byteArrayOf() //TODO: Default Signature
     }
+
 }

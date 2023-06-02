@@ -1,25 +1,23 @@
 package com.flipperplz.bisutils.bank.ast.misc
 
-import com.flipperplz.bisutils.family.interfaces.IFamilyChild
-import com.flipperplz.bisutils.binarization.interfaces.IStrictBinarizable
+import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
+import com.flipperplz.bisutils.bank.utils.IPboBinaryObject
+import com.flipperplz.bisutils.family.IFamilyChild
 import com.flipperplz.bisutils.io.putAsciiZ
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface IPboProperty : IStrictBinarizable, IFamilyChild {
+interface IPboProperty : IPboBinaryObject, IFamilyChild {
     val name: String
     val value: String
 
-    override fun writeValidated(buffer: ByteBuffer, charset: Charset): Boolean {
-        buffer.putAsciiZ(name, charset)
-        buffer.putAsciiZ(value, charset)
-        return true
+    override fun writeValidated(buffer: ByteBuffer, charset: Charset, options: PboBinarizationOptions?): Boolean = with(buffer) {
+        putAsciiZ(name, charset)
+        putAsciiZ(value, charset)
+        true
     }
 
-    override val binaryLength: Long
-        get() = name.length + value.length + 2L
+    override fun calculateBinaryLength(charset: Charset, options: PboBinarizationOptions?): Long = name.length + value.length + 2L
 
-    override fun isValid(): Boolean {
-        return true //TODO Value cannot be empty
-    }
+    override fun isValid(): Boolean = !(name.contains('\u0000') || name.isEmpty())
 }

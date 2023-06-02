@@ -1,13 +1,13 @@
 package com.flipperplz.bisutils.bank.ast
 
-import com.flipperplz.bisutils.bank.ast.entry.IPboVersionEntry
-import com.flipperplz.bisutils.bank.astImpl.entry.PboVersionEntry
+import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
+import com.flipperplz.bisutils.bank.utils.IPboBinaryObject
 import com.flipperplz.bisutils.bank.utils.getProperty
-import com.flipperplz.bisutils.family.interfaces.IFamilyMember
-import com.flipperplz.bisutils.family.interfaces.IFamilyParent
-import com.flipperplz.bisutils.binarization.interfaces.IStrictBinarizable
+import com.flipperplz.bisutils.family.IFamilyMember
+import com.flipperplz.bisutils.family.IFamilyParent
+import java.nio.charset.Charset
 
-interface IPboFile :  IStrictBinarizable, IFamilyParent {
+interface IPboFile : IPboBinaryObject, IFamilyParent {
     val prefix: String
         get() = entries.getProperty("prefix")?.value ?: defaultPrefix /*TODO: DIG THROUGH VERSION ENTRY*/
     val defaultPrefix: String
@@ -16,8 +16,10 @@ interface IPboFile :  IStrictBinarizable, IFamilyParent {
 
     override val children: List<IFamilyMember>?
         get() = entries
-    override val binaryLength: Long
-        get() = TODO()//TODO: calculate length
+
+    override fun calculateBinaryLength(charset: Charset, options: PboBinarizationOptions?): Long {
+        TODO()//TODO: calculate length
+    }
 
     override fun isValid(): Boolean {
         if(!entries.all { it.isValid() }) return false

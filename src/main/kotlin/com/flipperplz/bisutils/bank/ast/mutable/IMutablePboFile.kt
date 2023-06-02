@@ -2,8 +2,8 @@ package com.flipperplz.bisutils.bank.ast.mutable
 
 import com.flipperplz.bisutils.bank.ast.IPboEntry
 import com.flipperplz.bisutils.bank.ast.IPboFile
-import com.flipperplz.bisutils.family.interfaces.IFamilyMember
-import com.flipperplz.bisutils.family.interfaces.mutable.IMutableFamilyParent
+import com.flipperplz.bisutils.family.IFamilyMember
+import com.flipperplz.bisutils.family.mutable.IMutableFamilyParent
 import com.flipperplz.bisutils.utils.IFlushable
 
 interface IMutablePboFile : IMutableFamilyParent, IPboFile, IFlushable {
