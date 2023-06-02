@@ -29,6 +29,7 @@ class MutablePboVersionEntry(
 
     override fun read(buffer: ByteBuffer, charset: Charset): Boolean {
         if(!super.read(buffer, charset)) return false
+        if(entryMime != EntryMimeType.VERSION) return false
         properties = buffer.readPboProperties(charset) {  name, value ->
             MutablePboProperty(this, node, name, value)
         }.toMutableList()

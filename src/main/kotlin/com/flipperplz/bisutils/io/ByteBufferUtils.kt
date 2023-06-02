@@ -13,6 +13,10 @@ fun ByteBuffer.getBytes(count: Int): ByteArray {
     return bytes
 }
 
+fun <T> ByteBuffer.peek(peekFun: ByteBuffer.() -> T): T = with(position()) {
+    peekFun(this@peek).also { position(this) }
+}
+
 fun ByteBuffer.getInt(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Int =
     ByteBuffer.wrap(getBytes(4)).order(order).getInt(0)
 

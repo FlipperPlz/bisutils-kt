@@ -2,6 +2,7 @@ package com.flipperplz.bisutils.bank.astImpl
 
 import com.flipperplz.bisutils.bank.ast.IPboEntry
 import com.flipperplz.bisutils.bank.ast.IPboFile
+import com.flipperplz.bisutils.bank.utils.dataEntries
 import com.flipperplz.bisutils.family.interfaces.IFamilyNode
 import com.flipperplz.bisutils.binarization.BisStrictDebinarizable
 import com.flipperplz.bisutils.io.getBytes
@@ -18,18 +19,18 @@ open class PboFile(
         defaultPrefix,
         parent,
         mutableListOf(),
-        buffer.getBytes(buffer.remaining())
-    )
+        byteArrayOf()
+    ) { if(!read(buffer, charset)) throw Exception() }
 
     override val node: IFamilyNode?
         get() = parent?.node
 
 
-     override fun read(buffer: ByteBuffer, charset: Charset): Boolean = throw Exception("Not Supported")
+    override fun read(buffer: ByteBuffer, charset: Charset): Boolean = throw Exception("Not Supported")
 
     override fun writeValidated(buffer: ByteBuffer, charset: Charset): Boolean {
         entries.forEach { if(!it.writeValidated(buffer, charset)) return false }
-        //TODO: Write entry data
+        entries.dataEntries().forEach { if(!it.writeData(buffer, charset)) return false }
         signFile(buffer)
         return true
     }

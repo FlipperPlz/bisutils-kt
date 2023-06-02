@@ -19,7 +19,7 @@ class MutablePboFile(
 
     override fun read(buffer: ByteBuffer, charset: Charset): Boolean {
         flush()
-        entries = mutableListOf()
+        entries = mutableListOf() //TODO: Read PBO
         signature = buffer.getBytes(buffer.remaining())
         return true
     }
