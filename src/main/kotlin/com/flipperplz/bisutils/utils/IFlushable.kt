@@ -1,5 +1,5 @@
 package com.flipperplz.bisutils.utils
 
-interface BisFlushable {
+interface IFlushable {
     fun flush()
 }

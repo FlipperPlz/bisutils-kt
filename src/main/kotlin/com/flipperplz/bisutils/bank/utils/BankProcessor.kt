@@ -1,7 +1,7 @@
 package com.flipperplz.bisutils.bank.utils
 
-import com.flipperplz.bisutils.bank.ast.PboFile
-import com.flipperplz.bisutils.bank.ast.entry.PboDataEntry
+import com.flipperplz.bisutils.bank.ast.IPboFile
+import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
 import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.ast.literal.ParamArray
 import com.flipperplz.bisutils.param.ast.statement.ParamVariableStatement
@@ -24,26 +24,26 @@ import com.flipperplz.bisutils.dayz.DayZScriptModule
 import java.nio.charset.Charset
 
 class BankProcessor(
-    private val _banks: MutableList<PboFile>,
+    private val _banks: MutableList<IPboFile>,
     private val startingBoostDefines: MutableList<BoostDefineDirective> = mutableListOf(),
     private val startingEnforceDefines: MutableList<EnforceDefineDirective> = mutableListOf()
 ) {
     private val _enforcePreprocessor: EnforcePreprocessor = EnforcePreprocessor(startingEnforceDefines, ::locateEnforceFile)
     private val _boostPreprocessor: BoostPreprocessor = BoostPreprocessor(startingBoostDefines, ::locateBoostFile)
-    private val configFiles: MutableMap<PboDataEntry, ParamFile> = mutableMapOf()
-    private val stringTables: MutableMap<PboDataEntry, StringTableFile> = mutableMapOf() //TODO: stringtables implementation
+    private val configFiles: MutableMap<IPboDataEntry, ParamFile> = mutableMapOf()
+    private val stringTables: MutableMap<IPboDataEntry, StringTableFile> = mutableMapOf() //TODO: stringtables implementation
     private val globalConfig: ParamMutableFile = mutableParamFile("config")
     private val globalStringTable: StringTableMutableFile = mutableStringTable()
 
-    val banks: List<PboFile> = _banks
-    fun loadBank(bank: PboFile) {
+    val banks: List<IPboFile> = _banks
+    fun loadBank(bank: IPboFile) {
         _banks.add(bank)
         indexBank(bank)
     }
 
-    fun process(flush: Boolean = true): List<PboFile> {
-        val banks = mutableListOf<PboFile>()
-        val context = DayZScriptContext<PboDataEntry>()
+    fun process(flush: Boolean = true): List<IPboFile> {
+        val banks = mutableListOf<IPboFile>()
+        val context = DayZScriptContext<IPboDataEntry>()
         for ((pboFile, paramFile) in configFiles) {
             (paramFile % "CfgMods")?.childClasses?.forEach { modClass ->
                 (modClass % "defs")?.childClasses?.forEach { defsClass ->
@@ -64,10 +64,10 @@ class BankProcessor(
         return banks
     }
 
-    private var currentEntry: PboDataEntry? = null //current entry being preprocessed
+    private var currentEntry: IPboDataEntry? = null //current entry being preprocessed
 
-    private fun indexBank(bank: PboFile) {
-        for (dataEntry in bank.entries.filterIsInstance<PboDataEntry>()) {
+    private fun indexBank(bank: IPboFile) {
+        for (dataEntry in bank.entries.filterIsInstance<IPboDataEntry>()) {
             currentEntry = dataEntry
             //TODO: normalization of path
             var fileName = /*PboFile.normalizePath(dataEntry.fileName)*/dataEntry.entryName.split('\\').last()
@@ -123,17 +123,17 @@ class BankProcessor(
         //TODO: Path normalization
         locateVFSEntry(/*PboFile.normalizePath*/(include.path) ?: throw Exception("Error normalizing PBO path"))?.entryData?.array()?.toString(encoding) ?: throw EnforceIncludeNotFoundException(include)
 
-    private fun locateVFSEntry(path: String): PboDataEntry?{
+    private fun locateVFSEntry(path: String): IPboDataEntry?{
         return with(pboForPath(path) ?: return null) {
-            entries.filterIsInstance<PboDataEntry>().firstOrNull {
+            entries.filterIsInstance<IPboDataEntry>().firstOrNull {
                 //TODO:  Create absolute path
                 /*getAbsoluteEntryPath*/(it.entryName).equals(path, ignoreCase = true)
             }
         }
     }
 
-    private fun pboForPath(absolutePath: String): PboFile? {
-        var target: PboFile? = null
+    private fun pboForPath(absolutePath: String): IPboFile? {
+        var target: IPboFile? = null
         var longestMatch = 0
         val path = absolutePath.trimStart('\\')
         banks.forEach {

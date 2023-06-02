@@ -1,11 +1,11 @@
 package com.flipperplz.bisutils.bank.ast.mutable
 
-import com.flipperplz.bisutils.bank.ast.PboEntry
+import com.flipperplz.bisutils.bank.ast.IPboEntry
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.family.interfaces.mutable.MutableFamilyChild
-import com.flipperplz.bisutils.utils.BisFlushable
+import com.flipperplz.bisutils.family.interfaces.mutable.IMutableFamilyChild
+import com.flipperplz.bisutils.utils.IFlushable
 
-interface MutablePboEntry : MutableFamilyChild, PboEntry, BisFlushable {
+interface IMutablePboEntry : IMutableFamilyChild, IPboEntry, IFlushable {
     override var entrySize: Long
     override var entryName: String
     override var entryOffset: Long

@@ -4,7 +4,7 @@ import com.flipperplz.bisutils.param.ParamFile
 import com.flipperplz.bisutils.param.ast.node.ParamElement
 import com.flipperplz.bisutils.param.ast.node.ParamStatement
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
-import com.flipperplz.bisutils.utils.BisFlushable
+import com.flipperplz.bisutils.utils.IFlushable
 
 class ParamMutableFileImpl(
     override var slimName: String?,
@@ -14,7 +14,7 @@ class ParamMutableFileImpl(
     override var containingParamFile: ParamFile? = null
 }
 
-interface ParamMutableFile : ParamMutableStatementHolder, ParamFile, BisFlushable {
+interface ParamMutableFile : ParamMutableStatementHolder, ParamFile, IFlushable {
     override var slimName: String?
     override var slimCommands: MutableList<ParamStatement>
     override var containingParamFile: ParamFile?

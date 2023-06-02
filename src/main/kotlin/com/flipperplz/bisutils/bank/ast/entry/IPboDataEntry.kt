@@ -1,9 +1,9 @@
 package com.flipperplz.bisutils.bank.ast.entry
 
-import com.flipperplz.bisutils.bank.ast.PboEntry
+import com.flipperplz.bisutils.bank.ast.IPboEntry
 import java.nio.ByteBuffer
 
-interface PboDataEntry : PboEntry {
+interface IPboDataEntry : IPboEntry {
     val entryData: ByteBuffer
 
     override fun isValid(): Boolean = entrySize == entryData.capacity().toLong()

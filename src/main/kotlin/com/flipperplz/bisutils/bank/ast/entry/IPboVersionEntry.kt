@@ -1,17 +1,17 @@
 package com.flipperplz.bisutils.bank.ast.entry
 
-import com.flipperplz.bisutils.bank.ast.PboEntry
-import com.flipperplz.bisutils.bank.ast.misc.PboProperty
+import com.flipperplz.bisutils.bank.ast.IPboEntry
+import com.flipperplz.bisutils.bank.ast.misc.IPboProperty
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.family.interfaces.FamilyMember
-import com.flipperplz.bisutils.family.interfaces.FamilyParent
+import com.flipperplz.bisutils.family.interfaces.IFamilyMember
+import com.flipperplz.bisutils.family.interfaces.IFamilyParent
 import com.flipperplz.bisutils.io.putAsciiZ
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface PboVersionEntry : PboEntry, FamilyParent {
-    val properties: List<PboProperty>
-    override val children: List<FamilyMember>?
+interface IPboVersionEntry : IPboEntry, IFamilyParent {
+    val properties: List<IPboProperty>
+    override val children: List<IFamilyMember>?
         get() = properties
 
     override fun isValid(): Boolean =entryMime == EntryMimeType.VERSION && entrySize == 0L &&

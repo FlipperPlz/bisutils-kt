@@ -1,12 +1,12 @@
 package com.flipperplz.bisutils.bank.utils
 
-import com.flipperplz.bisutils.binarization.BisBinarizable
+import com.flipperplz.bisutils.binarization.interfaces.IBisBinarizable
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 enum class EntryMimeType(
     val mime: Int
-) : BisBinarizable {
+) : IBisBinarizable {
     VERSION(0x56657273),
     NORMAL_DATA(0x43707273),
     ENCRYPTED_DATA(0x456e6372),

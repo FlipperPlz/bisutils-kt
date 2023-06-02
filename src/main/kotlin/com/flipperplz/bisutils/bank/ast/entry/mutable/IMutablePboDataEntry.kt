@@ -1,10 +1,10 @@
 package com.flipperplz.bisutils.bank.ast.entry.mutable
 
-import com.flipperplz.bisutils.bank.ast.entry.PboDataEntry
-import com.flipperplz.bisutils.bank.ast.mutable.MutablePboEntry
+import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
+import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboEntry
 import java.nio.ByteBuffer
 
-interface MutablePboDataEntry : MutablePboEntry, PboDataEntry {
+interface IMutablePboDataEntry : IMutablePboEntry, IPboDataEntry {
     override var entryData: ByteBuffer
 
     override fun validateMutability(): Boolean = !super.validateMutability()

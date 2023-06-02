@@ -1,10 +1,10 @@
-package com.flipperplz.bisutils.binarization
+package com.flipperplz.bisutils.binarization.interfaces
 
-import com.flipperplz.bisutils.utils.BisValidatable
+import com.flipperplz.bisutils.utils.IValidatable
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface BisStrictBinarizable : BisBinarizable, BisValidatable {
+interface IStrictBinarizable : IBisBinarizable, IValidatable {
 
     fun writeValidated(buffer: ByteBuffer, charset: Charset): Boolean
 

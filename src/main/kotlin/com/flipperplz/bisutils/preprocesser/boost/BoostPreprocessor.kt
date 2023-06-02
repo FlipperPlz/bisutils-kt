@@ -9,13 +9,13 @@ import com.flipperplz.bisutils.preprocesser.boost.ast.directive.*
 import com.flipperplz.bisutils.preprocesser.boost.astImpl.element.BoostMacroElementImpl
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostDirectiveType
 import com.flipperplz.bisutils.preprocesser.boost.utils.BoostIncludeNotFoundException
-import com.flipperplz.bisutils.utils.BisFlushable
+import com.flipperplz.bisutils.utils.IFlushable
 
 typealias DefineDirective = BoostDefineDirective
 class BoostPreprocessor(
        private val _defines: MutableList<DefineDirective> = mutableListOf(),
        val locateFile: (BoostIncludeDirective) -> String? = { "" }
-) : BisPreprocessor, BisFlushable {
+) : BisPreprocessor, IFlushable {
     var defines: List<DefineDirective>
         get() = _defines
         set(value) {

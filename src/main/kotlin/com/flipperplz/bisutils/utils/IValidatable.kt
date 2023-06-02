@@ -1,5 +1,5 @@
 package com.flipperplz.bisutils.utils
 
-interface BisValidatable {
+interface IValidatable {
     fun isValid(): Boolean
 }

@@ -1,12 +1,12 @@
 package com.flipperplz.bisutils.bank.ast.misc
 
-import com.flipperplz.bisutils.family.interfaces.FamilyChild
-import com.flipperplz.bisutils.binarization.BisStrictBinarizable
+import com.flipperplz.bisutils.family.interfaces.IFamilyChild
+import com.flipperplz.bisutils.binarization.interfaces.IStrictBinarizable
 import com.flipperplz.bisutils.io.putAsciiZ
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface PboProperty : BisStrictBinarizable, FamilyChild {
+interface IPboProperty : IStrictBinarizable, IFamilyChild {
     val name: String
     val value: String
 
