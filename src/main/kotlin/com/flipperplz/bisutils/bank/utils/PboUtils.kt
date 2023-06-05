@@ -38,3 +38,4 @@ fun List<IPboEntry>.mutableVersionEntry(): IMutablePboVersionEntry? =
 
 fun List<IPboEntry>.getProperty(name: String): IPboProperty? =
     versionEntry()?.properties?.firstOrNull {it.name == name}
+
