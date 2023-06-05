@@ -26,11 +26,11 @@ class MutablePboVersionEntry(
 ) : MutablePboEntry(lowestBranch, parent, entryName, entryMime, entryDecompressedSize, entryOffset, entryTimestamp, entrySize), IMutablePboVersionEntry {
 
     companion object {
-        private fun <T: IPboProperty> ByteBuffer.readPboProperties(charset: Charset, createProperty: (String, String) -> T): List<T> =
+        fun <T: IPboProperty> readPboProperties(buffer: ByteBuffer, charset: Charset, createProperty: (String, String) -> T): List<T> =
             mutableListOf<T>().apply {
                 var propertyName: String
-                while (getAsciiZ(charset).also { propertyName = it }.isNotEmpty()) {
-                    val propertyValue: String = getAsciiZ(charset)
+                while (buffer. getAsciiZ(charset).also { propertyName = it }.isNotEmpty()) {
+                    val propertyValue: String = buffer.getAsciiZ(charset)
                     add(createProperty(propertyName, propertyValue))
                 }
             }
@@ -39,7 +39,7 @@ class MutablePboVersionEntry(
     override fun read(buffer: ByteBuffer, charset: Charset, options: PboDebinarizationOptions): Boolean {
         if(!super.read(buffer, charset, options)) return false
         if(entryMime != EntryMimeType.VERSION) return false
-        properties = buffer.readPboProperties(charset) {  name, value ->
+        properties = readPboProperties(buffer, charset) {  name, value ->
             MutablePboProperty(this, node, name, value)
         }.toMutableList()
 

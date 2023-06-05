@@ -4,6 +4,9 @@ import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboFile
 import com.flipperplz.bisutils.bank.ast.IPboEntry
 import com.flipperplz.bisutils.bank.astImpl.PboEntry
 import com.flipperplz.bisutils.bank.astImpl.PboFile
+import com.flipperplz.bisutils.bank.astImpl.entry.PboVersionEntry
+import com.flipperplz.bisutils.bank.astImpl.entry.mutable.MutablePboVersionEntry
+import com.flipperplz.bisutils.bank.astImpl.misc.mutable.MutablePboProperty
 import com.flipperplz.bisutils.bank.options.PboDebinarizationOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.family.IFamilyNode
@@ -13,6 +16,7 @@ import com.flipperplz.bisutils.utils.IFlushable
 import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
+import kotlin.math.abs
 
 class MutablePboFile(
     override var defaultPrefix: String,
@@ -23,7 +27,7 @@ class MutablePboFile(
 
     override fun read(buffer: ByteBuffer, charset: Charset, options: PboDebinarizationOptions): Boolean {
         flush()
-        entries = mutableListOf() //TODO: Read PBO
+        entries.addAll(readMetadataBlock(this, buffer, charset, options))
         signature = buffer.getBytes(buffer.remaining())
         return true
     }
@@ -45,14 +49,44 @@ class MutablePboFile(
             } while (currentEntry != null)
         }
 
-        private fun readEntryMeta(pbo: Any, buffer: ByteBuffer, charset: Charset, options: PboDebinarizationOptions): PboEntry? {
-            val start = buffer.position()
+        private fun readEntryMeta(pbo: MutablePboFile, buffer: ByteBuffer, charset: Charset, options: PboDebinarizationOptions): PboEntry? {
             val filename = buffer.getAsciiZ(charset)
             val mime = EntryMimeType.fromMime(buffer.getInt())
-            buffer.position(start)
+            val decompressedSize = abs(buffer.getLong())
+            val offset = abs(buffer.getLong())
+            val timestamp = abs(buffer.getLong())
+            val size = abs(buffer.getLong())
+            if(
+                filename == "" &&
+                mime == EntryMimeType.DUMMY &&
+                decompressedSize == 0L &&
+                offset == 0L &&
+                timestamp == 0L &&
+                size == 0L
+            ) return null
+            return when(mime) {
+                EntryMimeType.VERSION -> MutablePboVersionEntry(
+                    pbo,
+                    pbo,
+                    filename,
+                    mime,
+                    decompressedSize,
+                    offset,
+                    timestamp,
+                    size,
+                    mutableListOf()
+                ).apply {
+                    properties.addAll(
+                        MutablePboVersionEntry.readPboProperties(buffer, charset) { name, value ->
+                            MutablePboProperty(this, pbo, name, value) //TODO: correctly Identify Parent Directory
+                        }
+                    )
+                }
+                else -> {
 
-
-            TODO()
+                    TODO()
+                }
+            }
         }
     }
 
