@@ -46,8 +46,11 @@ class MutablePboFile(
         }
 
         private fun readEntryMeta(pbo: Any, buffer: ByteBuffer, charset: Charset, options: PboDebinarizationOptions): PboEntry? {
+            val start = buffer.position()
             val filename = buffer.getAsciiZ(charset)
             val mime = EntryMimeType.fromMime(buffer.getInt())
+            buffer.position(start)
+
 
             TODO()
         }
