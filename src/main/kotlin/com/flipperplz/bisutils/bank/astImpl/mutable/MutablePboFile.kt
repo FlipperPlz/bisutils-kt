@@ -8,6 +8,7 @@ import com.flipperplz.bisutils.bank.astImpl.entry.PboVersionEntry
 import com.flipperplz.bisutils.bank.astImpl.entry.mutable.MutablePboVersionEntry
 import com.flipperplz.bisutils.bank.astImpl.misc.mutable.MutablePboProperty
 import com.flipperplz.bisutils.bank.options.PboDebinarizationOptions
+import com.flipperplz.bisutils.bank.utils.BankPathUtilities
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.family.IFamilyNode
 import com.flipperplz.bisutils.io.getAsciiZ
@@ -50,7 +51,7 @@ class MutablePboFile(
         }
 
         private fun readEntryMeta(pbo: MutablePboFile, buffer: ByteBuffer, charset: Charset, options: PboDebinarizationOptions): PboEntry? {
-            val filename = buffer.getAsciiZ(charset)
+            var filename = buffer.getAsciiZ(charset)
             val mime = EntryMimeType.fromMime(buffer.getInt())
             val decompressedSize = abs(buffer.getLong())
             val offset = abs(buffer.getLong())
@@ -83,7 +84,9 @@ class MutablePboFile(
                     )
                 }
                 else -> {
-
+                    val path = BankPathUtilities.normalizePath(filename).split('\\')
+                    val directory = path.dropLast(1).joinToString("\\")
+                    filename = path.lastOrNull() ?: ""
                     TODO()
                 }
             }
