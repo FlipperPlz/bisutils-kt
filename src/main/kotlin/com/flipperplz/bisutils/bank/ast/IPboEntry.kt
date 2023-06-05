@@ -1,14 +1,15 @@
 package com.flipperplz.bisutils.bank.ast
 
 import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboEntryDebinOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.bank.utils.IPboBinaryObject
+import com.flipperplz.bisutils.binarization.interfaces.IStrictBinaryObject
 import com.flipperplz.bisutils.family.IFamilyChild
 import com.flipperplz.bisutils.io.putAsciiZ
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface IPboEntry : IPboBinaryObject, IFamilyChild {
+interface IPboEntry : IStrictBinaryObject<PboBinarizationOptions, PboEntryDebinOptions>, IFamilyChild {
     val entryName: String
     val entryMime: EntryMimeType
     val entryTimestamp: Long

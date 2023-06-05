@@ -8,6 +8,7 @@ import com.flipperplz.bisutils.bank.astImpl.entry.PboVersionEntry
 import com.flipperplz.bisutils.bank.astImpl.entry.mutable.MutablePboVersionEntry
 import com.flipperplz.bisutils.bank.astImpl.misc.mutable.MutablePboProperty
 import com.flipperplz.bisutils.bank.options.PboDebinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboEntryDebinOptions
 import com.flipperplz.bisutils.bank.utils.BankPathUtilities
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.family.IFamilyNode
@@ -65,6 +66,15 @@ class MutablePboFile(
                 timestamp == 0L &&
                 size == 0L
             ) return null
+            val entryOptions = PboEntryDebinOptions(charset,
+                options.endianness,
+                filename,
+                mime,
+                decompressedSize,
+                offset,
+                timestamp,
+                size
+            )
             return when(mime) {
                 EntryMimeType.VERSION -> MutablePboVersionEntry(
                     pbo,
