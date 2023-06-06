@@ -7,6 +7,7 @@ import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_CHARSET
 import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_ENDIANNESS
 import com.flipperplz.bisutils.io.putAsciiZ
 import com.flipperplz.bisutils.io.putLong
+import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 
 interface IPboEntry : IPboVFSEntry {
@@ -31,7 +32,8 @@ interface IPboEntry : IPboVFSEntry {
         return true
     }
 
-    override fun isValid(): Boolean = entryTimestamp >= 0 && entryOffset >= 0 && entryDecompressedSize >= 0 && entrySize >= 0
+    override fun isValid(options: BisOptions?): Boolean =
+        entryTimestamp >= 0 && entryOffset >= 0 && entryDecompressedSize >= 0 && entrySize >= 0
 
     override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
         throw Exception("Not Supported!")

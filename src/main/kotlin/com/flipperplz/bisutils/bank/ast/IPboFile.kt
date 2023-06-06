@@ -5,6 +5,7 @@ import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
 import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
 import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
 import com.flipperplz.bisutils.family.IFamilyNode
+import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 
 interface IPboFile : IPboDirectory, IFamilyNode {
@@ -34,8 +35,8 @@ interface IPboFile : IPboDirectory, IFamilyNode {
     override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
         throw Exception("Not Supported!")
 
-    override fun isValid(): Boolean { //TODO THIS NEEDS OPTIONS >:(
-        if(!super.isValid()) return false
+    override fun isValid(options: BisOptions?): Boolean {
+        if(!super.isValid(options)) return false
         if(entries.firstOrNull() !is IPboVersionEntry) return false
         return children != null && calculateSignature(children!!, null).contentEquals(signature)
     }

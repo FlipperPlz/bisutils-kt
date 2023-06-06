@@ -12,6 +12,7 @@ import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_CHARSET
 import com.flipperplz.bisutils.family.IFamilyMember
 import com.flipperplz.bisutils.family.IFamilyParent
 import com.flipperplz.bisutils.io.putAsciiZ
+import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
@@ -31,15 +32,13 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent {
     override val entrySize: Long
     override val children: List<IPboProperty>?
 
-    override fun isValid(): Boolean {
-        return entryMime == EntryMimeType.VERSION &&
-                entrySize == 0L &&
-                entryOffset == 0L &&
-                entryName == "" &&
-                entryTimestamp == 0L &&
-                entryDecompressedSize == 0L &&
-                children?.all { it.isValid() } ?: true
-    }
+    override fun isValid(options: BisOptions?): Boolean = entryMime == EntryMimeType.VERSION &&
+            entrySize == 0L &&
+            entryOffset == 0L &&
+            entryName == "" &&
+            entryTimestamp == 0L &&
+            entryDecompressedSize == 0L &&
+            children?.all { it.isValid(options) } ?: true
 
     override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
         throw Exception("Not Supported!")

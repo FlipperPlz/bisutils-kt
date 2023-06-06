@@ -3,6 +3,7 @@ package com.flipperplz.bisutils.bank.ast
 import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
 import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
 import com.flipperplz.bisutils.family.IFamilyParent
+import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 
 interface IPboDirectory : IFamilyParent, IPboVFSEntry {
@@ -22,8 +23,8 @@ interface IPboDirectory : IFamilyParent, IPboVFSEntry {
     override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
         throw Exception("Not Supported!")
 
-    override fun isValid(): Boolean {
-        children?.forEach { if (!it.isValid()) return false }
+    override fun isValid(options: BisOptions?): Boolean {
+        children?.forEach { if (!it.isValid(options)) return false }
         return true
     }
 

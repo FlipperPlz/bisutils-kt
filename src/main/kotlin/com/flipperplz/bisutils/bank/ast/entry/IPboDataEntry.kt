@@ -6,6 +6,7 @@ import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
 import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
+import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 
 interface IPboDataEntry : IPboEntry {
@@ -21,7 +22,8 @@ interface IPboDataEntry : IPboEntry {
     override val path: String
     val entryData: ByteBuffer
 
-    override fun isValid(): Boolean = entrySize == entryData.capacity().toLong() && validateMutability()
+    override fun isValid(options: BisOptions?): Boolean =
+        entrySize == entryData.capacity().toLong() && validateMutability()
 
     fun validateMutability(): Boolean = entryData.isReadOnly
 

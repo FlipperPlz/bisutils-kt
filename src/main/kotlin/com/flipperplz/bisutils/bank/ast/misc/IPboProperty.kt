@@ -11,6 +11,7 @@ import com.flipperplz.bisutils.family.IFamilyChild
 import com.flipperplz.bisutils.family.IFamilyNode
 import com.flipperplz.bisutils.family.IFamilyParent
 import com.flipperplz.bisutils.io.putAsciiZ
+import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
@@ -33,5 +34,6 @@ interface IPboProperty : IPboBinaryObject, IFamilyChild {
     //TODO: CALCULATE LENGTH USING CHARSET IN OPTIONS `options?.charset ?: DEFAULT_BIS_CHARSET`
     override fun calculateBinaryLength(options: PboEntryBinarizationOptions?): Long = name.length + value.length + 2L
 
-    override fun isValid(): Boolean = !(name.contains('\u0000') || name.isEmpty())
+    override fun isValid(options: BisOptions?): Boolean =
+        !(name.contains('\u0000') || name.isEmpty())
 }
