@@ -1,6 +1,5 @@
 package com.flipperplz.bisutils.bank.ast.mutable
 
-import com.flipperplz.bisutils.bank.ast.IPboDirectory
 import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
 import java.nio.ByteBuffer
@@ -19,12 +18,12 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory {
         set(value)  { defaultPrefix = value }//TODO Allow version property change if available
 
     override var directories: List<IMutablePboDirectory>
-        get() = super.directories
-        set(value) {super.directories = value}
+        get() = super<IMutablePboDirectory>.directories
+        set(value) { super<IMutablePboDirectory>.directories = value }
 
     override var entries: List<IMutablePboEntry>
-        get() = super.entries
-        set(value) {super.entries = value}
+        get() = super<IMutablePboDirectory>.entries
+        set(value) { super<IMutablePboDirectory>.entries = value }
 
     //TODO: READ
     override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean {

@@ -19,7 +19,10 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent {
     override val parent: IPboDirectory?
     override val node: IPboFile?
     override val path: String
+        get() = parent?.path ?: ""
     override val absolutePath: String
+        get() = parent?.absolutePath ?: ""
+
     override val entryName: String
     override val entryMime: EntryMimeType
     override val entryDecompressedSize: Long

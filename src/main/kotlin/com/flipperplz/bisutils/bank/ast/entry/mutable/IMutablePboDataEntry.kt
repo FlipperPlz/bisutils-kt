@@ -1,10 +1,10 @@
 package com.flipperplz.bisutils.bank.ast.entry.mutable
 
 import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
-import com.flipperplz.bisutils.bank.ast.misc.IPboProperty
 import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboDirectory
 import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboEntry
 import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboFile
+import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import java.nio.ByteBuffer
 
@@ -15,6 +15,8 @@ interface IMutablePboDataEntry : IPboDataEntry, IMutablePboEntry {
     override var entryName: String
     override var entryOffset: Long
     override var entrySize: Long
+
+
     override var entryTimestamp: Long
     override var node: IMutablePboFile?
     override var parent: IMutablePboDirectory?
@@ -23,4 +25,7 @@ interface IMutablePboDataEntry : IPboDataEntry, IMutablePboEntry {
 
     override fun validateMutability(): Boolean =
         !super.validateMutability()
+
+    override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
+        super<IMutablePboEntry>.read(buffer, options)
 }
