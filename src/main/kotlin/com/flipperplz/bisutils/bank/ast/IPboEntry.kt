@@ -34,7 +34,7 @@ interface IPboEntry : IPboVFSEntry {
     override fun isValid(): Boolean = entryTimestamp >= 0 && entryOffset >= 0 && entryDecompressedSize >= 0 && entrySize >= 0
 
     override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
-        throw Exception("Not Supported")
+        throw Exception("Not Supported!")
 
     override fun calculateBinaryLength(options: PboEntryBinarizationOptions?): Long = (options?.charset ?: DEFAULT_BIS_CHARSET).newEncoder().averageBytesPerChar().let {
         (entryName.length * it).toLong() + 21

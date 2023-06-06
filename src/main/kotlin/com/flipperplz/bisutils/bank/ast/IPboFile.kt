@@ -3,6 +3,7 @@ package com.flipperplz.bisutils.bank.ast
 import com.flipperplz.bisutils.bank.ast.entry.IPboVersionEntry
 import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
 import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
 import com.flipperplz.bisutils.bank.utils.IPboBinaryObject
 import com.flipperplz.bisutils.bank.utils.versionEntry
 import com.flipperplz.bisutils.family.IFamilyMember
@@ -32,6 +33,9 @@ interface IPboFile : IPboDirectory, IFamilyNode {
         if(!super.writeValidated(buffer, options)) return false
         return writeSignature(buffer, options)
     }
+
+    override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
+        throw Exception("Not Supported!")
 
     private fun writeSignature(buffer: ByteBuffer, options: PboBinarizationOptions?) : Boolean {
         TODO("PBO SIGNATURE")

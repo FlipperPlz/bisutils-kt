@@ -20,7 +20,7 @@ interface IPboDirectory : IFamilyParent, IPboVFSEntry {
         children?.sumOf { it.calculateBinaryLength(options) } ?: 0
 
     override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
-        throw Exception("Not Supported")
+        throw Exception("Not Supported!")
 
     override fun isValid(): Boolean {
         children?.forEach { if (!it.isValid()) return false }

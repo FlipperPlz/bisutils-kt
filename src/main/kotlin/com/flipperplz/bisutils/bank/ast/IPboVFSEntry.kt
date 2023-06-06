@@ -4,6 +4,7 @@ import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
 import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
 import com.flipperplz.bisutils.binarization.interfaces.IStrictBinaryObject
 import com.flipperplz.bisutils.family.IFamilyChild
+import java.nio.ByteBuffer
 
 interface IPboVFSEntry : IStrictBinaryObject<PboEntryBinarizationOptions, PboEntryDebinarizationOptions>, IFamilyChild {
     val entryName: String
@@ -15,4 +16,7 @@ interface IPboVFSEntry : IStrictBinaryObject<PboEntryBinarizationOptions, PboEnt
 
     val absolutePath: String
         get() =  if(parent == null) entryName else "${parent?.absolutePath}\\${entryName}"
+
+    override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
+        throw Exception("Not Supported!")
 }

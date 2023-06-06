@@ -6,6 +6,7 @@ import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.ast.misc.IPboProperty
 import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
 import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_CHARSET
 import com.flipperplz.bisutils.family.IFamilyMember
@@ -36,6 +37,9 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent {
                 entryDecompressedSize == 0L &&
                 children?.all { it.isValid() } ?: true
     }
+
+    override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
+        throw Exception("Not Supported!")
 
     override fun calculateBinaryLength(options: PboEntryBinarizationOptions?): Long =
         super.calculateBinaryLength(options) + (children?.sumOf { it.calculateBinaryLength(options) } ?: 0) + 1L
