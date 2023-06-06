@@ -23,16 +23,16 @@ fun paramLexerOf(entry: IPboDataEntry, encoding: Charset = Charsets.UTF_8): Para
 
 fun List<IPboEntry>.dataEntries(): List<IPboDataEntry> =
     filterIsInstance<IPboDataEntry>()
-
-fun List<IPboEntry>.mutableDataEntries(): List<IMutablePboDataEntry> =
-    filterIsInstance<IMutablePboDataEntry>()
+//
+//fun List<IPboEntry>.mutableDataEntries(): List<IMutablePboDataEntry> =
+//    filterIsInstance<IMutablePboDataEntry>()
 
 fun List<IPboEntry>.versionEntry(): IPboVersionEntry? =
     filterIsInstance<IPboVersionEntry>().firstOrNull()
-
-fun List<IPboEntry>.mutableVersionEntry(): IMutablePboVersionEntry? =
-    filterIsInstance<IMutablePboVersionEntry>().firstOrNull()
-
-fun List<IPboEntry>.getProperty(name: String): IPboProperty? =
-    versionEntry()?.properties?.firstOrNull {it.name == name}
+//
+//fun List<IPboEntry>.mutableVersionEntry(): IMutablePboVersionEntry? =
+//    filterIsInstance<IMutablePboVersionEntry>().firstOrNull()
+//
+//fun List<IPboEntry>.getProperty(name: String): IPboProperty? =
+//    versionEntry()?.properties?.firstOrNull {it.name == name}
 

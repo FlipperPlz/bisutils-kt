@@ -4,7 +4,7 @@ import com.flipperplz.bisutils.bank.ast.entry.IPboVersionEntry
 import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
 import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
 import com.flipperplz.bisutils.bank.utils.IPboBinaryObject
-import com.flipperplz.bisutils.bank.utils.getProperty
+import com.flipperplz.bisutils.bank.utils.versionEntry
 import com.flipperplz.bisutils.family.IFamilyMember
 import com.flipperplz.bisutils.family.IFamilyNode
 import com.flipperplz.bisutils.family.IFamilyParent
@@ -20,7 +20,7 @@ interface IPboFile : IPboDirectory, IFamilyNode {
     override val node: IPboFile? get() = null
     override val directories: List<IPboDirectory>
     override val entries: List<IPboEntry>
-    val prefix: String get() = entries.getProperty("prefix")?.value ?: defaultPrefix /*TODO: DIG THROUGH VERSION ENTRY*/
+    val prefix: String get() = /*entries.versionEntry()?.getProperty("prefix")?.value ?:*/ defaultPrefix /*TODO: DIG THROUGH VERSION ENTRY*/
     val defaultPrefix: String
     val signature: ByteArray //should always be 20 bytes **IIRC**
 
