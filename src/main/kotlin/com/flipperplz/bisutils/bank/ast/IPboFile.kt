@@ -1,28 +1,45 @@
 package com.flipperplz.bisutils.bank.ast
 
+import com.flipperplz.bisutils.bank.ast.entry.IPboVersionEntry
 import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
 import com.flipperplz.bisutils.bank.utils.IPboBinaryObject
 import com.flipperplz.bisutils.bank.utils.getProperty
 import com.flipperplz.bisutils.family.IFamilyMember
+import com.flipperplz.bisutils.family.IFamilyNode
 import com.flipperplz.bisutils.family.IFamilyParent
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface IPboFile : IPboBinaryObject, IFamilyParent {
-    val prefix: String
-        get() = entries.getProperty("prefix")?.value ?: defaultPrefix /*TODO: DIG THROUGH VERSION ENTRY*/
+interface IPboFile : IPboDirectory, IFamilyNode {
+    override val absolutePath: String get() = prefix
+    override val path: String get() = ""
+    override val children: List<IPboVFSEntry>?
+    override val parent: IPboDirectory? get() = null
+    override val entryName: String get() = prefix
+    override val node: IPboFile? get() = null
+    override val directories: List<IPboDirectory>
+    override val entries: List<IPboEntry>
+    val prefix: String get() = entries.getProperty("prefix")?.value ?: defaultPrefix /*TODO: DIG THROUGH VERSION ENTRY*/
     val defaultPrefix: String
-    val entries: List<IPboEntry>
     val signature: ByteArray //should always be 20 bytes **IIRC**
 
-    override val children: List<IFamilyMember>?
-        get() = entries
+    override fun calculateBinaryLength(options: PboEntryBinarizationOptions?): Long {
+        return super.calculateBinaryLength(options) //TODO: ADD SIGNATURE LENGTH AND DATA LENGTH
+    }
 
-    override fun calculateBinaryLength(charset: Charset, options: PboBinarizationOptions?): Long {
-        TODO()//TODO: calculate length
+    override fun writeValidated(buffer: ByteBuffer, options: PboEntryBinarizationOptions?): Boolean {
+        if(!super.writeValidated(buffer, options)) return false
+        return writeSignature(buffer, options)
+    }
+
+    private fun writeSignature(buffer: ByteBuffer, options: PboBinarizationOptions?) : Boolean {
+        TODO("PBO SIGNATURE")
     }
 
     override fun isValid(): Boolean {
-        if(!entries.all { it.isValid() }) return false
+        if(!super.isValid()) return false
+        if(entries.firstOrNull() !is IPboVersionEntry) return false
         TODO()
     }
 

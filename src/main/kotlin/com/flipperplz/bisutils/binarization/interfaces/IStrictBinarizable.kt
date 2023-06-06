@@ -7,10 +7,10 @@ import java.nio.charset.Charset
 
 interface IStrictBinarizable<in B : BinarizationOptions> : IBinarizable<B>, IValidatable {
 
-    fun writeValidated(buffer: ByteBuffer, charset: Charset, options: B?): Boolean
+    fun writeValidated(buffer: ByteBuffer, options: B?): Boolean
 
-    override fun write(buffer: ByteBuffer, charset: Charset, options: B?): Boolean {
-        if(!isValid()) return false
-        return writeValidated(buffer, charset, options)
+    override fun write(buffer: ByteBuffer, options: B?): Boolean {
+        if(options?.skipValidation == true &&!isValid()) return false
+        return writeValidated(buffer, options)
     }
 }

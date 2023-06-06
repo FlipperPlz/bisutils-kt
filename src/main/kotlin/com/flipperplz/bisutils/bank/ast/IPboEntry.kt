@@ -1,33 +1,42 @@
 package com.flipperplz.bisutils.bank.ast
 
-import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
-import com.flipperplz.bisutils.bank.options.PboEntryDebinOptions
+import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.binarization.interfaces.IStrictBinaryObject
-import com.flipperplz.bisutils.family.IFamilyChild
+import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_CHARSET
+import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_ENDIANNESS
 import com.flipperplz.bisutils.io.putAsciiZ
+import com.flipperplz.bisutils.io.putLong
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
-interface IPboEntry : IStrictBinaryObject<PboBinarizationOptions, PboEntryDebinOptions>, IFamilyChild {
-    val entryName: String
+interface IPboEntry : IPboVFSEntry {
+    override val parent: IPboDirectory?
+    override val node: IPboFile?
+    override val entryName: String
+    override val absolutePath: String
+    override val path: String
     val entryMime: EntryMimeType
     val entryTimestamp: Long
     val entryOffset: Long
     val entryDecompressedSize: Long
     val entrySize: Long
 
-    override fun writeValidated(buffer: ByteBuffer, charset: Charset, options: PboBinarizationOptions?): Boolean {
-        buffer.putAsciiZ(entryName, charset)
-        if(!entryMime.write(buffer, charset, options)) return false
-        buffer.putLong(entryDecompressedSize)
-        buffer.putLong(entryOffset)
-        buffer.putLong(entryTimestamp)
-        buffer.putLong(entrySize)
+    override fun writeValidated(buffer: ByteBuffer, options: PboEntryBinarizationOptions?): Boolean {
+        buffer.putAsciiZ(options?.entryName ?: entryName, options?.charset ?: DEFAULT_BIS_CHARSET)
+        if(!(options?.entryMime ?: entryMime).write(buffer, options)) return false
+        buffer.putLong(options?.entryOriginalSize ?: entryDecompressedSize, options?.endianness ?: DEFAULT_BIS_ENDIANNESS)
+        buffer.putLong(options?.entryOffset ?: entryOffset, options?.endianness ?: DEFAULT_BIS_ENDIANNESS)
+        buffer.putLong(options?.entryTimestamp ?: entryTimestamp, options?.endianness ?: DEFAULT_BIS_ENDIANNESS)
+        buffer.putLong(options?.entrySize ?: entrySize, options?.endianness ?: DEFAULT_BIS_ENDIANNESS)
         return true
     }
 
-    override fun calculateBinaryLength(charset: Charset, options: PboBinarizationOptions?): Long =
-        21L + entryName.length
+    override fun isValid(): Boolean = entryTimestamp >= 0 && entryOffset >= 0 && entryDecompressedSize >= 0 && entrySize >= 0
 
+    override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
+        throw Exception("Not Supported")
+
+    override fun calculateBinaryLength(options: PboEntryBinarizationOptions?): Long = (options?.charset ?: DEFAULT_BIS_CHARSET).newEncoder().averageBytesPerChar().let {
+        (entryName.length * it).toLong() + 21
+    }
 }

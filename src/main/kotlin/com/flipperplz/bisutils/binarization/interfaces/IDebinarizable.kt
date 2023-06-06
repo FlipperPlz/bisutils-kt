@@ -5,5 +5,5 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 interface IDebinarizable<in T : DebinarizationOptions> {
-    fun read(buffer: ByteBuffer, charset: Charset, options: T): Boolean
+    fun read(buffer: ByteBuffer, options: T): Boolean
 }

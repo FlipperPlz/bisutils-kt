@@ -5,6 +5,6 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 interface IBinarizable<in T: BinarizationOptions> {
-    fun calculateBinaryLength(charset: Charset, options: T?) : Long
-    fun write(buffer: ByteBuffer, charset: Charset, options: T?): Boolean
+    fun calculateBinaryLength(options: T?) : Long
+    fun write(buffer: ByteBuffer, options: T?): Boolean
 }

@@ -5,6 +5,7 @@ import java.nio.ByteOrder
 import java.nio.charset.Charset
 
 open class PboBinarizationOptions(
-    val charset: Charset = Charsets.UTF_8,
-    val endianness: ByteOrder = ByteOrder.LITTLE_ENDIAN,
-) : BinarizationOptions()
+    charset: Charset = Charsets.UTF_8,
+    endianness: ByteOrder = ByteOrder.LITTLE_ENDIAN,
+    skipValidation: Boolean = false
+) : BinarizationOptions(charset, endianness, skipValidation)
