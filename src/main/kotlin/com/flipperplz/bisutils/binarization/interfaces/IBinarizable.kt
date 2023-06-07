@@ -1,10 +1,9 @@
 package com.flipperplz.bisutils.binarization.interfaces
 
-import com.flipperplz.bisutils.binarization.options.BinarizationOptions
+import com.flipperplz.bisutils.binarization.options.IBinarizationOptions
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
-interface IBinarizable<in T: BinarizationOptions> {
+interface IBinarizable<in T: IBinarizationOptions> {
     fun calculateBinaryLength(options: T?) : Long
     fun write(buffer: ByteBuffer, options: T?): Boolean
 }

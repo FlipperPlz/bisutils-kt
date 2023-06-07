@@ -1,7 +1,6 @@
 package com.flipperplz.bisutils.binarization
 
 import com.flipperplz.bisutils.binarization.interfaces.IBinaryObject
-import com.flipperplz.bisutils.binarization.options.BinarizationOptions
-import com.flipperplz.bisutils.binarization.options.DebinarizationOptions
+import com.flipperplz.bisutils.binarization.options.IBinarizationOptions
 
-abstract class BisBinaryObject<in BO : BinarizationOptions, in DO : DebinarizationOptions> protected constructor() : IBinaryObject<BO, DO>
+abstract class BisBinaryObject<in BO : IBinarizationOptions, in DO : IBinarizationOptions> protected constructor() : IBinaryObject<BO, DO>

@@ -1,7 +1,7 @@
 package com.flipperplz.bisutils.utils
 
-import com.flipperplz.bisutils.options.BisOptions
+import com.flipperplz.bisutils.options.IOptions
 
 interface IValidatable {
-    fun isValid(options: BisOptions?): Boolean
+    fun isValid(options: IOptions?): Boolean
 }

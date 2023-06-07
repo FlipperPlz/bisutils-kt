@@ -14,7 +14,6 @@ open class BisLexer(private var string: String) {
         private set
     fun hasNext(): Boolean = peekForward() != null
 
-
     fun isEOF(): Boolean =  currentChar == null && bufferPtr > string.length
 
     fun isWhitespace(): Boolean = BoostPreprocessor.whitespaces.contains(currentChar)
@@ -79,6 +78,7 @@ open class BisLexer(private var string: String) {
         val replacedSubstring = substring.replace(from, to)
         string = string.replaceRange(bufferPtr, until, replacedSubstring)
     }
+
     fun replaceUntil(until: Int, from: String, to: String) {
         val substring = string.substring(bufferPtr, until)
         val replacedSubstring = substring.replace(from, to)

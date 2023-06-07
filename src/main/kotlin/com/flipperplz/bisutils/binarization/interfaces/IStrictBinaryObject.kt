@@ -1,6 +1,5 @@
 package com.flipperplz.bisutils.binarization.interfaces
 
-import com.flipperplz.bisutils.binarization.options.BinarizationOptions
-import com.flipperplz.bisutils.binarization.options.DebinarizationOptions
+import com.flipperplz.bisutils.binarization.options.IBinarizationOptions
 
-interface IStrictBinaryObject<in B : BinarizationOptions, in D : DebinarizationOptions> : IStrictBinarizable<B>, IDebinarizable<D>
+interface IStrictBinaryObject<in B : IBinarizationOptions, in D : IBinarizationOptions> : IStrictBinarizable<B>, IDebinarizable<D>

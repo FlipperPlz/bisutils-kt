@@ -4,7 +4,7 @@ import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
 import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboDirectory
 import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboEntry
 import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboFile
-import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import java.nio.ByteBuffer
 
@@ -23,7 +23,7 @@ interface IMutablePboDataEntry : IPboDataEntry, IMutablePboEntry, Cloneable {
 
     override fun validateMutability(): Boolean = !super.validateMutability()
 
-    override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
+    override fun read(buffer: ByteBuffer, options: PboOptions): Boolean =
         super<IMutablePboEntry>.read(buffer, options)
 
     override fun clone(): IMutablePboDataEntry = super<Cloneable>.clone() as IMutablePboDataEntry

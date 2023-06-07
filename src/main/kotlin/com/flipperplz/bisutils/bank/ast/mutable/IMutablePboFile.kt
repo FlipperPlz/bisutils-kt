@@ -1,17 +1,14 @@
 package com.flipperplz.bisutils.bank.ast.mutable
 
 import com.flipperplz.bisutils.bank.ast.IPboFile
-import com.flipperplz.bisutils.bank.ast.entry.mutable.IMutablePboDataEntry
-import com.flipperplz.bisutils.bank.astImpl.entry.PboVersionEntry
 import com.flipperplz.bisutils.bank.astImpl.entry.mutable.MutablePboDataEntry
 import com.flipperplz.bisutils.bank.astImpl.entry.mutable.MutablePboVersionEntry
-import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_CHARSET
-import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_ENDIANNESS
+import com.flipperplz.bisutils.binarization.options.IBinarizationOptions.Companion.DEFAULT_BIS_CHARSET
+import com.flipperplz.bisutils.binarization.options.IBinarizationOptions.Companion.DEFAULT_BIS_ENDIANNESS
 import com.flipperplz.bisutils.io.getAsciiZ
 import com.flipperplz.bisutils.io.getLong
-import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 
 interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
@@ -36,41 +33,42 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
         set(value) { super<IMutablePboDirectory>.entries = value }
 
     //TODO: READ
-    override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean {
+    override fun read(buffer: ByteBuffer, options: PboOptions): Boolean {
 
-        while (true) {
-            val name = buffer.getAsciiZ(options.charset ?: DEFAULT_BIS_CHARSET)
-            val mime = EntryMimeType.fromMime(buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)) ?: return false
-            val ogSize = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
-            val timestamp = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
-            val offset = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
-            val size = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
+        var i = 0
+        var versionEntryEncountered = false
+        while (true.also { i++ }) {
+
+            options.entryName = buffer.getAsciiZ(options.charset ?: DEFAULT_BIS_CHARSET)
+            options.entryMime = EntryMimeType.fromMime(buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)) ?: return false
+            options.entryOriginalSize = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
+            options.entryTimestamp = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
+            options.entryOffset = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
+            options.entrySize = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
+
             if(
-                name == "" &&
-                mime == EntryMimeType.DUMMY &&
-                ogSize == 0L &&
-                timestamp == 0L &&
-                offset == 0L &&
-                size == 0L
-            ) break
-            with(PboEntryDebinarizationOptions(
-                    entryName = name,
-                    entryMime = mime,
-                    entryOriginalSize = ogSize,
-                    entryTimestamp = timestamp,
-                    entryOffset = offset,
-                    entrySize = size
-            )) {
-                when(mime) {
-                    EntryMimeType.VERSION -> {
-                        val entry = MutablePboVersionEntry(this@IMutablePboFile, this@IMutablePboFile)
-                        if(!entry.read(buffer, this)) return false
-                        children?.add(entry)
-                    }
-                    else -> {
-                        //TODO: Normalize and disassociate to directories
-                        children?.add(MutablePboDataEntry(this@IMutablePboFile, this@IMutablePboFile, name, mime, ogSize, timestamp, offset, size, ByteBuffer.allocate(size.toInt())))
-                    }
+                options.entryName == "" && options.entryMime == EntryMimeType.DUMMY &&
+                options.entryOriginalSize == 0L && options.entryTimestamp == 0L && 
+                options.entryOffset == 0L && options.entrySize == 0L
+            ) {
+                if(options.emptyIsAlwaysSeparator) break
+                //TODO: Try recover
+            }
+            when(options.entryMime) {
+                EntryMimeType.VERSION -> {
+                    if(versionEntryEncountered && options.allowMultipleVersionEntries)
+                        throw Exception()//TODO(exception): multiple version entries encountered
+
+                    val entry = MutablePboVersionEntry(this@IMutablePboFile, this@IMutablePboFile)
+                    if(!entry.read(buffer, options)) return false
+
+                    versionEntryEncountered = true
+                    children?.add(entry)
+                }
+                else -> {
+                    if(i == 1 && options.requireVersionEntryFirst) throw Exception()//TODO(exception): First entry should be version
+                    //TODO: Normalize and disassociate to directories
+                    //children?.add(MutablePboDataEntry(this@IMutablePboFile, this@IMutablePboFile, name, mime, ogSize, timestamp, offset, size, ByteBuffer.allocate(size.toInt())))
                 }
             }
 

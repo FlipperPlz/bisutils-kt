@@ -2,11 +2,11 @@ package com.flipperplz.bisutils.bank.utils
 
 import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
-import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.ast.literal.ParamArray
-import com.flipperplz.bisutils.param.ast.statement.ParamVariableStatement
-import com.flipperplz.bisutils.param.utils.extensions.*
-import com.flipperplz.bisutils.param.utils.mutability.ParamMutableFile
+import com.flipperplz.bisutils.options.param.ParamFile
+import com.flipperplz.bisutils.options.param.ast.literal.ParamArray
+import com.flipperplz.bisutils.options.param.ast.statement.ParamVariableStatement
+import com.flipperplz.bisutils.options.param.utils.extensions.*
+import com.flipperplz.bisutils.options.param.utils.mutability.ParamMutableFile
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostDefineDirective
 import com.flipperplz.bisutils.preprocesser.boost.ast.directive.BoostIncludeDirective

@@ -4,17 +4,11 @@ import com.flipperplz.bisutils.bank.ast.IPboDirectory
 import com.flipperplz.bisutils.bank.ast.IPboEntry
 import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.ast.misc.IPboProperty
-import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
-import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
-import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboOptions
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_CHARSET
-import com.flipperplz.bisutils.family.IFamilyMember
 import com.flipperplz.bisutils.family.IFamilyParent
-import com.flipperplz.bisutils.io.putAsciiZ
-import com.flipperplz.bisutils.options.BisOptions
+import com.flipperplz.bisutils.options.IOptions
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
 interface IPboVersionEntry : IPboEntry, IFamilyParent, Cloneable {
     override val parent: IPboDirectory?
@@ -32,7 +26,7 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent, Cloneable {
     override val entrySize: Long
     override val children: List<IPboProperty>?
 
-    override fun isValid(options: BisOptions?): Boolean = entryMime == EntryMimeType.VERSION &&
+    override fun isValid(options: IOptions?): Boolean = entryMime == EntryMimeType.VERSION &&
         entrySize == 0L &&
         entryOffset == 0L &&
         entryName == "" &&
@@ -40,13 +34,13 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent, Cloneable {
         entryDecompressedSize == 0L &&
         children?.all { it.isValid(options) } ?: true
 
-    override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
+    override fun read(buffer: ByteBuffer, options: PboOptions): Boolean =
         throw Exception("Not Supported!")
 
-    override fun calculateBinaryLength(options: PboEntryBinarizationOptions?): Long =
+    override fun calculateBinaryLength(options: PboOptions?): Long =
         super.calculateBinaryLength(options) + (children?.sumOf { it.calculateBinaryLength(options) } ?: 0) + 1L
 
-    override fun writeValidated(buffer: ByteBuffer, options: PboEntryBinarizationOptions?): Boolean {
+    override fun writeValidated(buffer: ByteBuffer, options: PboOptions?): Boolean {
         if(!super.writeValidated(buffer, options)) return false
         children?.forEach { it.writeValidated(buffer, options) }
         buffer.put(0)

@@ -1,9 +1,8 @@
 package com.flipperplz.bisutils.binarization.interfaces
 
-import com.flipperplz.bisutils.binarization.options.DebinarizationOptions
+import com.flipperplz.bisutils.binarization.options.IBinarizationOptions
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
-interface IDebinarizable<in T : DebinarizationOptions> {
+interface IDebinarizable<in T : IBinarizationOptions> {
     fun read(buffer: ByteBuffer, options: T): Boolean
 }

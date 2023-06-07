@@ -1,11 +1,9 @@
 package com.flipperplz.bisutils.bank.ast
 
 import com.flipperplz.bisutils.bank.ast.entry.IPboVersionEntry
-import com.flipperplz.bisutils.bank.options.PboBinarizationOptions
-import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
-import com.flipperplz.bisutils.bank.options.PboEntryDebinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboOptions
 import com.flipperplz.bisutils.family.IFamilyNode
-import com.flipperplz.bisutils.options.BisOptions
+import com.flipperplz.bisutils.options.IOptions
 import java.nio.ByteBuffer
 
 interface IPboFile : IPboDirectory, IFamilyNode, Cloneable {
@@ -22,20 +20,20 @@ interface IPboFile : IPboDirectory, IFamilyNode, Cloneable {
     val defaultPrefix: String
     val signature: ByteArray //should always be 20 bytes **IIRC**
 
-    override fun calculateBinaryLength(options: PboEntryBinarizationOptions?): Long {
+    override fun calculateBinaryLength(options: PboOptions?): Long {
         return super.calculateBinaryLength(options) //TODO: ADD SIGNATURE LENGTH AND DATA LENGTH
     }
 
-    override fun writeValidated(buffer: ByteBuffer, options: PboEntryBinarizationOptions?): Boolean {
+    override fun writeValidated(buffer: ByteBuffer, options: PboOptions?): Boolean {
         if(!super.writeValidated(buffer, options)) return false
         buffer.put(signature)
         return true
     }
 
-    override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
+    override fun read(buffer: ByteBuffer, options: PboOptions): Boolean =
         throw Exception("Not Supported!")
 
-    override fun isValid(options: BisOptions?): Boolean {
+    override fun isValid(options: IOptions?): Boolean {
         if(!super.isValid(options)) return false
         if(entries.firstOrNull() !is IPboVersionEntry) return false
         return children != null && calculateSignature(children!!, null).contentEquals(signature)
@@ -45,7 +43,7 @@ interface IPboFile : IPboDirectory, IFamilyNode, Cloneable {
 
 
     companion object {
-        fun calculateSignature(entries: List<IPboVFSEntry>, options: PboEntryBinarizationOptions?): ByteArray {
+        fun calculateSignature(entries: List<IPboVFSEntry>, options: PboOptions?): ByteArray {
             TODO()
         }
     }
