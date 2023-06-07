@@ -8,8 +8,8 @@ import com.flipperplz.bisutils.binarization.options.DEFAULT_BIS_CHARSET
 import com.flipperplz.bisutils.io.getAsciiZ
 import java.nio.ByteBuffer
 
-interface IMutablePboProperty : IPboProperty {
-    override var node: IMutablePboFile
+interface IMutablePboProperty : IPboProperty, Cloneable {
+    override var node: IMutablePboFile?
     override var parent: IMutablePboVersionEntry?
     override var name: String
     override var value: String
@@ -20,4 +20,6 @@ interface IMutablePboProperty : IPboProperty {
         value = buffer.getAsciiZ(options.charset ?: DEFAULT_BIS_CHARSET)
         return true
     }
+
+    override fun clone(): IMutablePboProperty = super<Cloneable>.clone() as IMutablePboProperty
 }

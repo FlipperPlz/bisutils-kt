@@ -10,7 +10,7 @@ import com.flipperplz.bisutils.io.putLong
 import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 
-interface IPboEntry : IPboVFSEntry {
+interface IPboEntry : IPboVFSEntry, Cloneable {
     override val parent: IPboDirectory?
     override val node: IPboFile?
     override val entryName: String
@@ -41,4 +41,7 @@ interface IPboEntry : IPboVFSEntry {
     override fun calculateBinaryLength(options: PboEntryBinarizationOptions?): Long = (options?.charset ?: DEFAULT_BIS_CHARSET).newEncoder().averageBytesPerChar().let {
         (entryName.length * it).toLong() + 21
     }
+
+    public override fun clone(): IPboEntry = super<Cloneable>.clone() as IPboEntry
+
 }

@@ -16,5 +16,5 @@ class MutablePboVersionEntry(
     override var entryTimestamp: Long = 0,
     override var entryOffset: Long = 0,
     override var entrySize: Long = 0,
-    override var children: MutableList<IMutablePboProperty>
+    override var children: MutableList<IMutablePboProperty> = mutableListOf()
 ) : PboVersionEntry(parent, node, entryName, entryMime, entryDecompressedSize, entryTimestamp, entryOffset, entrySize, children), IMutablePboVersionEntry

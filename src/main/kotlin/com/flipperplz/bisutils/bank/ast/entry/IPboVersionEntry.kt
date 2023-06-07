@@ -16,7 +16,7 @@ import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface IPboVersionEntry : IPboEntry, IFamilyParent {
+interface IPboVersionEntry : IPboEntry, IFamilyParent, Cloneable {
     override val parent: IPboDirectory?
     override val node: IPboFile?
     override val path: String
@@ -33,12 +33,12 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent {
     override val children: List<IPboProperty>?
 
     override fun isValid(options: BisOptions?): Boolean = entryMime == EntryMimeType.VERSION &&
-            entrySize == 0L &&
-            entryOffset == 0L &&
-            entryName == "" &&
-            entryTimestamp == 0L &&
-            entryDecompressedSize == 0L &&
-            children?.all { it.isValid(options) } ?: true
+        entrySize == 0L &&
+        entryOffset == 0L &&
+        entryName == "" &&
+        entryTimestamp == 0L &&
+        entryDecompressedSize == 0L &&
+        children?.all { it.isValid(options) } ?: true
 
     override fun read(buffer: ByteBuffer, options: PboEntryDebinarizationOptions): Boolean =
         throw Exception("Not Supported!")
@@ -48,11 +48,11 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent {
 
     override fun writeValidated(buffer: ByteBuffer, options: PboEntryBinarizationOptions?): Boolean {
         if(!super.writeValidated(buffer, options)) return false
-        children?.forEach {
-            buffer.putAsciiZ(it.name, options?.charset ?: DEFAULT_BIS_CHARSET)
-            buffer.putAsciiZ(it.value, options?.charset ?: DEFAULT_BIS_CHARSET)
-        }
+        children?.forEach { it.writeValidated(buffer, options) }
         buffer.put(0)
         return true
     }
+
+    public override fun clone(): IPboVersionEntry =  super<Cloneable>.clone() as IPboVersionEntry
+
 }

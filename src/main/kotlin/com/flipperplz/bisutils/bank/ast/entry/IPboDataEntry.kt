@@ -9,7 +9,7 @@ import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 
-interface IPboDataEntry : IPboEntry {
+interface IPboDataEntry : IPboEntry, Cloneable {
     override val node: IPboFile?
     override val parent: IPboDirectory?
     override val entryName: String
@@ -31,4 +31,6 @@ interface IPboDataEntry : IPboEntry {
         throw Exception("Not Supported!")
 
     override fun writeValidated(buffer: ByteBuffer, options: PboEntryBinarizationOptions?): Boolean = super.writeValidated(buffer, options)
+
+    public override fun clone(): IPboDataEntry =  super<Cloneable>.clone() as IPboDataEntry
 }

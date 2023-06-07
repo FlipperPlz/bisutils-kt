@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.family.IFamilyParent
 import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 
-interface IPboDirectory : IFamilyParent, IPboVFSEntry {
+interface IPboDirectory : IFamilyParent, IPboVFSEntry, Cloneable {
     override val entryName: String
     override val children: List<IPboVFSEntry>?
     override val node: IPboFile?
@@ -33,4 +33,6 @@ interface IPboDirectory : IFamilyParent, IPboVFSEntry {
         directories.forEach { if(!it.writeValidated(buffer, options)) return false }
         return true
     }
+
+    public override fun clone(): IPboDirectory = super<Cloneable>.clone() as IPboDirectory
 }

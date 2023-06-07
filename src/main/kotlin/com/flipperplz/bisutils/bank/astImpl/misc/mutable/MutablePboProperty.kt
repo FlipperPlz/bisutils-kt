@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboFile
 import com.flipperplz.bisutils.bank.astImpl.misc.PboProperty
 
 class MutablePboProperty(
-    override var node: IMutablePboFile,
+    override var node: IMutablePboFile?,
     override var parent: IMutablePboVersionEntry?,
     override var name: String,
     override var value: String

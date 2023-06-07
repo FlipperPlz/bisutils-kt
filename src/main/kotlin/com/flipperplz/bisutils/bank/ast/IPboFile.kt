@@ -8,7 +8,7 @@ import com.flipperplz.bisutils.family.IFamilyNode
 import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 
-interface IPboFile : IPboDirectory, IFamilyNode {
+interface IPboFile : IPboDirectory, IFamilyNode, Cloneable {
     override val absolutePath: String get() = prefix
     override val path: String get() = ""
     override val children: List<IPboVFSEntry>?
@@ -40,6 +40,9 @@ interface IPboFile : IPboDirectory, IFamilyNode {
         if(entries.firstOrNull() !is IPboVersionEntry) return false
         return children != null && calculateSignature(children!!, null).contentEquals(signature)
     }
+
+    public override fun clone(): IPboFile = super<Cloneable>.clone() as IPboFile
+
 
     companion object {
         fun calculateSignature(entries: List<IPboVFSEntry>, options: PboEntryBinarizationOptions?): ByteArray {

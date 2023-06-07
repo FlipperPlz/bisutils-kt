@@ -15,7 +15,7 @@ import com.flipperplz.bisutils.options.BisOptions
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-interface IPboProperty : IPboBinaryObject, IFamilyChild {
+interface IPboProperty : IPboBinaryObject, IFamilyChild, Cloneable {
     override val node: IPboFile?
     override val parent: IPboVersionEntry?
 
@@ -36,4 +36,6 @@ interface IPboProperty : IPboBinaryObject, IFamilyChild {
 
     override fun isValid(options: BisOptions?): Boolean =
         !(name.contains('\u0000') || name.isEmpty())
+
+    public override fun clone(): IPboProperty =  super.clone() as IPboProperty
 }
