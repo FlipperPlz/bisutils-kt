@@ -1,8 +1,8 @@
 package com.flipperplz.bisutils.param.utils.mutability.node
 
-import com.flipperplz.bisutils.param.ast.node.ParamStatement
-import com.flipperplz.bisutils.param.ast.node.ParamStatementHolder
+import com.flipperplz.bisutils.param.ast.node.IParamStatement
+import com.flipperplz.bisutils.param.ast.node.IParamStatementHolder
 
-interface ParamMutableStatementHolder: ParamMutableElement, ParamStatementHolder {
-    override var slimCommands: MutableList<ParamStatement>
+interface ParamMutableStatementHolder: ParamMutableElement, IParamStatementHolder {
+    override var slimCommands: MutableList<IParamStatement>
 }

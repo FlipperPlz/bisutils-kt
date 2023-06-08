@@ -1,5 +1,5 @@
 package com.flipperplz.bisutils.param.ast.node
 
-interface ParamNumerical : ParamLiteral<Number> {
+interface IParamNumerical : IParamLiteral<Number> {
     override fun toParam(): String = slimValue.toString()
 }

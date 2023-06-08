@@ -1,7 +1,7 @@
 package com.flipperplz.bisutils.param.parser
 
-import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.ast.node.ParamNumerical
+import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.node.IParamNumerical
 import com.flipperplz.bisutils.param.lexer.ParamLexer
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.extensions.*
@@ -14,7 +14,7 @@ import java.util.Stack
 object ParamParser {
 
     @Throws(LexerException::class)
-    fun parse(lexer: ParamLexer, name: String, preProcessor: BisPreprocessor? = null): ParamFile = mutableParamFile(name).apply {
+    fun parse(lexer: ParamLexer, name: String, preProcessor: BisPreprocessor? = null): IParamFile = mutableParamFile(name).apply {
         preProcessor?.processAndReset(lexer)
         val contextStack = Stack<ParamMutableStatementHolder>().also { it.add(this) }
         fun tryEnd(): Boolean {
@@ -83,7 +83,7 @@ object ParamParser {
                         keyword = lexer.readIdentifier()
                         lexer.traverseWhitespace(); lexer.moveForward()
                         val enumValue = if(lexer.previousChar != '=') enum.floatOf { enumNum.toFloat() } else
-                            (lexer.readLiteral(enum, this, '}', ',') as? ParamNumerical) ?: throw lexer.unexpectedInputException()
+                            (lexer.readLiteral(enum, this, '}', ',') as? IParamNumerical) ?: throw lexer.unexpectedInputException()
                         enum.enumValues[keyword] = enumValue
                         enumNum++
                     } while (lexer.currentChar != '}')

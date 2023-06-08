@@ -1,5 +1,5 @@
 package com.flipperplz.bisutils.param.ast.node
 
-interface ParamLiteral<T> : ParamLiteralBase {
+interface IParamLiteral<out T> : IParamLiteralBase {
     override val slimValue: T?
 }

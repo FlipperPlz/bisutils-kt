@@ -2,9 +2,9 @@ package com.flipperplz.bisutils.bank.utils
 
 import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
-import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.ast.literal.ParamArray
-import com.flipperplz.bisutils.param.ast.statement.ParamVariableStatement
+import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.literal.IParamArray
+import com.flipperplz.bisutils.param.ast.statement.IParamVariableStatement
 import com.flipperplz.bisutils.param.utils.extensions.*
 import com.flipperplz.bisutils.param.utils.mutability.ParamMutableFile
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
@@ -30,7 +30,7 @@ class BankProcessor(
 ) {
     private val _enforcePreprocessor: EnforcePreprocessor = EnforcePreprocessor(startingEnforceDefines, ::locateEnforceFile)
     private val _boostPreprocessor: BoostPreprocessor = BoostPreprocessor(startingBoostDefines, ::locateBoostFile)
-    private val configFiles: MutableMap<IPboDataEntry, ParamFile> = mutableMapOf()
+    private val configFiles: MutableMap<IPboDataEntry, IParamFile> = mutableMapOf()
     private val stringTables: MutableMap<IPboDataEntry, StringTableFile> = mutableMapOf() //TODO: stringtables implementation
     private val globalConfig: ParamMutableFile = mutableParamFile("config")
     private val globalStringTable: StringTableMutableFile = mutableStringTable()
@@ -49,10 +49,10 @@ class BankProcessor(
                 (modClass % "defs")?.childClasses?.forEach { defsClass ->
                     for(module in DayZScriptModule.values()) {
                         val scriptDefinitionClass = (defsClass % module.defsTitle) ?: continue
-                        (scriptDefinitionClass.childrenOfType<ParamVariableStatement>().firstOrNull {
+                        (scriptDefinitionClass.childrenOfType<IParamVariableStatement>().firstOrNull {
                             it.slimName == "files" &&
-                            it.slimValue is ParamArray
-                        }?.slimValue as? ParamArray)?.slimValue?.forEach {
+                            it.slimValue is IParamArray
+                        }?.slimValue as? IParamArray)?.slimValue?.forEach {
                           //todo: parse each directory or filename and add to context
                         }
 
@@ -75,7 +75,7 @@ class BankProcessor(
             val extension = fileName.split('.').last()
             fileName = fileName.removeRange(fileName.length-extension.length-1.. fileName.length)
 
-            fun processConfig(file: ParamFile) = configFiles.putIfAbsent(dataEntry, file)
+            fun processConfig(file: IParamFile) = configFiles.putIfAbsent(dataEntry, file)
 
             fun processStringtable(table: StringTableFile) {
                 stringTables.putIfAbsent(dataEntry, table)

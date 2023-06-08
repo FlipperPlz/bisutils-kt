@@ -1,15 +1,15 @@
 package com.flipperplz.bisutils.param.bin
 
-import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.ast.literal.ParamArray
-import com.flipperplz.bisutils.param.ast.literal.ParamFloat
-import com.flipperplz.bisutils.param.ast.literal.ParamInt
-import com.flipperplz.bisutils.param.ast.literal.ParamString
-import com.flipperplz.bisutils.param.ast.node.ParamElement
-import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
-import com.flipperplz.bisutils.param.ast.node.ParamStatement
-import com.flipperplz.bisutils.param.ast.statement.ParamDeleteStatement
-import com.flipperplz.bisutils.param.ast.statement.ParamExternalClass
+import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.literal.IParamArray
+import com.flipperplz.bisutils.param.ast.literal.IParamFloat
+import com.flipperplz.bisutils.param.ast.literal.IParamInt
+import com.flipperplz.bisutils.param.ast.literal.IParamString
+import com.flipperplz.bisutils.param.ast.node.IParamElement
+import com.flipperplz.bisutils.param.ast.node.IParamLiteralBase
+import com.flipperplz.bisutils.param.ast.node.IParamStatement
+import com.flipperplz.bisutils.param.ast.statement.IParamDeleteStatement
+import com.flipperplz.bisutils.param.ast.statement.IParamExternalClass
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.extensions.*
 import com.flipperplz.bisutils.param.utils.extensions.RapClassImpl
@@ -23,32 +23,32 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 object ParamDebinarizer {
-    fun readString(parent: ParamElement?, buffer: ByteBuffer): ParamString =
-            ParamString(parent, buffer.getAsciiZ())
+    fun readString(parent: IParamElement?, buffer: ByteBuffer): IParamString =
+            IParamString(parent, buffer.getAsciiZ())
 
-    fun readFloat(parent: ParamElement?, buffer: ByteBuffer): ParamFloat =
-            ParamFloat(parent, buffer.getFloat(ByteOrder.LITTLE_ENDIAN))
+    fun readFloat(parent: IParamElement?, buffer: ByteBuffer): IParamFloat =
+            IParamFloat(parent, buffer.getFloat(ByteOrder.LITTLE_ENDIAN))
 
-    fun readInt(parent: ParamElement?, buffer: ByteBuffer): ParamInt =
-            ParamInt(parent, buffer.getInt(ByteOrder.LITTLE_ENDIAN))
+    fun readInt(parent: IParamElement?, buffer: ByteBuffer): IParamInt =
+            IParamInt(parent, buffer.getInt(ByteOrder.LITTLE_ENDIAN))
 
-    fun readExternalClass(parent: ParamElement?, buffer: ByteBuffer): ParamExternalClass =
-            ParamExternalClass(parent, buffer.getAsciiZ())
+    fun readExternalClass(parent: IParamElement?, buffer: ByteBuffer): IParamExternalClass =
+            IParamExternalClass(parent, buffer.getAsciiZ())
 
-    fun readDeleteStatement(parent: ParamElement?, buffer: ByteBuffer, locateTarget: ((ParamDeleteStatement) -> ParamExternalClass)? = null): ParamDeleteStatement =
-            ParamDeleteStatement(parent, buffer.getAsciiZ(), locateTarget)
+    fun readDeleteStatement(parent: IParamElement?, buffer: ByteBuffer, locateTarget: ((IParamDeleteStatement) -> IParamExternalClass)? = null): IParamDeleteStatement =
+            IParamDeleteStatement(parent, buffer.getAsciiZ(), locateTarget)
 
-    fun readArray(parent: ParamElement?, buffer: ByteBuffer): ParamArray = ParamArray(parent, mutableListOf<ParamLiteralBase>().apply {
+    fun readArray(parent: IParamElement?, buffer: ByteBuffer): IParamArray = IParamArray(parent, mutableListOf<IParamLiteralBase>().apply {
         repeat(buffer.getCompactInt()) {
             add(readLiteral(parent, buffer))
         }
     })
 
-    fun readParamFile(name: String, buffer: ByteBuffer): ParamFile {
+    fun readParamFile(name: String, buffer: ByteBuffer): IParamFile {
 
         val file = RapFileImpl(name)
         fun loadChildClasses(child: RapClassImpl, buffer: ByteBuffer): Boolean {
-            with(mutableListOf<ParamStatement>()) {
+            with(mutableListOf<IParamStatement>()) {
                 buffer.position(child.binaryOffset)
                 child.slimSuperClass = buffer.getAsciiZ()
 
@@ -65,7 +65,7 @@ object ParamDebinarizer {
 
         val enumOffset = buffer.getInt(ByteOrder.LITTLE_ENDIAN)
 
-        with(mutableListOf<ParamStatement>()) {
+        with(mutableListOf<IParamStatement>()) {
             buffer.getAsciiZ()
             for (i in 0 until buffer.getCompactInt())
                 add(readStatement(file, buffer))
@@ -83,7 +83,7 @@ object ParamDebinarizer {
 
 
 
-    fun readStatement(parent: ParamElement?, buffer: ByteBuffer): ParamStatement = when(buffer.get()) {
+    fun readStatement(parent: IParamElement?, buffer: ByteBuffer): IParamStatement = when(buffer.get()) {
         0.toByte() -> RapClassImpl(parent, buffer.getAsciiZ(), buffer.getInt(ByteOrder.LITTLE_ENDIAN))
 
         1.toByte() -> RapVariableImpl(parent, ParamOperatorTypes.ASSIGN, buffer.getAsciiZ()).apply {
@@ -104,7 +104,7 @@ object ParamDebinarizer {
         else -> throw Exception()
     }
 
-    fun readLiteral(parent: ParamElement?, id: Int, buffer: ByteBuffer): ParamLiteralBase = when (id) {
+    fun readLiteral(parent: IParamElement?, id: Int, buffer: ByteBuffer): IParamLiteralBase = when (id) {
         0 -> readString(parent, buffer)
         1 -> readFloat(parent, buffer)
         2 -> readInt(parent, buffer)
@@ -112,5 +112,5 @@ object ParamDebinarizer {
         else -> throw Exception()
     }
 
-    fun readLiteral(parent: ParamElement?, buffer: ByteBuffer): ParamLiteralBase = readLiteral(parent, buffer.getInt(), buffer)
+    fun readLiteral(parent: IParamElement?, buffer: ByteBuffer): IParamLiteralBase = readLiteral(parent, buffer.getInt(), buffer)
 }

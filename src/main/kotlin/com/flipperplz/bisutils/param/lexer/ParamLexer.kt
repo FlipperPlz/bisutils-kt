@@ -1,9 +1,9 @@
 package com.flipperplz.bisutils.param.lexer
 
-import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.ast.literal.ParamString
-import com.flipperplz.bisutils.param.ast.node.ParamElement
-import com.flipperplz.bisutils.param.ast.node.ParamLiteralBase
+import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.literal.IParamString
+import com.flipperplz.bisutils.param.ast.node.IParamElement
+import com.flipperplz.bisutils.param.ast.node.IParamLiteralBase
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
 import com.flipperplz.bisutils.param.utils.extensions.plusAssign
@@ -80,7 +80,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
     }
 
     @Throws(LexerException::class)
-    fun readString(parent: ParamElement, file: ParamFile, vararg delimiters: Char): ParamString {
+    fun readString(parent: IParamElement, file: IParamFile, vararg delimiters: Char): IParamString {
         var string = readString(*delimiters)
         val type = if(string.startsWith('"')) ParamStringType.QUOTED.also {
             string = string.trimStart('"').trimEnd('"')
@@ -89,7 +89,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
     }
 
     @Throws(LexerException::class)
-    fun readLiteral(parent: ParamElement, file: ParamFile, vararg delimiters: Char): ParamLiteralBase = readString(parent, file, *delimiters).also { string ->
+    fun readLiteral(parent: IParamElement, file: IParamFile, vararg delimiters: Char): IParamLiteralBase = readString(parent, file, *delimiters).also { string ->
         return if(string.slimStringType == ParamStringType.QUOTED) string else with(string.slimValue?.toFloatOrNull()) {
             if(this != null) {
                 if(ceil(this/3) == floor(this/3) && this <= Int.MAX_VALUE)
@@ -100,7 +100,7 @@ class ParamLexer(paramText: String) : BisLexer(paramText) {
     }
 
     @Throws(LexerException::class)
-    fun readArray(parent: ParamElement, file: ParamMutableFile): ParamMutableArray {
+    fun readArray(parent: IParamElement, file: ParamMutableFile): ParamMutableArray {
         val array = ParamMutableArrayImpl(parent, file)
         val contextStack = Stack<ParamMutableArray>().apply { push(array); traverseWhitespace() }
         if(currentChar != '{') throw unexpectedInputException()

@@ -1,5 +1,5 @@
 package com.flipperplz.bisutils.param.ast.node
 
-interface ParamStatement : ParamElement {
+interface IParamStatement : IParamElement {
     companion object
 }

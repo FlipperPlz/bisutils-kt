@@ -1,11 +1,11 @@
 package com.flipperplz.bisutils.param.utils.mutability.node
 
-import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.ast.node.ParamElement
+import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.node.IParamElement
 
-interface ParamMutableElement: ParamElement {
+interface ParamMutableElement: IParamElement {
 
-    override var containingParamFile: ParamFile?
-    override var slimParent: ParamElement?
+    override var containingParamFile: IParamFile?
+    override var slimParent: IParamElement?
 
 }

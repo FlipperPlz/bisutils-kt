@@ -1,24 +1,24 @@
 package com.flipperplz.bisutils.param.utils.mutability
 
-import com.flipperplz.bisutils.param.ParamFile
-import com.flipperplz.bisutils.param.ast.node.ParamElement
-import com.flipperplz.bisutils.param.ast.node.ParamStatement
+import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.node.IParamElement
+import com.flipperplz.bisutils.param.ast.node.IParamStatement
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
 import com.flipperplz.bisutils.utils.IFlushable
 
 class ParamMutableFileImpl(
     override var slimName: String?,
-    override var slimCommands: MutableList<ParamStatement> = mutableListOf(),
+    override var slimCommands: MutableList<IParamStatement> = mutableListOf(),
 ): ParamMutableFile {
-    override var slimParent: ParamElement? = null
-    override var containingParamFile: ParamFile? = null
+    override var slimParent: IParamElement? = null
+    override var containingParamFile: IParamFile? = null
 }
 
-interface ParamMutableFile : ParamMutableStatementHolder, ParamFile, IFlushable {
+interface ParamMutableFile : ParamMutableStatementHolder, IParamFile, IFlushable {
     override var slimName: String?
-    override var slimCommands: MutableList<ParamStatement>
-    override var containingParamFile: ParamFile?
-    override var slimParent: ParamElement?
+    override var slimCommands: MutableList<IParamStatement>
+    override var containingParamFile: IParamFile?
+    override var slimParent: IParamElement?
 
     override fun flush() {
         slimCommands.clear()

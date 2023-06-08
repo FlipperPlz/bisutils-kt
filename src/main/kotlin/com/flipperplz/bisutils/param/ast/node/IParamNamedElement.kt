@@ -1,5 +1,5 @@
 package com.flipperplz.bisutils.param.ast.node
 
-interface ParamNamedElement : ParamElement {
+interface IParamNamedElement : IParamElement {
     val slimName: String?
 }
