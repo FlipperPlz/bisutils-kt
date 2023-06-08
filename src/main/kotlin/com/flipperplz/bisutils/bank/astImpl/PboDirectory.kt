@@ -8,5 +8,5 @@ open class PboDirectory(
     override val node: IPboFile?,
     override val parent: IPboDirectory?,
     override val entryName: String,
-    override val children: List<IPboVFSEntry>?,
+    override val children: List<IPboVFSEntry>,
 ) : IPboDirectory

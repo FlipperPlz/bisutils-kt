@@ -4,14 +4,14 @@ import com.flipperplz.bisutils.bank.ast.IPboDirectory
 import com.flipperplz.bisutils.bank.ast.IPboEntry
 import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.ast.IPboVFSEntry
-import com.flipperplz.bisutils.bank.options.PboEntryBinarizationOptions
+import com.flipperplz.bisutils.bank.options.PboOptions
 
 open class PboFile(
     override val defaultPrefix: String = "",
     override val children: List<IPboVFSEntry> = emptyList(),
     override val signature: ByteArray
 ) : IPboFile {
-    constructor(defaultPrefix: String, children: List<IPboVFSEntry>, options: PboEntryBinarizationOptions?) :
+    constructor(defaultPrefix: String, children: List<IPboVFSEntry>, options: PboOptions?) :
         this(defaultPrefix, children, IPboFile.calculateSignature(children, options))
 
     final override val entryName: String = super.entryName
@@ -19,7 +19,7 @@ open class PboFile(
     final override val node: PboFile? = null
     final override val absolutePath: String = super.absolutePath
     final override val path: String = super.path
-    final override val parent: IPboDirectory? = null
+    open override val parent: IPboDirectory? = null
     final override val entries: List<IPboEntry> = super.entries
     final override val directories: List<IPboDirectory> = super.directories
 }

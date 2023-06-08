@@ -24,7 +24,7 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent, Cloneable {
     override val entryTimestamp: Long
     override val entryOffset: Long
     override val entrySize: Long
-    override val children: List<IPboProperty>?
+    override val children: List<IPboProperty>
 
     override fun isValid(options: IOptions?): Boolean = entryMime == EntryMimeType.VERSION &&
         entrySize == 0L &&

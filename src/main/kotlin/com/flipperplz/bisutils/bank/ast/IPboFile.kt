@@ -9,7 +9,7 @@ import java.nio.ByteBuffer
 interface IPboFile : IPboDirectory, IFamilyNode, Cloneable {
     override val absolutePath: String get() = prefix
     override val path: String get() = ""
-    override val children: List<IPboVFSEntry>?
+    override val children: List<IPboVFSEntry>
     override val parent: IPboDirectory? get() = null
     override val entryName: String get() = prefix
     override val node: IPboFile? get() = null
@@ -36,7 +36,7 @@ interface IPboFile : IPboDirectory, IFamilyNode, Cloneable {
     override fun isValid(options: IOptions?): Boolean {
         if(!super.isValid(options)) return false
         if(entries.firstOrNull() !is IPboVersionEntry) return false
-        return children != null && calculateSignature(children!!, null).contentEquals(signature)
+        return calculateSignature(children, null).contentEquals(signature)
     }
 
     public override fun clone(): IPboFile = super<Cloneable>.clone() as IPboFile

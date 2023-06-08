@@ -19,7 +19,7 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
     override var node: IMutablePboFile?
     override var defaultPrefix: String
     override var signature: ByteArray
-    override val children: MutableList<IMutablePboVFSEntry>?
+    override val children: MutableList<IMutablePboVFSEntry>
     override val absolutePath: String get() = super<IMutablePboDirectory>.absolutePath
     override val path: String get() = super<IMutablePboDirectory>.path
 
@@ -42,12 +42,12 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
         var versionEntryEncountered = false
         while (true.also { i++ }) {
 
-            options.entryName = buffer.getAsciiZ(options.charset ?: DEFAULT_BIS_CHARSET)
-            options.entryMime = EntryMimeType.fromMime(buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)) ?: return false
-            options.entryOriginalSize = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
-            options.entryTimestamp = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
-            options.entryOffset = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
-            options.entrySize = buffer.getLong(options.endianness ?: DEFAULT_BIS_ENDIANNESS)
+            options.entryName = buffer.getAsciiZ(options.charset)
+            options.entryMime = EntryMimeType.fromMime(buffer.getLong(options.endianness)) ?: return false
+            options.entryOriginalSize = buffer.getLong(options.endianness)
+            options.entryTimestamp = buffer.getLong(options.endianness)
+            options.entryOffset = buffer.getLong(options.endianness)
+            options.entrySize = buffer.getLong(options.endianness)
 
             if(
                 options.entryName == "" && options.entryMime == EntryMimeType.DUMMY &&
@@ -72,9 +72,9 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
                     if(i == 1 && options.requireVersionEntryFirst) throw Exception("First entry should be version (requireVersionEntryFirst is enabled)")
                     val path = normalizePboPath(options.entryName!!)
                     val parent = createDirectory(getParent(path))
-                    children?.add(parent)
+                    children.add(parent)
                     options.entryName = getFilename(path)
-                    parent.children?.add(MutablePboDataEntry(parent, node).apply { read(buffer, options) })
+                    parent.children.add(MutablePboDataEntry(parent, node).apply { read(buffer, options) })
                 }
             }
         }
