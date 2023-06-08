@@ -1,6 +1,7 @@
 package com.flipperplz.bisutils.bank.ast.mutable
 
 import com.flipperplz.bisutils.bank.ast.IPboDirectory
+import com.flipperplz.bisutils.bank.astImpl.mutable.MutablePboDirectory
 import com.flipperplz.bisutils.bank.options.PboOptions
 import java.nio.ByteBuffer
 
@@ -28,5 +29,14 @@ interface IMutablePboDirectory : IPboDirectory, IMutablePboVFSEntry, Cloneable {
         throw Exception("Directories CANNOT be read directly, they must be formed by the pbo reader.")
 
     override fun clone(): IMutablePboDirectory = super<Cloneable>.clone() as IMutablePboDirectory
+
+    fun createDirectory(name: String): IMutablePboDirectory = with(name.split("\\", limit = 2)) {
+        getDirectory(this[0])?.let { return it.createDirectory(this[1]) }
+        return MutablePboDirectory(node, this@IMutablePboDirectory, this[0], mutableListOf()).also {
+            children?.add(it.createDirectory(this[1]))
+        }
+    }
+
+    fun getDirectory(name: String): IMutablePboDirectory? = directories.firstOrNull { it.entryName == name }
 
 }

@@ -41,7 +41,6 @@ interface IPboFile : IPboDirectory, IFamilyNode, Cloneable {
 
     public override fun clone(): IPboFile = super<Cloneable>.clone() as IPboFile
 
-
     companion object {
         fun calculateSignature(entries: List<IPboVFSEntry>, options: PboOptions?): ByteArray {
             TODO()

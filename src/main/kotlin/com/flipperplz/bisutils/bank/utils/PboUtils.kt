@@ -24,6 +24,7 @@ fun List<IPboEntry>.dataEntries(): List<IPboDataEntry> =
 
 fun List<IPboEntry>.versionEntry(): IPboVersionEntry? =
     filterIsInstance<IPboVersionEntry>().firstOrNull()
+
 //
 //fun List<IPboEntry>.mutableVersionEntry(): IMutablePboVersionEntry? =
 //    filterIsInstance<IMutablePboVersionEntry>().firstOrNull()

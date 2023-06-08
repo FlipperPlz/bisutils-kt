@@ -4,6 +4,9 @@ import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.astImpl.entry.mutable.MutablePboDataEntry
 import com.flipperplz.bisutils.bank.astImpl.entry.mutable.MutablePboVersionEntry
 import com.flipperplz.bisutils.bank.options.PboOptions
+import com.flipperplz.bisutils.bank.utils.BankPathUtils.getFilename
+import com.flipperplz.bisutils.bank.utils.BankPathUtils.getParent
+import com.flipperplz.bisutils.bank.utils.BankPathUtils.normalizePboPath
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 import com.flipperplz.bisutils.binarization.options.IBinarizationOptions.Companion.DEFAULT_BIS_CHARSET
 import com.flipperplz.bisutils.binarization.options.IBinarizationOptions.Companion.DEFAULT_BIS_ENDIANNESS
@@ -57,7 +60,7 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
             when(options.entryMime) {
                 EntryMimeType.VERSION -> {
                     if(versionEntryEncountered && options.allowMultipleVersionEntries)
-                        throw Exception()//TODO(exception): multiple version entries encountered
+                        throw Exception("TODO multiple version entries encountered")
 
                     val entry = MutablePboVersionEntry(this@IMutablePboFile, this@IMutablePboFile)
                     if(!entry.read(buffer, options)) return false
@@ -66,13 +69,14 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
                     children?.add(entry)
                 }
                 else -> {
-                    if(i == 1 && options.requireVersionEntryFirst) throw Exception()//TODO(exception): First entry should be version
-                    //TODO: Normalize and disassociate to directories
-                    //children?.add(MutablePboDataEntry(this@IMutablePboFile, this@IMutablePboFile, name, mime, ogSize, timestamp, offset, size, ByteBuffer.allocate(size.toInt())))
+                    if(i == 1 && options.requireVersionEntryFirst) throw Exception("First entry should be version (requireVersionEntryFirst is enabled)")
+                    val path = normalizePboPath(options.entryName!!)
+                    val parent = createDirectory(getParent(path))
+                    children?.add(parent)
+                    options.entryName = getFilename(path)
+                    parent.children?.add(MutablePboDataEntry(parent, node).apply { read(buffer, options) })
                 }
             }
-
-
         }
 
         return true
