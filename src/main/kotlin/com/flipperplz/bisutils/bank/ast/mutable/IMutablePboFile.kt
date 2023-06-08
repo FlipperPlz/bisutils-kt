@@ -1,5 +1,6 @@
 package com.flipperplz.bisutils.bank.ast.mutable
 
+import com.flipperplz.bisutils.bank.ast.IPboDirectory
 import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.astImpl.entry.mutable.MutablePboDataEntry
 import com.flipperplz.bisutils.bank.astImpl.entry.mutable.MutablePboVersionEntry
@@ -8,15 +9,13 @@ import com.flipperplz.bisutils.bank.utils.BankPathUtils.getFilename
 import com.flipperplz.bisutils.bank.utils.BankPathUtils.getParent
 import com.flipperplz.bisutils.bank.utils.BankPathUtils.normalizePboPath
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
-import com.flipperplz.bisutils.binarization.options.IBinarizationOptions.Companion.DEFAULT_BIS_CHARSET
-import com.flipperplz.bisutils.binarization.options.IBinarizationOptions.Companion.DEFAULT_BIS_ENDIANNESS
 import com.flipperplz.bisutils.io.getAsciiZ
 import com.flipperplz.bisutils.io.getLong
 import java.nio.ByteBuffer
 
 interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
-    override var parent: IMutablePboDirectory?
-    override var node: IMutablePboFile?
+    override var parent: IPboDirectory?
+    override var node: IPboFile?
     override var defaultPrefix: String
     override var signature: ByteArray
     override val children: MutableList<IMutablePboVFSEntry>
@@ -59,6 +58,14 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
             }
             when(options.entryMime) {
                 EntryMimeType.VERSION -> {
+                    if(options.requireBlankVersionMeta &&
+                       (options.entryName != "" ||
+                           options.entryOriginalSize != 0L ||
+                           options.entryTimestamp != 0L ||
+                           options.entryOffset == 0L ||
+                           options.entrySize == 0L
+                       )
+                      ) throw Exception("TODO non blank version entry encountered")
                     if(versionEntryEncountered && options.allowMultipleVersionEntries)
                         throw Exception("TODO multiple version entries encountered")
 
@@ -66,7 +73,7 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
                     if(!entry.read(buffer, options)) return false
 
                     versionEntryEncountered = true
-                    children?.add(entry)
+                    children.add(entry)
                 }
                 else -> {
                     if(i == 1 && options.requireVersionEntryFirst) throw Exception("First entry should be version (requireVersionEntryFirst is enabled)")

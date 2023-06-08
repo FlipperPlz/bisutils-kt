@@ -27,10 +27,16 @@ interface IPboProperty : IStrictBinaryObject<PboOptions, PboOptions>, IFamilyChi
         throw Exception("Not Supported!")
 
     //TODO: CALCULATE LENGTH USING CHARSET IN OPTIONS `options?.charset ?: DEFAULT_BIS_CHARSET`
-    override fun calculateBinaryLength(options: PboOptions?): Long = name.length + value.length + 2L
+    override fun calculateBinaryLength(options: PboOptions?): Long =
+        name.length + value.length + 2L
 
     override fun isValid(options: IOptions?): Boolean =
         !(name.contains('\u0000') || name.isEmpty())
 
-    public override fun clone(): IPboProperty =  super.clone() as IPboProperty
+    public override fun clone(): IPboProperty =
+        super.clone() as IPboProperty
+
+    companion object {
+        val usedProperties: List<String> = listOf("prefix", "version", "obfuscated", "encryption")
+    }
 }

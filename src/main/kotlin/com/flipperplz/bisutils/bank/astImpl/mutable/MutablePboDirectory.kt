@@ -9,8 +9,8 @@ import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboVFSEntry
 import com.flipperplz.bisutils.bank.astImpl.PboDirectory
 
 class MutablePboDirectory(
-    override var node: IMutablePboFile?,
-    override var parent: IMutablePboDirectory?,
+    override var node: IPboFile?,
+    override var parent: IPboDirectory?,
     override var entryName: String,
-    override var children: MutableList<IMutablePboVFSEntry>?
+    override var children: MutableList<IMutablePboVFSEntry>
 ) : PboDirectory(node, parent, entryName, children), IMutablePboDirectory

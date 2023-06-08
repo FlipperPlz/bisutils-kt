@@ -1,6 +1,7 @@
 package com.flipperplz.bisutils.binarization.interfaces
 
 import com.flipperplz.bisutils.binarization.options.IBinarizationOptions
+import com.flipperplz.bisutils.options.IOptions
 import com.flipperplz.bisutils.utils.IValidatable
 import java.nio.ByteBuffer
 

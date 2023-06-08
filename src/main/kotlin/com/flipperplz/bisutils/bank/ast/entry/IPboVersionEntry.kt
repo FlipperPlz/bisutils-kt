@@ -32,17 +32,17 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent, Cloneable {
         entryName == "" &&
         entryTimestamp == 0L &&
         entryDecompressedSize == 0L &&
-        children?.all { it.isValid(options) } ?: true
+        children.all { it.isValid(options) }
 
     override fun read(buffer: ByteBuffer, options: PboOptions): Boolean =
         throw Exception("Not Supported!")
 
     override fun calculateBinaryLength(options: PboOptions?): Long =
-        super.calculateBinaryLength(options) + (children?.sumOf { it.calculateBinaryLength(options) } ?: 0) + 1L
+        super.calculateBinaryLength(options) + (children.sumOf { it.calculateBinaryLength(options) } ?: 0) + 1L
 
     override fun writeValidated(buffer: ByteBuffer, options: PboOptions?): Boolean {
         if(!super.writeValidated(buffer, options)) return false
-        children?.forEach { it.writeValidated(buffer, options) }
+        children.forEach { it.writeValidated(buffer, options) }
         buffer.put(0)
         return true
     }

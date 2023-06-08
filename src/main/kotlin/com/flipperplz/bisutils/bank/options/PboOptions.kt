@@ -10,7 +10,7 @@ class PboOptions(
     override val endianness: ByteOrder = ByteOrder.LITTLE_ENDIAN,
     override val skipValidation: Boolean = false,
     var skipDataRead: Boolean = false,
-    var timeoutAsciiSeek: Int = 256, //Assume read fuck up if string is this long
+    var timeoutAsciiSeek: Int? = null, //Assume read fuck up if string is this long
     var timeoutDecompression: Int = 1, //minutes
     var respectEntryOffsets: Boolean = false, // Some of the Arma games use said offsets
     var requireVersionEntryFirst: Boolean = true,
@@ -24,6 +24,7 @@ class PboOptions(
     var allowObfuscatedBank: Boolean = false,
     var allowFPackerBank: Boolean = false,
     var allowEncryptedBank: Boolean = false,
+    var allowInvalidEntryMeta: Boolean = false,
     var allowDuplicateFiles: Boolean = false,
     var registerEmptyFiles: Boolean = false,
     var removeBenignProperties: Boolean = true,
@@ -33,5 +34,4 @@ class PboOptions(
     var entryOffset: Long?,
     var entryTimestamp: Long?,
     var entrySize: Long?,
-
 ) : IBinarizationOptions

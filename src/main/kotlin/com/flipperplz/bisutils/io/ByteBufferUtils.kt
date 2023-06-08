@@ -53,9 +53,10 @@ fun ByteBuffer.getInt(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Int =
 fun ByteBuffer.getFloat(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Float =
     ByteBuffer.wrap(getBytes(4)).order(order).getFloat(0)
 
-fun ByteBuffer.getAsciiZ(charset: Charset = Charsets.UTF_8): String {
+fun ByteBuffer.getAsciiZ(charset: Charset = Charsets.UTF_8, timeout: Int? = null): String {
     val builder = mutableListOf<Byte>()
     while (this.hasRemaining()) {
+        if(timeout != null && builder.count() >= timeout) break
         val c = this.get()
         if (c == 0.toByte()) break
         builder.add(c)

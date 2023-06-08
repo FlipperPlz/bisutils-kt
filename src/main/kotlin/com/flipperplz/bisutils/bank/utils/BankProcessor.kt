@@ -50,9 +50,10 @@ class BankProcessor(
                     for(module in DayZScriptModule.values()) {
                         val scriptDefinitionClass = (defsClass % module.defsTitle) ?: continue
                         (scriptDefinitionClass.childrenOfType<ParamVariableStatement>().firstOrNull {
-                            it.slimName == "files" && it.slimValue is ParamArray
+                            it.slimName == "files" &&
+                            it.slimValue is ParamArray
                         }?.slimValue as? ParamArray)?.slimValue?.forEach {
-                            //todo: parse each directory or filename and add to context
+                          //todo: parse each directory or filename and add to context
                         }
 
                     }

@@ -1,5 +1,7 @@
 package com.flipperplz.bisutils.bank.ast.entry.mutable
 
+import com.flipperplz.bisutils.bank.ast.IPboDirectory
+import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.ast.entry.IPboVersionEntry
 import com.flipperplz.bisutils.bank.ast.misc.IPboProperty
 import com.flipperplz.bisutils.bank.ast.misc.mutable.IMutablePboProperty
@@ -21,16 +23,19 @@ interface IMutablePboVersionEntry : IPboVersionEntry, IMutablePboEntry, Cloneabl
     override var entryOffset: Long
     override var entrySize: Long
     override var entryTimestamp: Long
-    override var node: IMutablePboFile?
-    override var parent: IMutablePboDirectory?
+    override var node: IPboFile?
+    override var parent: IPboDirectory?
 
     override fun flush() { super.flush(); children.clear() }
 
     override fun read(buffer: ByteBuffer, options: PboOptions): Boolean {
         if(!super<IMutablePboEntry>.read(buffer, options)) return false
 
-        val property = MutablePboProperty(node, this, "n/a", "n/a")
-        while (property.read(buffer, options)) children.add(property.clone())
+        val property = MutablePboProperty(this, node, "", "")
+        while (property.read(buffer, options)) {
+            if(options.removeBenignProperties && !(IPboProperty.usedProperties.contains(property.name))) continue
+            children.add(property.clone())
+        }
 
         return true
     }

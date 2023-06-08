@@ -1,13 +1,14 @@
 package com.flipperplz.bisutils.bank.ast.mutable
 
 import com.flipperplz.bisutils.bank.ast.IPboDirectory
+import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.astImpl.mutable.MutablePboDirectory
 import com.flipperplz.bisutils.bank.options.PboOptions
 import java.nio.ByteBuffer
 
 interface IMutablePboDirectory : IPboDirectory, IMutablePboVFSEntry, Cloneable {
-    override var parent: IMutablePboDirectory?
-    override var node: IMutablePboFile?
+    override var parent: IPboDirectory?
+    override var node: IPboFile?
     override val children: MutableList<IMutablePboVFSEntry>
     override var entryName: String
 

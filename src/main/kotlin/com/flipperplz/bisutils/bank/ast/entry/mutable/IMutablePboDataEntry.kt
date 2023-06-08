@@ -1,5 +1,7 @@
 package com.flipperplz.bisutils.bank.ast.entry.mutable
 
+import com.flipperplz.bisutils.bank.ast.IPboDirectory
+import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
 import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboDirectory
 import com.flipperplz.bisutils.bank.ast.mutable.IMutablePboEntry
@@ -16,8 +18,8 @@ interface IMutablePboDataEntry : IPboDataEntry, IMutablePboEntry, Cloneable {
     override var entryOffset: Long
     override var entrySize: Long
     override var entryTimestamp: Long
-    override var node: IMutablePboFile?
-    override var parent: IMutablePboDirectory?
+    override var node: IPboFile?
+    override var parent: IPboDirectory?
     override var entryData: ByteBuffer
     override var path: String
 
