@@ -3,7 +3,7 @@ package com.flipperplz.bisutils.bank.utils
 import com.flipperplz.bisutils.bank.ast.IPboEntry
 import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
 import com.flipperplz.bisutils.bank.ast.entry.IPboVersionEntry
-import com.flipperplz.bisutils.options.param.lexer.ParamLexer
+import com.flipperplz.bisutils.param.lexer.ParamLexer
 import java.nio.charset.Charset
 
 

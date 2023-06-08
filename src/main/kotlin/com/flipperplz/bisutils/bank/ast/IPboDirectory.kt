@@ -33,5 +33,11 @@ interface IPboDirectory : IFamilyParent, IPboVFSEntry, Cloneable {
         return true
     }
 
+    fun allEntries(recursive: Boolean = true) : List<IPboEntry> = entries.toMutableList().apply {
+        if(recursive) directories.forEach {
+            addAll(it.allEntries(true))
+        }
+    }
+
     public override fun clone(): IPboDirectory = super<Cloneable>.clone() as IPboDirectory
 }

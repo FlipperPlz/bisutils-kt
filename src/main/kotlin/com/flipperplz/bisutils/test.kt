@@ -1,7 +1,7 @@
 package com.flipperplz.bisutils
 
-import com.flipperplz.bisutils.options.param.lexer.ParamLexer
-import com.flipperplz.bisutils.options.param.utils.extensions.parseParamFile
+import com.flipperplz.bisutils.param.lexer.ParamLexer
+import com.flipperplz.bisutils.param.utils.extensions.parseParamFile
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 
 fun main() {

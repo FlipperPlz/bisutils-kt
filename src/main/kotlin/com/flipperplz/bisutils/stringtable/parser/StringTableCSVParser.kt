@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.stringtable.parser
 
-import com.flipperplz.bisutils.options.param.utils.extensions.mutableStringTable
+import com.flipperplz.bisutils.param.utils.extensions.mutableStringTable
 import com.flipperplz.bisutils.preprocesser.BisPreprocessor
 import com.flipperplz.bisutils.preprocesser.boost.BoostPreprocessor
 import com.flipperplz.bisutils.stringtable.lexer.StringTableLexer
