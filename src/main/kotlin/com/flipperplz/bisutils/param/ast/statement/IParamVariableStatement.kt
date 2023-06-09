@@ -1,12 +1,15 @@
 package com.flipperplz.bisutils.param.ast.statement
 
+import com.flipperplz.bisutils.io.putAsciiZ
 import com.flipperplz.bisutils.options.IOptions
 import com.flipperplz.bisutils.param.ast.literal.IParamArray
 import com.flipperplz.bisutils.param.ast.node.IParamElement
 import com.flipperplz.bisutils.param.ast.node.IParamLiteral
 import com.flipperplz.bisutils.param.ast.node.IParamLiteralParent
 import com.flipperplz.bisutils.param.ast.node.IParamStatement
+import com.flipperplz.bisutils.param.options.ParamOptions
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
+import java.nio.ByteBuffer
 
 interface IParamVariableStatement : IParamStatement, IParamLiteralParent {
     companion object
@@ -29,4 +32,13 @@ interface IParamVariableStatement : IParamStatement, IParamLiteralParent {
         builder.append(' ').append(paramOperator?.text).append(' ')
         return builder.append(paramValue?.toParam()).append(';').toString()
     }
+
+    override fun write(buffer: ByteBuffer, options: ParamOptions?): Boolean {
+        if(paramValue is IParamArray && paramOperator!!.write(buffer, options)) return false
+        buffer.putAsciiZ(paramName ?: throw Exception(), options?.charset ?: Charsets.UTF_8)
+        return paramValue!!.write(buffer, options)
+    }
+
+    override fun read(buffer: ByteBuffer, options: ParamOptions): Boolean =
+            throw Exception("Not Supported")
 }

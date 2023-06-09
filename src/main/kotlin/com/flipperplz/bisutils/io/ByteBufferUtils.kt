@@ -5,6 +5,9 @@ import java.nio.ByteOrder
 import java.nio.charset.Charset
 import kotlin.math.floor
 
+typealias JLong = java.lang.Long;
+typealias JFloat = java.lang.Float;
+typealias JDouble = java.lang.Double
 
 fun ByteBuffer.getBytes(count: Int): ByteArray {
     val bytes = ByteArray(count) // 4 bytes for an integer
@@ -13,36 +16,22 @@ fun ByteBuffer.getBytes(count: Int): ByteArray {
     return bytes
 }
 
-fun ByteBuffer.putLong(value: Long, order: ByteOrder): Unit = this.order().let {
-    this.order(order)
-
-    this.put((value shr 56).toByte())
-    this.put((value shr 48).toByte())
-    this.put((value shr 40).toByte())
-    this.put((value shr 32).toByte())
-    this.put((value shr 24).toByte())
-    this.put((value shr 16).toByte())
-    this.put((value shr 8).toByte())
-    this.put(value.toByte())
-
-    this.order(it)
+fun ByteBuffer.putFloat(value: Float, order: ByteOrder) {
+    if (order == ByteOrder.LITTLE_ENDIAN) putFloat(value)
+    else putInt(with(value.toRawBits()) { (this and 0xFF shl 24) or (this and 0xFF00 shl 8) or (this and 0xFF0000 shr 8) or (this and 0xFF000000.toInt() ushr 24) })
 }
 
-fun ByteBuffer.getLong(order: ByteOrder): Long = this.order().let {
-    this.order(order)
-
-    val value = (this.get().toLong() and 0xFF) shl 56 or
-            (this.get().toLong() and 0xFF) shl 48 or
-            (this.get().toLong() and 0xFF) shl 40 or
-            (this.get().toLong() and 0xFF) shl 32 or
-            (this.get().toLong() and 0xFF) shl 24 or
-            (this.get().toLong() and 0xFF) shl 16 or
-            (this.get().toLong() and 0xFF) shl 8 or
-            (this.get().toLong() and 0xFF)
-    this.order(it)
-
-    value
+fun ByteBuffer.putInt(value: Int, order: ByteOrder) {
+    if (order == ByteOrder.LITTLE_ENDIAN) putInt(value)
+    else putInt(Integer.reverseBytes(value))
 }
+
+fun ByteBuffer.putLong(value: Long, order: ByteOrder) {
+    if (order == ByteOrder.LITTLE_ENDIAN) putLong(value)
+    else putLong(JLong.reverseBytes(value))
+}
+
+
 fun <T> ByteBuffer.peek(peekFun: ByteBuffer.() -> T): T = with(position()) {
     peekFun(this@peek).also { position(this) }
 }

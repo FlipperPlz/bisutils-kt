@@ -3,6 +3,8 @@ package com.flipperplz.bisutils.param.ast.statement
 import com.flipperplz.bisutils.options.IOptions
 import com.flipperplz.bisutils.param.ast.node.IParamElement
 import com.flipperplz.bisutils.param.ast.node.IParamStatementHolder
+import com.flipperplz.bisutils.param.options.ParamOptions
+import java.nio.ByteBuffer
 
 interface IParamClass : IParamElement, IParamExternalClass, IParamStatementHolder {
     companion object
@@ -17,4 +19,13 @@ interface IParamClass : IParamElement, IParamExternalClass, IParamStatementHolde
         builder.append(super<IParamStatementHolder>.toParam())
         return builder.append("};").toString()
     }
+
+    override fun writeValidated(buffer: ByteBuffer, options: ParamOptions?): Boolean {
+        if(!super.writeValidated(buffer, options)) return false
+        options?.currentOffset = buffer.position()
+        return true
+    }
+
+    override fun read(buffer: ByteBuffer, options: ParamOptions): Boolean =
+        throw Exception("Not Supported")
 }
