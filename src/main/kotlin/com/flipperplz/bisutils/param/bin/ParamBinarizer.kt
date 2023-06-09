@@ -1,11 +1,10 @@
 package com.flipperplz.bisutils.param.bin
 
-import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.IParamFile
 import com.flipperplz.bisutils.param.ast.literal.IParamArray
 import com.flipperplz.bisutils.param.ast.literal.IParamFloat
 import com.flipperplz.bisutils.param.ast.literal.IParamInt
 import com.flipperplz.bisutils.param.ast.literal.IParamString
-import com.flipperplz.bisutils.param.ast.node.IParamLiteralBase
 import com.flipperplz.bisutils.param.ast.node.IParamStatement
 import com.flipperplz.bisutils.param.ast.statement.IParamClass
 import com.flipperplz.bisutils.param.ast.statement.IParamDeleteStatement
@@ -26,11 +25,11 @@ fun IParamString.write(buffer: ByteBuffer): Boolean = if(!isCurrentlyValid()) fa
 }
 
 fun IParamFloat.write(buffer: ByteBuffer): Boolean = if(!isCurrentlyValid()) false else {
-    buffer.putFloat(slimValue!!); true
+    buffer.putFloat(paramValue!!); true
 }
 
 fun IParamInt.write(buffer: ByteBuffer): Boolean = if(!isCurrentlyValid()) false else {
-    buffer.putInt(slimValue!!); true
+    buffer.putInt(paramValue!!); true
 }
 
 fun IParamExternalClass.write(buffer: ByteBuffer): Boolean = if(!isCurrentlyValid()) false else {
@@ -42,7 +41,7 @@ fun IParamDeleteStatement.write(buffer: ByteBuffer): Boolean = if(!isCurrentlyVa
 }
 
 fun IParamArray.write(buffer: ByteBuffer): Boolean { return if(!isCurrentlyValid()) false else {
-    buffer.putCompactInt(slimValue?.count() ?: return false); true
+    buffer.putCompactInt(paramValue?.count() ?: return false); true
 }}
 
 
@@ -66,7 +65,7 @@ data class ParamOffset(var location: Int, var data: Int)
 
 fun IParamClass.save(buffer: ByteBuffer, offsets: MutableList<ParamOffset>? = null, i: Int = 0): Int {
     offsets?.get(i)?.data = buffer.position()
-    buffer.putAsciiZ(slimSuperClass ?: "")
+    buffer.putAsciiZ(paramSuperClassname ?: "")
     var ii = i
     slimCommands.forEach { it.write(buffer, offsets) }
     childClasses.forEach { ii = it.save(buffer, offsets, ii++) }
@@ -80,12 +79,12 @@ fun IParamClass.write(buffer: ByteBuffer, offsets: MutableList<ParamOffset>? = n
 }
 
 fun IParamVariableStatement.write(buffer: ByteBuffer): Boolean {
-    if(getID() == 5.toByte()) buffer.put(slimOperator?.flag ?: return false)
+    if(getID() == 5.toByte()) buffer.put(paramOperator?.flag ?: return false)
     buffer.putAsciiZ(slimName ?: return false)
-    if(slimValue is IParamArray) (slimValue as? IParamArray)?.let {
+    if(paramValue is IParamArray) (paramValue as? IParamArray)?.let {
         return it.write(buffer)
     }
-    return slimValue?.write(buffer) ?: return false
+    return paramValue?.write(buffer) ?: return false
 }
 
 fun IParamLiteralBase.write(buffer: ByteBuffer) = when (this) {
@@ -117,6 +116,6 @@ fun IParamStatement.getID(): Byte = when(this) {
     is IParamDeleteStatement -> 4
     is IParamClass -> 0
     is IParamExternalClass -> 3
-    is IParamVariableStatement -> if(slimValue !is IParamArray) 1 else if(slimOperator != ParamOperatorTypes.ASSIGN) 5 else 2
+    is IParamVariableStatement -> if(paramValue !is IParamArray) 1 else if(paramOperator != ParamOperatorTypes.ASSIGN) 5 else 2
     else -> throw Exception("Unknown statement in context of ParamFile Binarization")
 }

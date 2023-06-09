@@ -2,7 +2,7 @@ package com.flipperplz.bisutils.bank.utils
 
 import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.ast.entry.IPboDataEntry
-import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.IParamFile
 import com.flipperplz.bisutils.param.ast.literal.IParamArray
 import com.flipperplz.bisutils.param.ast.statement.IParamVariableStatement
 import com.flipperplz.bisutils.param.utils.extensions.*
@@ -51,8 +51,8 @@ class BankProcessor(
                         val scriptDefinitionClass = (defsClass % module.defsTitle) ?: continue
                         (scriptDefinitionClass.childrenOfType<IParamVariableStatement>().firstOrNull {
                             it.slimName == "files" &&
-                            it.slimValue is IParamArray
-                        }?.slimValue as? IParamArray)?.slimValue?.forEach {
+                            it.paramValue is IParamArray
+                        }?.paramValue as? IParamArray)?.paramValue?.forEach {
                           //todo: parse each directory or filename and add to context
                         }
 

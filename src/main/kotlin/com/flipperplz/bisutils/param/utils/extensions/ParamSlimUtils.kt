@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.param.utils.extensions
 
-import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.IParamFile
 import com.flipperplz.bisutils.param.ast.literal.*
 import com.flipperplz.bisutils.param.ast.node.*
 import com.flipperplz.bisutils.param.ast.statement.*
@@ -19,11 +19,11 @@ import java.nio.charset.Charset
 
 //object ParamSlimUtils {
     internal class RapVariableImpl(
-    override val slimParent: IParamElement?,
-    override val slimOperator: ParamOperatorTypes?,
-    override val slimName: String?,
+        override val slimParent: IParamElement?,
+        override val paramOperator: ParamOperatorTypes?,
+        override val slimName: String?,
     ) : IParamVariableStatement {
-        override lateinit var slimValue: IParamLiteralBase
+        override lateinit var paramValue: IParamLiteralBase
 
         override val containingParamFile: IParamFile? = slimParent?.containingParamFile
     }
@@ -38,7 +38,7 @@ import java.nio.charset.Charset
         var binaryOffset: Int,
     ) : IParamClass {
         override lateinit var slimCommands: List<IParamStatement>
-        override lateinit var  slimSuperClass: String
+        override lateinit var  paramSuperClassname: String
         override val containingParamFile: IParamFile? = slimParent?.containingParamFile
 
         override fun shouldValidateSuper(): Boolean = false
@@ -97,7 +97,7 @@ import java.nio.charset.Charset
     inline fun paramArrayOf(parent: IParamElement? = null, crossinline value: () -> List<IParamLiteralBase>): IParamArray =
         IParamArray(parent, value())
 
-    operator fun ParamMutableArray.plusAssign(push: IParamLiteralBase?) { push?.let { slimValue?.add(it) } }
+    operator fun ParamMutableArray.plusAssign(push: IParamLiteralBase?) { push?.let { paramValue?.add(it) } }
 
     operator fun IParamFile.Companion.invoke(lexer: ParamLexer, name: String, preProcessor: BoostPreprocessor? = null): IParamFile =
         ParamParser.parse(lexer, name, preProcessor)
@@ -147,12 +147,12 @@ import java.nio.charset.Charset
 
     operator fun IParamString.Companion.invoke(parent: IParamElement?, value: String): IParamString = object : IParamString {
         override val slimStringType: ParamStringType = ParamStringType.QUOTED
-        override val slimValue: String = value
+        val paramValue: String = value
         override val slimParent: IParamElement? = parent
         override val containingParamFile: IParamFile? = parent?.containingParamFile
-        override val length: Int = slimValue.length
-        override fun get(index: Int): Char = slimValue[index]
-        override fun subSequence(startIndex: Int, endIndex: Int): CharSequence = slimValue.subSequence(startIndex, endIndex)
+        override val length: Int = paramValue.length
+        override fun get(index: Int): Char = paramValue[index]
+        override fun subSequence(startIndex: Int, endIndex: Int): CharSequence = paramValue.subSequence(startIndex, endIndex)
     }
 
     operator fun IParamClass.Companion.invoke(
@@ -162,7 +162,7 @@ import java.nio.charset.Charset
         commands: List<IParamStatement> = emptyList<IParamStatement>(),
         locateSuper: ((IParamClass) -> IParamExternalClass)? = null
     ): IParamClass = object : IParamClass {
-        override val slimSuperClass: String? = externalClassName
+        override val paramSuperClassname: String? = externalClassName
         override fun locateSuperClass(): IParamExternalClass? = locateSuper?.let { it(this) }
         override fun shouldValidateSuper(): Boolean = locateSuper != null
         override val slimParent: IParamElement? = parent
@@ -177,8 +177,8 @@ import java.nio.charset.Charset
         operator: ParamOperatorTypes,
         value: IParamLiteralBase
     ): IParamVariableStatement = object : IParamVariableStatement {
-        override val slimValue: IParamLiteralBase = value
-        override val slimOperator: ParamOperatorTypes = operator
+        override val paramValue: IParamLiteralBase = value
+        override val paramOperator: ParamOperatorTypes = operator
         override val slimParent: IParamElement? = parent
         override val containingParamFile: IParamFile? = parent?.containingParamFile
         override val slimName: String = name
@@ -206,34 +206,34 @@ import java.nio.charset.Charset
     }
 
     operator fun IParamFloat.Companion.invoke(parent: IParamElement?, value: Float): IParamFloat = object : IParamFloat {
-        override val slimValue: Float = value
+        val paramValue: Float = value
         override val slimParent: IParamElement? = parent
         override val containingParamFile: IParamFile? = parent?.containingParamFile
     }
 
     operator fun IParamInt.Companion.invoke(parent: IParamElement?, value: Int): IParamInt = object : IParamInt {
-        override val slimValue: Int = value
+        override val paramValue: Int = value
         override val slimParent: IParamElement? = parent
         override val containingParamFile: IParamFile? = parent?.containingParamFile
     }
 
     operator fun IParamArray.Companion.invoke(parent: IParamElement?, value: List<IParamLiteralBase>): IParamArray = object : IParamArray {
-        override val slimValue: List<IParamLiteralBase> = value
+        override val paramValue: List<IParamLiteralBase> = value
         override val slimParent: IParamElement? = parent
         override val containingParamFile: IParamFile? = parent?.containingParamFile
         override val size: Int
-            get() = slimValue.size
+            get() = paramValue.size
 
-        override fun contains(element: IParamLiteralBase): Boolean = slimValue.contains(element)
-        override fun containsAll(elements: Collection<IParamLiteralBase>): Boolean = slimValue.containsAll(elements)
-        override fun get(index: Int): IParamLiteralBase = slimValue[index]
-        override fun indexOf(element: IParamLiteralBase): Int = slimValue.indexOf(element)
-        override fun isEmpty(): Boolean = slimValue.isEmpty()
-        override fun iterator(): Iterator<IParamLiteralBase> = slimValue.iterator()
-        override fun lastIndexOf(element: IParamLiteralBase): Int = slimValue.lastIndexOf(element)
-        override fun listIterator(): ListIterator<IParamLiteralBase> = slimValue.listIterator()
-        override fun listIterator(index: Int): ListIterator<IParamLiteralBase> = slimValue.listIterator(index)
-        override fun subList(fromIndex: Int, toIndex: Int): List<IParamLiteralBase> = slimValue.subList(fromIndex, toIndex)
+        override fun contains(element: IParamLiteralBase): Boolean = paramValue.contains(element)
+        override fun containsAll(elements: Collection<IParamLiteralBase>): Boolean = paramValue.containsAll(elements)
+        override fun get(index: Int): IParamLiteralBase = paramValue[index]
+        override fun indexOf(element: IParamLiteralBase): Int = paramValue.indexOf(element)
+        override fun isEmpty(): Boolean = paramValue.isEmpty()
+        override fun iterator(): Iterator<IParamLiteralBase> = paramValue.iterator()
+        override fun lastIndexOf(element: IParamLiteralBase): Int = paramValue.lastIndexOf(element)
+        override fun listIterator(): ListIterator<IParamLiteralBase> = paramValue.listIterator()
+        override fun listIterator(index: Int): ListIterator<IParamLiteralBase> = paramValue.listIterator(index)
+        override fun subList(fromIndex: Int, toIndex: Int): List<IParamLiteralBase> = paramValue.subList(fromIndex, toIndex)
     }
 
 
@@ -257,16 +257,16 @@ import java.nio.charset.Charset
 
 
     fun IParamArray.toMutableArray(): ParamMutableArray =
-        ParamMutableArrayImpl(slimParent, slimParent?.containingParamFile, slimValue?.toMutableList())
+        ParamMutableArrayImpl(slimParent, slimParent?.containingParamFile, paramValue?.toMutableList())
 
     fun IParamString.toMutableString(): ParamMutableString =
         ParamMutableStringImpl(slimParent, slimParent?.containingParamFile, slimStringType, slimValue)
 
     fun IParamFloat.toMutableFloat(): ParamMutableFloat =
-        ParamMutableFloatImpl(slimParent, slimParent?.containingParamFile, slimValue)
+        ParamMutableFloatImpl(slimParent, slimParent?.containingParamFile, paramValue)
 
     fun IParamInt.toMutableInt(): ParamMutableInt =
-        ParamMutableIntImpl(slimParent, slimParent?.containingParamFile, slimValue)
+        ParamMutableIntImpl(slimParent, slimParent?.containingParamFile, paramValue)
 
     operator fun ParamMutableStatementHolder.plusAssign(statement: IParamStatement ) { slimCommands += statement }
 
@@ -276,7 +276,7 @@ import java.nio.charset.Charset
         slimParent,
         slimParent?.containingParamFile,
         slimName,
-        slimSuperClass,
+        paramSuperClassname,
         slimCommands.toMutableList(),
         false,
         null
@@ -286,7 +286,7 @@ import java.nio.charset.Charset
         ParamMutableExternalClassImpl(slimParent, slimParent?.containingParamFile, slimName)
 
     fun IParamVariableStatement.toMutableVariable(): ParamMutableVariableStatement =
-        ParamMutableVariableStatementImpl(slimParent, slimParent?.containingParamFile, slimName, slimValue, slimOperator)
+        ParamMutableVariableStatementImpl(slimParent, slimParent?.containingParamFile, slimName, paramValue, paramOperator)
 
     fun IParamDeleteStatement.toMutableDeleteStatement(): ParamMutableDeleteStatement =
         ParamMutableDeleteStatementImpl(slimParent, slimParent?.containingParamFile, slimName)

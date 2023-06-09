@@ -1,12 +1,11 @@
 package com.flipperplz.bisutils.param.bin
 
-import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.IParamFile
 import com.flipperplz.bisutils.param.ast.literal.IParamArray
 import com.flipperplz.bisutils.param.ast.literal.IParamFloat
 import com.flipperplz.bisutils.param.ast.literal.IParamInt
 import com.flipperplz.bisutils.param.ast.literal.IParamString
 import com.flipperplz.bisutils.param.ast.node.IParamElement
-import com.flipperplz.bisutils.param.ast.node.IParamLiteralBase
 import com.flipperplz.bisutils.param.ast.node.IParamStatement
 import com.flipperplz.bisutils.param.ast.statement.IParamDeleteStatement
 import com.flipperplz.bisutils.param.ast.statement.IParamExternalClass
@@ -50,7 +49,7 @@ object ParamDebinarizer {
         fun loadChildClasses(child: RapClassImpl, buffer: ByteBuffer): Boolean {
             with(mutableListOf<IParamStatement>()) {
                 buffer.position(child.binaryOffset)
-                child.slimSuperClass = buffer.getAsciiZ()
+                child.paramSuperClassname = buffer.getAsciiZ()
 
                 repeat(buffer.getCompactInt()) { add(readStatement(child, buffer)) }
 
@@ -87,11 +86,11 @@ object ParamDebinarizer {
         0.toByte() -> RapClassImpl(parent, buffer.getAsciiZ(), buffer.getInt(ByteOrder.LITTLE_ENDIAN))
 
         1.toByte() -> RapVariableImpl(parent, ParamOperatorTypes.ASSIGN, buffer.getAsciiZ()).apply {
-            slimValue = readLiteral(id = buffer.get().toInt(), parent = this@apply, buffer = buffer)
+            paramValue = readLiteral(id = buffer.get().toInt(), parent = this@apply, buffer = buffer)
         }
 
         2.toByte() -> RapVariableImpl(parent, ParamOperatorTypes.ASSIGN, buffer.getAsciiZ()).apply {
-            slimValue = readLiteral(this, buffer)
+            paramValue = readLiteral(this, buffer)
         }
 
         3.toByte() -> readExternalClass(parent, buffer)
@@ -99,7 +98,7 @@ object ParamDebinarizer {
         4.toByte() -> readDeleteStatement(parent, buffer)
 
         5.toByte() -> RapVariableImpl(parent, ParamOperatorTypes.forFlag(buffer.get()), buffer.getAsciiZ()).apply {
-            slimValue = readArray(parent, buffer)
+            paramValue = readArray(parent, buffer)
         }
         else -> throw Exception()
     }

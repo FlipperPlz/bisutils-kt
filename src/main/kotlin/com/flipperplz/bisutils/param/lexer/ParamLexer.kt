@@ -1,9 +1,8 @@
 package com.flipperplz.bisutils.param.lexer
 
-import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.IParamFile
 import com.flipperplz.bisutils.param.ast.literal.IParamString
 import com.flipperplz.bisutils.param.ast.node.IParamElement
-import com.flipperplz.bisutils.param.ast.node.IParamLiteralBase
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
 import com.flipperplz.bisutils.param.utils.ParamStringType
 import com.flipperplz.bisutils.param.utils.extensions.plusAssign

@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.param.utils.mutability
 
-import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.IParamFile
 import com.flipperplz.bisutils.param.ast.node.*
 import com.flipperplz.bisutils.param.ast.statement.*
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
@@ -10,11 +10,11 @@ import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatement
 interface ParamMutableStatement: ParamMutableElement, IParamStatement
 
 class ParamMutableDeleteStatementImpl(
-    override var slimParent: IParamElement? = null,
-    override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
-    override var slimName: String?,
-    override var shouldValidateTarget: Boolean = false,
-    override var locateTargetClass: ((IParamDeleteStatement) -> IParamExternalClass?)? = null
+        override var slimParent: IParamElement? = null,
+        override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
+        override var slimName: String?,
+        override var shouldValidateTarget: Boolean = false,
+        override var locateTargetClass: ((IParamDeleteStatement) -> IParamExternalClass?)? = null
 ): ParamMutableDeleteStatement
 
 interface ParamMutableDeleteStatement : ParamMutableStatement, IParamDeleteStatement {
@@ -28,25 +28,25 @@ interface ParamMutableDeleteStatement : ParamMutableStatement, IParamDeleteState
 }
 
 class ParamMutableVariableStatementImpl(
-    override var slimParent: IParamElement? = null,
-    override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
-    override var slimName: String? = null,
-    override var slimValue: IParamLiteralBase? = null,
-    override var slimOperator: ParamOperatorTypes? = ParamOperatorTypes.ASSIGN,
+        override var slimParent: IParamElement? = null,
+        override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
+        override var slimName: String? = null,
+        override var paramValue: IParamLiteralBase? = null,
+        override var paramOperator: ParamOperatorTypes? = ParamOperatorTypes.ASSIGN,
 ): ParamMutableVariableStatement
 
 interface ParamMutableVariableStatement : ParamMutableStatement, IParamVariableStatement{
     override var slimParent: IParamElement?
     override var containingParamFile: IParamFile?
     override var slimName: String?
-    override var slimValue: IParamLiteralBase?
-    override var slimOperator: ParamOperatorTypes?
+    override var paramValue: IParamLiteralBase?
+    override var paramOperator: ParamOperatorTypes?
 }
 
 open class ParamMutableExternalClassImpl(
-    override var slimParent: IParamElement? = null,
-    override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
-    override var slimName: String? = null,
+        override var slimParent: IParamElement? = null,
+        override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
+        override var slimName: String? = null,
 ): ParamMutableExternalClass
 
 interface ParamMutableExternalClass: ParamMutableStatement, IParamExternalClass {
@@ -56,20 +56,20 @@ interface ParamMutableExternalClass: ParamMutableStatement, IParamExternalClass 
 }
 
 class ParamMutableClassImpl(
-    override var slimParent: IParamElement?,
-    override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
-    override var slimName: String? = null,
-    override var slimSuperClass: String? = null,
-    override var slimCommands: MutableList<IParamStatement> = mutableListOf(),
-    override var shouldLocateSuperClass: Boolean = false,
-    override var locateSuperClass: ((IParamClass) -> IParamExternalClass?)? = null
+        override var slimParent: IParamElement?,
+        override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
+        override var slimName: String? = null,
+        override var paramSuperClassname: String? = null,
+        override var slimCommands: MutableList<IParamStatement> = mutableListOf(),
+        override var shouldLocateSuperClass: Boolean = false,
+        override var locateSuperClass: ((IParamClass) -> IParamExternalClass?)? = null
 ): ParamMutableClass
 
 interface ParamMutableClass : ParamMutableExternalClass, ParamMutableStatementHolder, IParamClass {
     override var slimParent: IParamElement?
     override var containingParamFile: IParamFile?
     override var slimName: String?
-    override var slimSuperClass: String?
+    override var paramSuperClassname: String?
     override var slimCommands: MutableList<IParamStatement>
     var shouldLocateSuperClass: Boolean
     var locateSuperClass: ((IParamClass) -> IParamExternalClass?)?
@@ -79,7 +79,7 @@ interface ParamMutableClass : ParamMutableExternalClass, ParamMutableStatementHo
 }
 
 class ParamMutableEnum(
-    override var slimParent: IParamElement? = null,
-    override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
-    override var enumValues: MutableMap<String, IParamNumerical>,
+        override var slimParent: IParamElement? = null,
+        override var containingParamFile: IParamFile? = slimParent?.containingParamFile,
+        override var enumValues: MutableMap<String, IParamNumerical>,
 ): ParamMutableStatement, IParamEnum

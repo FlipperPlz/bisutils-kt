@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.param.parser
 
-import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.IParamFile
 import com.flipperplz.bisutils.param.ast.node.IParamNumerical
 import com.flipperplz.bisutils.param.lexer.ParamLexer
 import com.flipperplz.bisutils.param.utils.ParamOperatorTypes
@@ -113,15 +113,15 @@ object ParamParser {
                         lexer.moveForward(); lexer.traverseWhitespace()
                         val operator: ParamOperatorTypes = lexer.readOperator(); lexer.moveForward(); lexer.traverseWhitespace()
                         currentContext.slimCommands.add(ParamMutableVariableStatementImpl(currentContext, this, keyword).also {
-                            it.slimValue = lexer.readArray(this, this)
-                            it.slimOperator = operator
+                            it.paramValue = lexer.readArray(this, this)
+                            it.paramOperator = operator
                         })
                         while (lexer.currentChar == ';') lexer.moveForward()
                         continue
                     } else if (lexer.currentChar == '=') {
                         lexer.moveForward(); lexer.traverseWhitespace()
                         currentContext.slimCommands.add(ParamMutableVariableStatementImpl(currentContext, this, keyword).also {
-                            it.slimValue = lexer.readLiteral(this, this, ';')
+                            it.paramValue = lexer.readLiteral(this, this, ';')
                         })
                         lexer.traverseWhitespace()
                         if (lexer.currentChar != ';') throw lexer.unexpectedInputException()

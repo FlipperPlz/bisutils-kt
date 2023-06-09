@@ -1,7 +1,6 @@
 package com.flipperplz.bisutils.param.utils.delegation
 
 import com.flipperplz.bisutils.param.ast.literal.IParamArray
-import com.flipperplz.bisutils.param.ast.node.IParamLiteralBase
 import kotlin.reflect.KClass
 import kotlin.reflect.full.starProjectedType
 
@@ -14,8 +13,8 @@ class ParamTemplatedArray(
         if (!super.isCurrentlyValid()) return false
         var current = 0
         val length = template.count()
-        if (slimValue.isNullOrEmpty()) return allowEmpty
-        slimValue.forEach { element ->
+        if (paramValue.isNullOrEmpty()) return allowEmpty
+        paramValue.forEach { element ->
             if (element::class.starProjectedType != template[current].starProjectedType) return false
             if (current == length) current = 0
             else current++

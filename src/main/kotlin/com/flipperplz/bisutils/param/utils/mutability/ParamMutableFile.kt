@@ -1,6 +1,6 @@
 package com.flipperplz.bisutils.param.utils.mutability
 
-import com.flipperplz.bisutils.param.IParamFile
+import com.flipperplz.bisutils.param.ast.IParamFile
 import com.flipperplz.bisutils.param.ast.node.IParamElement
 import com.flipperplz.bisutils.param.ast.node.IParamStatement
 import com.flipperplz.bisutils.param.utils.mutability.node.ParamMutableStatementHolder
