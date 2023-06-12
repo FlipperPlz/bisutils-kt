@@ -1,3 +1,7 @@
+import com.flipperplz.bisutils.param.ast.node.IParamElement
+import com.flipperplz.bisutils.param.ast.node.IParamStatementHolder
+import com.flipperplz.bisutils.param.ast.statement.IParamClass
+
 //package com.flipperplz.bisutils.param.utils.extensions
 //
 //import com.flipperplz.bisutils.param.ast.IParamFile
@@ -135,12 +139,12 @@
 //    infix fun IParamStatementHolder.contains(command: IParamStatement): Boolean =
 //        slimCommands.contains(command)
 //
-//    inline fun <reified T : IParamElement> IParamStatementHolder.childrenOfType(): List<T> =
-//        slimCommands.filterIsInstance<T>()
+    inline fun <reified T : IParamElement> IParamStatementHolder.childrenOfType(): List<T> =
+        familyChildren.filterIsInstance<T>()
 //
 //
-//    val IParamStatementHolder.childClasses: List<IParamClass>
-//        get() = childrenOfType()
+    val IParamStatementHolder.childClasses: List<IParamClass>
+        get() = childrenOfType()
 //
 //    operator fun IParamStatementHolder.iterator(): Iterator<IParamStatement> =
 //        slimCommands.iterator()

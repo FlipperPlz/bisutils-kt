@@ -19,8 +19,7 @@ interface IParamArray : IParamLiteral, IParamLiteralParent {
 
     override fun writeValidated(buffer: ByteBuffer, options: ParamOptions?): Boolean {
         buffer.putCompactInt(familyChildren!!.count())
-
-        //TODO: Write array contents
+        familyChildren!!.forEach { if(!it.writeValidated(buffer, options)) return false }
         return true
     }
 
