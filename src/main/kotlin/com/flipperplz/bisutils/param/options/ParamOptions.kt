@@ -12,8 +12,6 @@ class ParamOptions(
     var fileSignature: Int = DEFAULT_PARAM_SIGNATURE,
     var pClass: Int? = null,
     var oClass: Int? = null,
-    var pArray: Int? = null,
-    var oArray: Int? = null,
     var pEnum: Int? = null,
     var oEnum: Int? = null,
 

@@ -18,8 +18,8 @@ interface IMutablePboDataEntry : IPboDataEntry, IMutablePboEntry, Cloneable {
     override var entryOffset: Long
     override var entrySize: Long
     override var entryTimestamp: Long
-    override var node: IPboFile?
-    override var parent: IPboDirectory?
+    override var familyNode: IPboFile?
+    override var familyParent: IPboDirectory?
     override var entryData: ByteBuffer
     override var path: String
 

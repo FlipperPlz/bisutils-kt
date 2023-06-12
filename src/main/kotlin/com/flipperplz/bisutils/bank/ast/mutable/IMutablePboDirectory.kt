@@ -7,18 +7,18 @@ import com.flipperplz.bisutils.bank.options.PboOptions
 import java.nio.ByteBuffer
 
 interface IMutablePboDirectory : IPboDirectory, IMutablePboVFSEntry, Cloneable {
-    override var parent: IPboDirectory?
-    override var node: IPboFile?
-    override val children: MutableList<IMutablePboVFSEntry>
+    override var familyParent: IPboDirectory?
+    override var familyNode: IPboFile?
+    override val familyChildren: MutableList<IMutablePboVFSEntry>
     override var entryName: String
 
     override var directories: List<IMutablePboDirectory>
-        get() = children.filterIsInstance<IMutablePboDirectory>()
-        set(value) {children.removeIf { it is IPboDirectory }; children.addAll(value)}
+        get() = familyChildren.filterIsInstance<IMutablePboDirectory>()
+        set(value) {familyChildren.removeIf { it is IPboDirectory }; familyChildren.addAll(value)}
 
     override var entries: List<IMutablePboEntry>
-        get() = children.filterIsInstance<IMutablePboEntry>()
-        set(value) {children.removeIf { it is IMutablePboEntry }; children.addAll(value)}
+        get() = familyChildren.filterIsInstance<IMutablePboEntry>()
+        set(value) {familyChildren.removeIf { it is IMutablePboEntry }; familyChildren.addAll(value)}
 
     override val absolutePath: String
         get() = super<IPboDirectory>.absolutePath
@@ -33,8 +33,8 @@ interface IMutablePboDirectory : IPboDirectory, IMutablePboVFSEntry, Cloneable {
 
     fun createDirectory(name: String): IMutablePboDirectory = with(name.split("\\", limit = 2)) {
         getDirectory(this[0])?.let { return it.createDirectory(this[1]) }
-        return MutablePboDirectory(node, this@IMutablePboDirectory, this[0], mutableListOf()).also {
-            children.add(it.createDirectory(this[1]))
+        return MutablePboDirectory(familyNode, this@IMutablePboDirectory, this[0], mutableListOf()).also {
+            familyChildren.add(it.createDirectory(this[1]))
         }
     }
 

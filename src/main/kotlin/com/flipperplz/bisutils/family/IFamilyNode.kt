@@ -1,10 +1,10 @@
 package com.flipperplz.bisutils.family
 
 interface IFamilyNode : IFamilyParent {
-    override val parent: IFamilyParent?
+    override val familyParent: IFamilyParent?
         get() = null
-    override val node: IFamilyNode?
+    override val familyNode: IFamilyNode?
         get() = null
-    override val children: List<IFamilyMember>?
+    override val familyChildren: List<IFamilyMember>?
 
 }

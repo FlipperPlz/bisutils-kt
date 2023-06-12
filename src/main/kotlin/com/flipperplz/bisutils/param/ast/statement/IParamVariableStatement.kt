@@ -16,7 +16,7 @@ interface IParamVariableStatement : IParamStatement, IParamLiteralParent {
     val paramName: String?
     val paramValue: IParamLiteral?
     val paramOperator: ParamOperatorTypes?
-    override val children: List<IParamLiteral>?
+    override val familyChildren: List<IParamLiteral>?
         get() = paramValue?.let { listOf(it) } ?: emptyList()
 
     override fun isValid(options: IOptions?): Boolean =

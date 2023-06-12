@@ -11,8 +11,8 @@ import com.flipperplz.bisutils.io.getAsciiZ
 import java.nio.ByteBuffer
 
 interface IMutablePboProperty : IPboProperty, Cloneable {
-    override var node: IPboFile?
-    override var parent: IPboVersionEntry?
+    override var familyNode: IPboFile?
+    override var familyParent: IPboVersionEntry?
     override var name: String
     override var value: String
 

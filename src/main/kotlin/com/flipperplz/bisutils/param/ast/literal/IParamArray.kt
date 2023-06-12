@@ -9,8 +9,8 @@ import java.nio.ByteBuffer
 
 interface IParamArray : IParamLiteral, IParamLiteralParent {
     companion object;
-    override val children: List<IParamLiteral>? get() = paramValue
-    override val parent: IParamLiteralParent?
+    override val familyChildren: List<IParamLiteral>? get() = paramValue
+    override val familyParent: IParamLiteralParent?
     override val paramValue: List<IParamLiteral>?
     override fun isValid(options: IOptions?): Boolean = super.isValid(options) && paramValue?.all { it.isValid(options) } ?: false
 
@@ -18,7 +18,7 @@ interface IParamArray : IParamLiteral, IParamLiteralParent {
         (paramValue ?: emptyList()).joinToString(", ", prefix = "{", postfix = "}") { it.toParam() }
 
     override fun writeValidated(buffer: ByteBuffer, options: ParamOptions?): Boolean {
-        buffer.putCompactInt(children!!.count())
+        buffer.putCompactInt(familyChildren!!.count())
 
         //TODO: Write array contents
         return true

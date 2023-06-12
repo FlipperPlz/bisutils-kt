@@ -12,10 +12,10 @@ import com.flipperplz.bisutils.param.options.ParamOptions
 import java.nio.ByteBuffer
 
 interface IParamEnumValue : IParamElement, IParamLiteralParent {
-    override val parent: IParamEnum?
+    override val familyParent: IParamEnum?
     val paramName: String?
     val paramValue: IParamNumerical?
-    override val children: List<IParamLiteral>?
+    override val familyChildren: List<IParamLiteral>?
         get() = paramValue?.let { listOf(it) } ?: emptyList()
 
     override fun isValid(options: IOptions?): Boolean = !paramName.isNullOrBlank() && REGEX_ALPHANUM.matches(paramName!!)

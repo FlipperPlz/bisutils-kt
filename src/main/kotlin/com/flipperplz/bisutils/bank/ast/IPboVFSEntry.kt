@@ -7,14 +7,14 @@ import java.nio.ByteBuffer
 
 interface IPboVFSEntry : IStrictBinaryObject<PboOptions, PboOptions>, IFamilyChild, Cloneable {
     val entryName: String
-    override val node: IPboFile?
-    override val parent: IPboDirectory?
+    override val familyNode: IPboFile?
+    override val familyParent: IPboDirectory?
 
     val path: String
-        get() = if(parent == null) entryName else "${parent?.path}\\${entryName}"
+        get() = if(familyParent == null) entryName else "${familyParent?.path}\\${entryName}"
 
     val absolutePath: String
-        get() = if(parent == null) entryName else "${parent?.absolutePath}\\${entryName}"
+        get() = if(familyParent == null) entryName else "${familyParent?.absolutePath}\\${entryName}"
 
     override fun read(buffer: ByteBuffer, options: PboOptions): Boolean =
         throw Exception("Not Supported!")

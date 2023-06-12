@@ -11,8 +11,8 @@ import com.flipperplz.bisutils.options.IOptions
 import java.nio.ByteBuffer
 
 interface IPboProperty : IStrictBinaryObject<PboOptions, PboOptions>, IFamilyChild, Cloneable {
-    override val node: IPboFile?
-    override val parent: IPboVersionEntry?
+    override val familyNode: IPboFile?
+    override val familyParent: IPboVersionEntry?
 
     val name: String
     val value: String

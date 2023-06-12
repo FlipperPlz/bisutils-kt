@@ -5,8 +5,8 @@ import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.ast.IPboVFSEntry
 
 open class PboDirectory(
-    override val node: IPboFile?,
-    override val parent: IPboDirectory?,
-    override val entryName: String,
-    override val children: List<IPboVFSEntry>,
+        override val familyNode: IPboFile?,
+        override val familyParent: IPboDirectory?,
+        override val entryName: String,
+        override val familyChildren: List<IPboVFSEntry>,
 ) : IPboDirectory

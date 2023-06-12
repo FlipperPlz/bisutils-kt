@@ -11,12 +11,12 @@ import com.flipperplz.bisutils.options.IOptions
 import java.nio.ByteBuffer
 
 interface IPboVersionEntry : IPboEntry, IFamilyParent, Cloneable {
-    override val parent: IPboDirectory?
-    override val node: IPboFile?
+    override val familyParent: IPboDirectory?
+    override val familyNode: IPboFile?
     override val path: String
-        get() = parent?.path ?: ""
+        get() = familyParent?.path ?: ""
     override val absolutePath: String
-        get() = parent?.absolutePath ?: ""
+        get() = familyParent?.absolutePath ?: ""
 
     override val entryName: String
     override val entryMime: EntryMimeType
@@ -24,7 +24,7 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent, Cloneable {
     override val entryTimestamp: Long
     override val entryOffset: Long
     override val entrySize: Long
-    override val children: List<IPboProperty>
+    override val familyChildren: List<IPboProperty>
 
     override fun isValid(options: IOptions?): Boolean = entryMime == EntryMimeType.VERSION &&
         entrySize == 0L &&
@@ -32,17 +32,17 @@ interface IPboVersionEntry : IPboEntry, IFamilyParent, Cloneable {
         entryName == "" &&
         entryTimestamp == 0L &&
         entryDecompressedSize == 0L &&
-        children.all { it.isValid(options) }
+        familyChildren.all { it.isValid(options) }
 
     override fun read(buffer: ByteBuffer, options: PboOptions): Boolean =
         throw Exception("Not Supported!")
 
     override fun calculateBinaryLength(options: PboOptions?): Long =
-        super.calculateBinaryLength(options) + (children.sumOf { it.calculateBinaryLength(options) } ?: 0) + 1L
+        super.calculateBinaryLength(options) + (familyChildren.sumOf { it.calculateBinaryLength(options) } ?: 0) + 1L
 
     override fun writeValidated(buffer: ByteBuffer, options: PboOptions?): Boolean {
         if(!super.writeValidated(buffer, options)) return false
-        children.forEach { it.writeValidated(buffer, options) }
+        familyChildren.forEach { it.writeValidated(buffer, options) }
         buffer.put(0)
         return true
     }

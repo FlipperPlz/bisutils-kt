@@ -6,7 +6,7 @@ import com.flipperplz.bisutils.param.ast.IParamFile
 import com.flipperplz.bisutils.param.options.ParamOptions
 
 interface IParamElement : IFamilyMember, IStrictBinaryObject<ParamOptions, ParamOptions> {
-    override val node: IParamFile?
+    override val familyNode: IParamFile?
     fun toParam(): String
 
     companion object {

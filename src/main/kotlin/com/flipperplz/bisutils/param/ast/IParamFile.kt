@@ -12,8 +12,8 @@ import java.nio.ByteOrder
 interface IParamFile : IFamilyNode, IParamStatementHolder {
     companion object;
     val paramName: String?
-    override val parent: IFamilyParent? get() = null
-    override val node: IParamFile? get() = this
+    override val familyParent: IFamilyParent? get() = null
+    override val familyNode: IParamFile? get() = this
 
     override fun toParam(): String = super.toParam()
 

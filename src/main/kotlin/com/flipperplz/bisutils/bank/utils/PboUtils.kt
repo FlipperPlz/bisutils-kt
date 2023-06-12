@@ -19,32 +19,31 @@ import com.flipperplz.bisutils.bank.astImpl.misc.PboProperty
 import com.flipperplz.bisutils.bank.astImpl.misc.mutable.MutablePboProperty
 import com.flipperplz.bisutils.bank.astImpl.mutable.MutablePboFile
 import com.flipperplz.bisutils.bank.options.PboOptions
-import com.flipperplz.bisutils.family.IFamilyParent
-import com.flipperplz.bisutils.param.lexer.ParamLexer
+//import com.flipperplz.bisutils.param.lexer.ParamLexer
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 
-fun lexerOf(entry: IPboDataEntry, encoding: Charset = Charsets.UTF_8): ParamLexer =
-    ParamLexer(textOf(entry, encoding))
+//fun lexerOf(entry: IPboDataEntry, encoding: Charset = Charsets.UTF_8): ParamLexer =
+//    ParamLexer(textOf(entry, encoding))
 
 fun textOf(entry: IPboDataEntry, encoding: Charset = Charsets.UTF_8): String =
     entry.entryData.array().toString(encoding)
-
-fun paramLexerOf(entry: IPboDataEntry, encoding: Charset = Charsets.UTF_8): ParamLexer =
-    ParamLexer(textOf(entry, encoding))
+//
+//fun paramLexerOf(entry: IPboDataEntry, encoding: Charset = Charsets.UTF_8): ParamLexer =
+//    ParamLexer(textOf(entry, encoding))
 
 val IPboDirectory.dataEntries: List<IPboDataEntry>
-    get() = children.filterIsInstance<IPboDataEntry>()
+    get() = familyChildren.filterIsInstance<IPboDataEntry>()
 
 val IPboDirectory.versionEntries: List<IPboVersionEntry>
-    get() = children.filterIsInstance<IPboVersionEntry>()
+    get() = familyChildren.filterIsInstance<IPboVersionEntry>()
 
 val IMutablePboDirectory.mutableVersionEntries: List<IMutablePboVersionEntry>
-    get() = children.filterIsInstance<IMutablePboVersionEntry>()
+    get() = familyChildren.filterIsInstance<IMutablePboVersionEntry>()
 
 val IMutablePboDirectory.mutableDataEntries: List<IMutablePboDataEntry>
-    get() = children.filterIsInstance<IMutablePboDataEntry>()
+    get() = familyChildren.filterIsInstance<IMutablePboDataEntry>()
 
 val IPboDirectory.mainVersionEntry: IPboVersionEntry?
     get() = versionEntries.firstOrNull()
@@ -53,16 +52,16 @@ val IMutablePboDirectory.mainMutableVersionEntry: IMutablePboVersionEntry?
     get() = mutableVersionEntries.firstOrNull()
 
 val IPboFile.properties: List<IPboProperty>
-    get() = mainVersionEntry?.children ?: emptyList()
+    get() = mainVersionEntry?.familyChildren ?: emptyList()
 
 val IMutablePboFile.mutableProperties: List<IMutablePboProperty>
-    get() = mainMutableVersionEntry?.children ?: emptyList()
+    get() = mainMutableVersionEntry?.familyChildren ?: emptyList()
 
 fun IPboVersionEntry.getProperty(name: String): IPboProperty? =
-    children.firstOrNull { it.name == name }
+    familyChildren.firstOrNull { it.name == name }
 
 fun IMutablePboVersionEntry.getMutableProperty(name: String): IMutablePboProperty? =
-    children.firstOrNull { it.name == name }
+    familyChildren.firstOrNull { it.name == name }
 
 fun IPboFile.getProperty(name: String): IPboProperty? =
     properties.firstOrNull {it.name == name}
@@ -79,29 +78,29 @@ operator fun PboFile.invoke(name: String, buffer: ByteBuffer, options: PboOption
 operator fun MutablePboFile.invoke(name: String, buffer: ByteBuffer, options: PboOptions): MutablePboFile =
     MutablePboFile(name).apply { read(buffer, options) }
 //----------------------------------------------------------------------------------------------------------------------
-operator fun IPboVersionEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.node): IPboVersionEntry =
+operator fun IPboVersionEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.familyNode): IPboVersionEntry =
     MutablePboVersionEntry(parent, node).apply { read(buffer, options) }
 
-operator fun PboVersionEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.node): PboVersionEntry =
+operator fun PboVersionEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.familyNode): PboVersionEntry =
     MutablePboVersionEntry(parent, node).apply { read(buffer, options) }
 
-operator fun MutablePboVersionEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.node): PboVersionEntry =
+operator fun MutablePboVersionEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.familyNode): PboVersionEntry =
     MutablePboVersionEntry(parent, node).apply { read(buffer, options) }
 //----------------------------------------------------------------------------------------------------------------------
-operator fun IPboDataEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.node): IPboDataEntry =
+operator fun IPboDataEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.familyNode): IPboDataEntry =
     MutablePboDataEntry(parent, node).apply { read(buffer, options) }
 
-operator fun PboDataEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.node): IPboDataEntry =
+operator fun PboDataEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.familyNode): IPboDataEntry =
     MutablePboDataEntry(parent, node).apply { read(buffer, options) }
 
-operator fun MutablePboDataEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.node): IPboDataEntry =
+operator fun MutablePboDataEntry.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboDirectory?, node: IPboFile? = parent?.familyNode): IPboDataEntry =
     MutablePboDataEntry(parent, node).apply { read(buffer, options) }
 //----------------------------------------------------------------------------------------------------------------------
-operator fun IPboProperty.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboVersionEntry?, node: IPboFile? = parent?.node): IPboProperty =
+operator fun IPboProperty.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboVersionEntry?, node: IPboFile? = parent?.familyNode): IPboProperty =
     MutablePboProperty(parent, node).apply { read(buffer, options) }
 
-operator fun PboProperty.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboVersionEntry?, node: IPboFile? = parent?.node): PboProperty =
+operator fun PboProperty.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboVersionEntry?, node: IPboFile? = parent?.familyNode): PboProperty =
     MutablePboProperty(parent, node).apply { read(buffer, options) }
 
-operator fun MutablePboProperty.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboVersionEntry?, node: IPboFile? = parent?.node): MutablePboProperty =
+operator fun MutablePboProperty.invoke(buffer: ByteBuffer, options: PboOptions, parent: IPboVersionEntry?, node: IPboFile? = parent?.familyNode): MutablePboProperty =
     MutablePboProperty(parent, node).apply { read(buffer, options) }

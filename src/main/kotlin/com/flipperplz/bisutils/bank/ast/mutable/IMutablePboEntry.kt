@@ -16,8 +16,8 @@ import com.flipperplz.bisutils.utils.IFlushable
 import java.nio.ByteBuffer
 
 interface IMutablePboEntry : IPboEntry, IMutablePboVFSEntry, IFlushable, Cloneable {
-    override var parent: IPboDirectory?
-    override var node: IPboFile?
+    override var familyParent: IPboDirectory?
+    override var familyNode: IPboFile?
     override val absolutePath: String
     override val path: String
     override var entryName: String

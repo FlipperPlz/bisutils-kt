@@ -10,13 +10,13 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 interface IParamEnum: IParamStatement, IFamilyParent {
-    override val children: List<IParamEnumValue>?
-    override fun isValid(options: IOptions?): Boolean = children?.all { it.isValid(options) } ?: true
+    override val familyChildren: List<IParamEnumValue>?
+    override fun isValid(options: IOptions?): Boolean = familyChildren?.all { it.isValid(options) } ?: true
 
     override fun writeValidated(buffer: ByteBuffer, options: ParamOptions?): Boolean {
-        options?.currentOffset = buffer.position()
-        buffer.putInt(children!!.count(), options?.endianness ?: ByteOrder.LITTLE_ENDIAN)
-        children!!.forEach { if(!it.writeValidated(buffer, options)) return false }
+        options?.pEnum = buffer.position()
+        buffer.putInt(familyChildren!!.count(), options?.endianness ?: ByteOrder.LITTLE_ENDIAN)
+        familyChildren!!.forEach { if(!it.writeValidated(buffer, options)) return false }
         return true
     }
 
@@ -24,6 +24,6 @@ interface IParamEnum: IParamStatement, IFamilyParent {
             throw Exception("Not Supported")
 
     override fun toParam(): String =
-        if(children.isNullOrEmpty()) ""
-        else "enum {\n${children?.joinToString(separator = ",\n") { it.toParam() }}\n};"
+        if(familyChildren.isNullOrEmpty()) ""
+        else "enum {\n${familyChildren?.joinToString(separator = ",\n") { it.toParam() }}\n};"
 }

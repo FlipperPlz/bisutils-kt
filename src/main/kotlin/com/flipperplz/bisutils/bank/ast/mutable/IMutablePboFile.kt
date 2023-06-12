@@ -14,11 +14,11 @@ import com.flipperplz.bisutils.io.getLong
 import java.nio.ByteBuffer
 
 interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
-    override var parent: IPboDirectory?
-    override var node: IPboFile?
+    override var familyParent: IPboDirectory?
+    override var familyNode: IPboFile?
     override var defaultPrefix: String
     override var signature: ByteArray
-    override val children: MutableList<IMutablePboVFSEntry>
+    override val familyChildren: MutableList<IMutablePboVFSEntry>
     override val absolutePath: String get() = super<IMutablePboDirectory>.absolutePath
     override val path: String get() = super<IMutablePboDirectory>.path
 
@@ -73,15 +73,15 @@ interface IMutablePboFile : IPboFile, IMutablePboDirectory, Cloneable {
                     if(!entry.read(buffer, options)) return false
 
                     versionEntryEncountered = true
-                    children.add(entry)
+                    familyChildren.add(entry)
                 }
                 else -> {
                     if(i == 1 && options.requireVersionEntryFirst) throw Exception("First entry should be version (requireVersionEntryFirst is enabled)")
                     val path = normalizePboPath(options.entryName!!)
                     val parent = createDirectory(getParent(path))
-                    children.add(parent)
+                    familyChildren.add(parent)
                     options.entryName = getFilename(path)
-                    parent.children.add(MutablePboDataEntry(parent, node).apply { read(buffer, options) })
+                    parent.familyChildren.add(MutablePboDataEntry(parent, familyNode).apply { read(buffer, options) })
                 }
             }
         }

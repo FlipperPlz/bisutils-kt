@@ -6,6 +6,6 @@ import com.flipperplz.bisutils.bank.ast.IPboFile
 import com.flipperplz.bisutils.bank.utils.EntryMimeType
 
 abstract class PboEntry(
-    override val parent: IPboDirectory?,
-    override val node: IPboFile?
+        override val familyParent: IPboDirectory?,
+        override val familyNode: IPboFile?
 ) : IPboEntry

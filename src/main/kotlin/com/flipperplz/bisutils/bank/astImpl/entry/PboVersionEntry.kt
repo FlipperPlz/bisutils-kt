@@ -16,7 +16,7 @@ open class PboVersionEntry(
     override val entryTimestamp: Long = 0,
     override val entryOffset: Long = 0,
     override val entrySize: Long = 0,
-    override val children: List<IPboProperty> = emptyList()
+    override val familyChildren: List<IPboProperty> = emptyList()
 ) : PboEntry(parent, node), IPboVersionEntry {
     override val path: String
         get() = super.path

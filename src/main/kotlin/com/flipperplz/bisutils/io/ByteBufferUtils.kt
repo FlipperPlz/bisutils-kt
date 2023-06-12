@@ -39,6 +39,10 @@ fun <T> ByteBuffer.peek(peekFun: ByteBuffer.() -> T): T = with(position()) {
 fun ByteBuffer.getInt(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Int =
     ByteBuffer.wrap(getBytes(4)).order(order).getInt(0)
 
+fun ByteBuffer.getLong(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Long =
+    ByteBuffer.wrap(getBytes(4)).order(order).getLong(0)
+
+
 fun ByteBuffer.getFloat(order: ByteOrder = ByteOrder.LITTLE_ENDIAN): Float =
     ByteBuffer.wrap(getBytes(4)).order(order).getFloat(0)
 

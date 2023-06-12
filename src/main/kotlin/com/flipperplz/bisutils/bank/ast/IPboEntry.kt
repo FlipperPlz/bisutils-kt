@@ -10,8 +10,8 @@ import com.flipperplz.bisutils.options.IOptions
 import java.nio.ByteBuffer
 
 interface IPboEntry : IPboVFSEntry, Cloneable {
-    override val parent: IPboDirectory?
-    override val node: IPboFile?
+    override val familyParent: IPboDirectory?
+    override val familyNode: IPboFile?
     override val entryName: String
     override val absolutePath: String
     override val path: String

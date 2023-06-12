@@ -22,7 +22,7 @@ interface IParamClass : IParamElement, IParamExternalClass, IParamStatementHolde
 
     override fun writeValidated(buffer: ByteBuffer, options: ParamOptions?): Boolean {
         if(!super.writeValidated(buffer, options)) return false
-        options?.currentOffset = buffer.position()
+        options?.pClass = buffer.position()
         return true
     }
 
